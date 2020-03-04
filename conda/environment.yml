@@ -1,0 +1,45 @@
+name: isnobal
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - bumpversion 
+  - beautifulsoup4
+  - cfgrib 
+  - coloredlogs 
+  - cmocean
+  - cython 
+  - dateparser
+  - jinja2
+  - latexcodec
+  - matplotlib 
+  - mock 
+  - make
+  - nco
+  - netCDF4 
+  - numpy
+  - pandas 
+  - pip
+  - pyproj=1.9 
+  - python
+  - pytz 
+  - pyyaml 
+  - regex
+  - requests 
+  - scipy
+  - seaborn 
+  - siphon 
+  - sphinxcontrib-bibtex 
+  - sphinxcontrib-websupport 
+  - sqlalchemy
+  - tox
+  - utm
+  - urllib3
+  - watchdog
+  - xarray 
+  - pip:
+    - inicheck
+    - git+https://github.com/USDA-ARS-NWRC/PyKrige.git@master
+    - mysql-connector-python-rf
+    - spatialnc
+    - sphinx_rtd_theme
