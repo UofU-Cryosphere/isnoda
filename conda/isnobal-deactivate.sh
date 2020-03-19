@@ -6,6 +6,7 @@ done
 
 unset IPW
 unset IPW_PATH
+unset WORKDIR
 
 unset MACPORTS
 

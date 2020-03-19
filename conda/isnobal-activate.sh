@@ -2,6 +2,7 @@
 
 IPW_PATH=/Volumes/warehouse/projects/ARS/ipw
 export IPW=$IPW_PATH
+export WORKDIR=/Volumes/warehouse/projects/ARS/
 
 export MACPORTS=/Volumes/warehouse/projects/macports/bin
 
