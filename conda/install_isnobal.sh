@@ -21,7 +21,7 @@ done
 
 for repository in $(find . -maxdepth 1 ! -path . -type d); do
   pushd ${repository}
-  pip install --no-deps -e .
+  pip install -v --no-deps -e .
   popd
 done
 
