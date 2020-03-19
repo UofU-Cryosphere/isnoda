@@ -1,5 +1,6 @@
 os: linux
 language: python
+compiler: gcc
 addons:
   apt:
     packages: &common_packages
