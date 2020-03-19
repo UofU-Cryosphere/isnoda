@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+# Script to install all required components from the USDA ARS NWRC
+# GitHub repositories.
+#
+# These components are installed with the latest from the master branch:
+#  - AWSM
+#  - SMRF
+#  - PySnobal
+#  - Weather Forecast Retrieval
+#
+# Other packages are installed via the latest available version as pip package.
 
 set -e
 
