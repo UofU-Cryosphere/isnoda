@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-IPW_PATH=/Volumes/warehouse/projects/ARS/ipw
+IPW_PATH=$HOME/isnobal/ipw
 export IPW=$IPW_PATH
-export WORKDIR=/Volumes/warehouse/projects/ARS/
+export WORKDIR=$HOME/isnobal
 
 export MACPORTS=/Volumes/warehouse/projects/macports/bin
 

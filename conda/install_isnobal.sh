@@ -12,7 +12,7 @@
 
 set -e
 
-ISNOBAL_HOME=${1:-/usr/local/isnobal}
+ISNOBAL_HOME=${1:-$HOME/isnobal}
 mkdir -p ${ISNOBAL_HOME}
 
 cd $ISNOBAL_HOME

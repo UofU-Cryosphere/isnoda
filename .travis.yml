@@ -38,4 +38,4 @@ before_script:
   - cd $TRAVIS_BUILD_DIR/
 
 script:
-  - $TRAVIS_BUILD_DIR/conda/install_isnobal.sh $HOME/isnobal
+  - $TRAVIS_BUILD_DIR/conda/install_isnobal.sh
