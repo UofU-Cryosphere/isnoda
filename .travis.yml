@@ -31,6 +31,7 @@ before_install:
 
 install:
   - conda env create -q --file $TRAVIS_BUILD_DIR/conda/environment.yml
+  - conda clean -ypa
 
 before_script:
   - source $CONDA_SH
