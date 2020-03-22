@@ -7,6 +7,7 @@
 #  - SMRF
 #  - PySnobal
 #  - Weather Forecast Retrieval
+#  - IPW
 #
 # Other packages are installed via the latest available version as pip package.
 
@@ -17,6 +18,7 @@ mkdir -p ${ISNODA_HOME}
 
 cd $ISNODA_HOME
 
+# Python based repositories
 declare -a repositories=(
   "https://github.com/USDA-ARS-NWRC/awsm.git"
   "https://github.com/USDA-ARS-NWRC/smrf.git"
@@ -48,3 +50,14 @@ do
   pip install --no-deps ${package}
 done
 
+# IPW
+git clone --depth 1 https://github.com/USDA-ARS-NWRC/ipw.git
+pushd ipw
+
+./configure
+export IPW=`pwd`
+export WORKDIR=${IPW}/tmp
+make
+make install
+
+popd
