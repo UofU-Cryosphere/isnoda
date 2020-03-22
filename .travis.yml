@@ -34,8 +34,8 @@ install:
 before_script:
   - source $CONDA_SH
   - conda env list
-  - conda activate isnobal
+  - conda activate isnoda
   - cd $TRAVIS_BUILD_DIR/
 
 script:
-  - $TRAVIS_BUILD_DIR/conda/install_isnobal.sh
+  - $TRAVIS_BUILD_DIR/conda/install_isnoda.sh

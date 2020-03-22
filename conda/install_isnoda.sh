@@ -12,10 +12,10 @@
 
 set -e
 
-ISNOBAL_HOME=${1:-$HOME/isnobal}
-mkdir -p ${ISNOBAL_HOME}
+ISNODA_HOME=${1:-$HOME/isnoda}
+mkdir -p ${ISNODA_HOME}
 
-cd $ISNOBAL_HOME
+cd $ISNODA_HOME
 
 declare -a repositories=(
   "https://github.com/USDA-ARS-NWRC/awsm.git"

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-IPW_PATH=$HOME/isnobal/ipw
+IPW_PATH=$HOME/snoda/ipw
 export IPW=$IPW_PATH
-export WORKDIR=$HOME/isnobal
+export WORKDIR=$HOME/snoda
 
 export PATH=${IPW_PATH}/bin:${IPW_PATH}/sbin:$PATH
 
