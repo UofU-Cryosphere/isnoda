@@ -27,6 +27,7 @@ before_install:
       source $CONDA_SH;
     fi;
   - conda update --name base --channel defaults --quiet conda;
+  - conda config --prepend envs_dirs $HOME/conda_envs;
 
 install:
   - conda env create -q --file $TRAVIS_BUILD_DIR/conda/environment.yml
