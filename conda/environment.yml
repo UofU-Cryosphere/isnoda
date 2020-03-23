@@ -3,38 +3,39 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - bumpversion 
   - beautifulsoup4
-  - cfgrib 
-  - coloredlogs 
+  - bumpversion
+  - cfgrib
   - cmocean
-  - cython 
+  - coloredlogs
+  - cython
   - dateparser
   - jinja2
   - latexcodec
-  - matplotlib 
-  - mock 
   - make
+  - matplotlib
+  - mock
   - nco
-  - netCDF4 
+  - netCDF4
   - numpy
-  - pandas 
+  - pandas
   - pip
-  - pyproj=1.9 
+  - progressbar2
+  - pyproj=1.9
   - python
-  - pytz 
-  - pyyaml 
+  - pytz
+  - pyyaml
   - regex
-  - requests 
+  - requests
   - scipy
-  - seaborn 
-  - siphon 
-  - sphinxcontrib-bibtex 
-  - sphinxcontrib-websupport 
+  - seaborn
+  - siphon
+  - sphinxcontrib-bibtex
+  - sphinxcontrib-websupport
   - sqlalchemy
   - tox
-  - utm
   - urllib3
+  - utm
   - watchdog
   - xarray 
   - pip:
