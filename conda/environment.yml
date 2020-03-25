@@ -1,0 +1,43 @@
+name: isnoda
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - beautifulsoup4
+  - bumpversion
+  - cfgrib
+  - cmocean
+  - coloredlogs
+  - cython
+  - dateparser
+  - jinja2
+  - latexcodec
+  - make
+  - matplotlib
+  - mock
+  - nco
+  - netCDF4
+  - numpy
+  - pandas
+  - pip
+  - progressbar2
+  - pyproj=1.9
+  - python
+  - pytz
+  - pyyaml
+  - regex
+  - requests
+  - scipy
+  - seaborn
+  - siphon
+  - sphinxcontrib-bibtex
+  - sphinxcontrib-websupport
+  - sqlalchemy
+  - tox
+  - urllib3
+  - utm
+  - watchdog
+  - xarray 
+  - pip:
+    - mysql-connector-python-rf
+    - sphinx_rtd_theme

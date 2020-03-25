@@ -1,0 +1,43 @@
+os: linux
+language: python
+compiler: gcc
+addons:
+  apt:
+    packages: &common_packages
+      - libgomp1
+
+cache:
+  directories:
+    - $HOME/miniconda
+
+env:
+  global:
+    - MINICONDA_HOME=$HOME/miniconda
+    - CONDA_SH=$MINICONDA_HOME/etc/profile.d/conda.sh
+
+before_install:
+  - if [[ ! -f $CONDA_SH ]]; then
+      rm -rf $MINICONDA_HOME;
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      bash miniconda.sh -b -p $MINICONDA_HOME;
+      source $CONDA_SH;
+      conda config --add channels conda-forge;
+      conda config --set channel_priority strict --set always_yes yes;
+    else
+      source $CONDA_SH;
+    fi;
+  - conda update --name base --channel defaults --quiet conda;
+  - conda config --prepend envs_dirs $HOME/conda_envs;
+
+install:
+  - conda env create -q --file $TRAVIS_BUILD_DIR/conda/environment.yml
+  - conda clean -ypa
+
+before_script:
+  - source $CONDA_SH
+  - conda env list
+  - conda activate isnoda
+  - cd $TRAVIS_BUILD_DIR/
+
+script:
+  - $TRAVIS_BUILD_DIR/conda/install_isnoda.sh
