@@ -21,11 +21,11 @@ before_install:
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
       bash miniconda.sh -b -p $MINICONDA_HOME;
       source $CONDA_SH;
-      conda config --add channels conda-forge;
-      conda config --set channel_priority strict --set always_yes yes;
     else
       source $CONDA_SH;
     fi;
+  - conda config --add channels conda-forge;
+  - conda config --set channel_priority strict --set always_yes yes;
   - conda update --name base --channel defaults --quiet conda;
   - conda config --prepend envs_dirs $HOME/conda_envs;
 
