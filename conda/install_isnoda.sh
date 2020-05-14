@@ -40,9 +40,7 @@ done
 declare -a packages=(
   "inicheck"
   "PyKrige"
-  "snowav"
   "spatialnc"
-  "tablizer"
 )
 
 for package in "${packages[@]}"
