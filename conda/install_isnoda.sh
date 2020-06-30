@@ -39,7 +39,6 @@ done
 
 declare -a packages=(
   "inicheck"
-  "PyKrige"
   "spatialnc"
 )
 
