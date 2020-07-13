@@ -12,7 +12,7 @@ for DATE in "${DATES[@]}"; do
   pushd "hrrr.${DATE}"
   for HOUR in {0..23}; do
     for FIELD in {0..2}; do
-      wget "https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/hrrr.t$(printf "%02d" $HOUR)z.wrfsfcf0${FIELD}.grib2"
+      wget --no-check-certificate "https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/hrrr.t$(printf "%02d" $HOUR)z.wrfsfcf0${FIELD}.grib2"
     done
   done
   popd
