@@ -8,6 +8,8 @@ unset IPW
 unset IPW_PATH
 unset WORKDIR
 
+unset NOT_ON_GOLD_HOST
+
 unset CC
 #unset LDFLAGS
 #unset CPPFLAGS

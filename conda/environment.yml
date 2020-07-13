@@ -21,7 +21,7 @@ dependencies:
   - pandas
   - pip
   - progressbar2
-  - pyproj=1.9
+  - pykrige
   - python
   - pytz
   - pyyaml
