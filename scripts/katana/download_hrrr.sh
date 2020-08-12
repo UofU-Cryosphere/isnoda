@@ -4,7 +4,7 @@ declare -a DATES=(
   20171031
 )
 
-HRRR_VARS='TMP:2 m|RH:2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
+HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
 
 for DATE in "${DATES[@]}"; do
   FOLDER="hrrr.${DATE}"
