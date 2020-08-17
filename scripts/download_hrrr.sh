@@ -7,6 +7,8 @@ declare -a DATES=(
 HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
 
 for DATE in "${DATES[@]}"; do
+  printf "Processing: $DATE\n"
+
   FOLDER="hrrr.${DATE}"
   mkdir -p $FOLDER
   pushd $FOLDER
@@ -21,8 +23,8 @@ for DATE in "${DATES[@]}"; do
         wgrib_file="${FILE_NAME}_tmp"
         mkfifo $wgrib_file
 
-        wgrib2 -v0 -ncpu 8 $grib_download -small_grib -109.06:-102 36.99:41.01 $wgrib_file &
-        wgrib2 -v0 -ncpu 8 $wgrib_file -match "$HRRR_VARS" -GRIB $FILE_NAME
+        (wgrib2 -v0 -ncpu 8 $grib_download -small_grib -109.06:-102 36.99:41.01 $wgrib_file &) | echo "  cropped"
+        wgrib2 -v0 -ncpu 8 $wgrib_file -match "$HRRR_VARS" -GRIB $FILE_NAME | echo "  filtered"
 
         rm $wgrib_file
         rm $grib_download
