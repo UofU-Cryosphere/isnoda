@@ -4,7 +4,7 @@
 
 * Install gcc and OpenMP using Homebrew
     ```shell script
-    brew install gcc-7 lipomp
+    brew install gcc-7 libomp
     ```
    * Set `CC` environment variable to point to the installed gcc compiler
    * Using gcc-9 and OpenMP 5 is currently breaking pysnobal
