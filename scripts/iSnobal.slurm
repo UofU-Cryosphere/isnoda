@@ -11,6 +11,7 @@
 #SBATCH --mail-type=FAIL,END
 #SBATCH --mail-user=user@utah.edu
 
+#SBATCH --chdir=/path/to/scratch/
 #SBATCH --output=slurm-%j.out-%N
 #SBATCH --error=slurm-%j.err-%N
 
