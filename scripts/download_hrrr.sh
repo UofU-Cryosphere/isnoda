@@ -17,6 +17,7 @@ if [ ! -z "$1" ] && [ ! -z "$2" ]; then
   DATES=($(seq -f "${YEAR}${MONTH}%02g" 1 $LAST_DAY))
 else
   declare -a DATES=(
+    $1
   )
 fi
 
