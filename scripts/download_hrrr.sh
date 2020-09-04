@@ -32,9 +32,14 @@ for DATE in "${DATES[@]}"; do
     for FIELD in {0..1}; do
         FILE_NAME="hrrr.t$(printf "%02d" $HOUR)z.wrfsfcf0${FIELD}.grib2"
 
-        wget -nv --no-check-certificate "https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/${FILE_NAME}" -O - | \
-        wgrib2 - -v0 -ncpu ${SLURM_NTASKS} -small_grib -112.322:-105.628 35.556:43.452 -| \
-        wgrib2 - -v0 -ncpu ${SLURM_NTASKS} -match "$HRRR_VARS" -GRIB $FILE_NAME | \
+        TMP_FILE="${FILE_NAME}_tmp"
+        mkfifo $TMP_FILE
+
+        wget -nv --no-check-certificate "https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/${FILE_NAME}" -O $TMP_FILE | \
+        wgrib2 $TMP_FILE -v0 -ncpu ${SLURM_NTASKS} -small_grib -112.322:-105.628 35.556:43.452 - | \
+        wgrib2 - -v0 -ncpu ${SLURM_NTASKS} -match "$HRRR_VARS" -GRIB $FILE_NAME 
+
+        rm $TMP_FILE
 
         printf "${FILE_NAME} created \n"
     done
