@@ -6,12 +6,10 @@ dependencies:
   - beautifulsoup4
   - bumpversion
   - cfgrib
-  - cmocean
   - coloredlogs
   - cython
-  - dateparser
+  - dateparser=0.7.2
   - jinja2
-  - latexcodec
   - make
   - matplotlib
   - mock
@@ -27,17 +25,13 @@ dependencies:
   - pyyaml
   - regex
   - requests
+  - setuptools_scm<4.2
   - scipy
-  - seaborn
   - siphon
   - sphinxcontrib-bibtex
   - sphinxcontrib-websupport
-  - sqlalchemy
-  - tox
   - urllib3
   - utm
-  - watchdog
-  - xarray 
+  - xarray
   - pip:
-    - mysql-connector-python-rf
     - sphinx_rtd_theme
