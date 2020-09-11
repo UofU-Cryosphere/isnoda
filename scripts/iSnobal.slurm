@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #SBATCH --job-name=iSnobal
-#SBATCH --account=notchpeak-shared-short
-#SBATCH --partition=notchpeak-shared-short
+#SBATCH --account=owner-guest
+#SBATCH --partition=notchpeak-guest
 
-#SBATCH --time=2:00:00
-#SBATCH --ntasks=8
-#SBATCH --mem=1G
+#SBATCH --time=1:00:00
+#SBATCH --ntasks=16
+#SBATCH --mem=4G
 
 #SBATCH --mail-type=FAIL,END
 #SBATCH --mail-user=user@utah.edu
@@ -15,10 +15,10 @@
 #SBATCH --output=slurm-%j.out-%N
 #SBATCH --error=slurm-%j.err-%N
 
-ml wgrib2 rclone
+# Enable CPU Hyper-threading
+export OMP_NUM_THREADS=${SLURM_NTASKS}
 
-cd ${HOME}/scratch/iSnobal/hrrr_CBR
-${HOME}/projects/ARS/isnoda/scripts/download_hrrr.sh 2018 09
+source load_conda_env isnoda
 
-cd ${HOME}/scratch/iSnobal
-rclone sync hrrr_CBR isnoda:HRRR_CBR/ --transfers ${SLURM_NTASKS}
+awsm_daily ~/project-data/iSnobal/ERW/ERW_subset_awsm.ini
+
