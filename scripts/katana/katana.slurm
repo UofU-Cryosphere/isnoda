@@ -19,7 +19,11 @@ export OMP_NUM_THREADS=${SLURM_NTASKS}
 
 # ml rclone
 # cd ${HOME}/scratch/iSnobal
-# rclone sync katana_ERW isnoda:katana_ERW/ --transfers ${SLURM_NTASKS}
+# rclone sync katana_ERW isnoda:katana_ERW/ \
+#   --transfers ${SLURM_NTASKS} \
+#   --include "*.asc" \
+#   --delete-during \
+#   --delete-excluded
 
 cd ${HOME}/project-data/iSnobal/katana
 
