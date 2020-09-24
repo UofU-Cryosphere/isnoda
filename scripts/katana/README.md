@@ -5,3 +5,5 @@
 * Needs roughly 0.5 GB per core of memory
 * One month with 24 cores takes about 20 minutes run time
  
+#### Possible error sources
+* Bad HRRR grib files with no or corrupted data
