@@ -22,9 +22,3 @@ source load_conda_env isnoda
 
 awsm_daily ~/project-data/iSnobal/ERW/ERW_subset_awsm.ini
 
-# Compress and backup
-BACKUP_SUFFIX=".tar.bz2"
-tar -I pbzip2 -cf run201YMM${BACKUP_SUFFIX} run201Y[0-2][0-9]
-rclone sync ERW_subset isnoda:ERW_subset/ \
-  --transfers ${SLURM_NTASKS} \
-  --include "*${BACKUP_SUFFIX}" \
