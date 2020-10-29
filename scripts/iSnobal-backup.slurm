@@ -23,13 +23,15 @@ export OMP_NUM_THREADS=${SLURM_NTASKS}
 cd /path/to/backup
 
 # Compress and backup
+BACKUP_PREFIX="data"
 BACKUP_SUFFIX=".tar.bz2"
 START_MONTH=201710
 
 for MONTH in {0..11}; do
   BACKUP_YEAR=$(date -d "${START_MONTH}01 + ${MONTH} month" +%Y%m)
 
-  tar -I pbzip2 -cf run${BACKUP_YEAR}${BACKUP_SUFFIX} run${BACKUP_YEAR}[0-3][0-9]
+  tar -I pbzip2 -cf ${BACKUP_PREFIX}${BACKUP_YEAR}${BACKUP_SUFFIX} \
+                    ${BACKUP_PREFIX}${BACKUP_YEAR}[0-3][0-9]
 done
 
 rclone sync . isnoda:ERW_subset/ \
