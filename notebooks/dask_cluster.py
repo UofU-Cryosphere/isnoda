@@ -15,6 +15,7 @@ def start_cluster(cores=6, memory=None):
             project="notchpeak-shared-short",
             queue="notchpeak-shared-short",
             memory=f"{memory or cores}g",
+            walltime="2:00:00",
         )
 
         cluster.scale(1)
