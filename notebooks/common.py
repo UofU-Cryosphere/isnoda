@@ -8,6 +8,6 @@ from pathlib import PurePath, Path
 
 plt.rcParams.update(
     {
-        'axes.labelsize': 14
+        'axes.labelsize': 10
     }
 )
