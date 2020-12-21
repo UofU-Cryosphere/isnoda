@@ -16,24 +16,25 @@
 #SBATCH --error=slurm-%j.err-%N
 
 ml rclone
-
-# Enable CPU Hyper-threading
 export OMP_NUM_THREADS=${SLURM_NTASKS}
 
-cd /path/to/backup
-
-# Compress and backup
-BACKUP_PREFIX="data"
+BACKUP_PREFIX="run"
 BACKUP_SUFFIX=".tar.bz2"
-START_MONTH=201710
+BACKUP_ORIGIN="runs"
+BACKUP_DIR="${HOME}/shared-cyrosphere/iSnobal/${BACKUP_ORIGIN}"
+START_MONTH=201810
+
+cd ${HOME}/scratch/iSnobal/ERW_subset/output/erw_subset/devel/wy2019/initial_run/${BACKUP_ORIGIN}/
 
 for MONTH in {0..11}; do
   BACKUP_YEAR=$(date -d "${START_MONTH}01 + ${MONTH} month" +%Y%m)
 
-  tar -I pbzip2 -cf ${BACKUP_PREFIX}${BACKUP_YEAR}${BACKUP_SUFFIX} \
-                    ${BACKUP_PREFIX}${BACKUP_YEAR}[0-3][0-9]
+  tar -I pbzip2 -cf ${BACKUP_DIR}/${BACKUP_PREFIX}${BACKUP_YEAR}${BACKUP_SUFFIX} \
+    ${BACKUP_PREFIX}${BACKUP_YEAR}[0-3][0-9]
 done
 
-rclone sync . isnoda:ERW_subset/ \
+cd ${BACKUP_DIR}
+
+rclone copy . isnoda:ERW_subset/${BACKUP_ORIGIN}/ \
   --transfers ${SLURM_NTASKS} \
-  --include "*${BACKUP_SUFFIX}" \
+  --include "*${BACKUP_SUFFIX}"
