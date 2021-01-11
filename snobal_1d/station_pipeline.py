@@ -67,8 +67,6 @@ def longwave_est_2(RH_col, sw_net, air_t_col_K):
     :param air_t_col_K: col with
     :return: list populated with estimated longwave.
     """
-    SB_CONST = 5.67e-8
-
     clear = {'c1': -75.28,
              'c2': 0.82,
              'c3': 0.79}
