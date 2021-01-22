@@ -44,7 +44,7 @@ for MONTH in {0..11}; do
 
   ./singularity_katana.sh ${PROJECT_DIR}/ERW/topo/basin_setup/ \
     ${HOME}/scratch/iSnobal/hrrr_CBR \
-    ${OUTPUT_DIR} &1>2
+    ${OUTPUT_DIR} 1>&2
 
   echo "  Archiving"
 
