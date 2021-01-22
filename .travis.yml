@@ -15,6 +15,10 @@ env:
     - MINICONDA_HOME=$HOME/miniconda
     - CONDA_SH=$MINICONDA_HOME/etc/profile.d/conda.sh
 
+branches:
+  only:
+  - /^conda-.*$/
+
 before_install:
   - if [[ ! -f $CONDA_SH ]]; then
       rm -rf $MINICONDA_HOME;
