@@ -41,6 +41,7 @@ for MONTH in {0..11}; do
   cd ${PROJECT_DIR}/katana
   sed -i -e "s/^start_date: .* UTC/start_date: ${YEAR}-${MONTH}-01 00:00:00 UTC/g" katana.ini
   sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" katana.ini
+  cp katana.ini ${OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
 
   ./singularity_katana.sh ${PROJECT_DIR}/ERW/topo/basin_setup/ \
     ${HOME}/scratch/iSnobal/hrrr_CBR \
@@ -50,6 +51,7 @@ for MONTH in {0..11}; do
 
   cd ${OUTPUT_DIR}
   tar -I pbzip2 -cf ${ARCHIVE_DIR}/katana/${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
+  cp katana.log katana_${YEAR}${MONTH}.log
 
   echo "  Backup"
 
