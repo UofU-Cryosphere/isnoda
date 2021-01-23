@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH --job-name=iSnobal
+#SBATCH --job-name=iSnobal-backup
 #SBATCH --account=owner-guest
 #SBATCH --partition=notchpeak-guest
 
-#SBATCH --time=4:00:00
+#SBATCH --time=2:00:00
 #SBATCH --ntasks=16
 #SBATCH --mem=2G
 
@@ -18,13 +18,18 @@
 ml rclone
 export OMP_NUM_THREADS=${SLURM_NTASKS}
 
-BACKUP_PREFIX="run"
-BACKUP_SUFFIX=".tar.bz2"
-BACKUP_ORIGIN="runs"
-BACKUP_DIR="${HOME}/shared-cyrosphere/iSnobal/${BACKUP_ORIGIN}"
 START_MONTH=201810
+WATER_YEAR="wy$(date -d "${START_MONTH}01 + 1 year" +%Y)"
 
-cd ${HOME}/scratch/iSnobal/ERW_subset/output/erw_subset/devel/wy2019/initial_run/${BACKUP_ORIGIN}/
+BACKUP_PREFIX="run"
+BACKUP_ORIGIN="runs"
+
+BACKUP_SUFFIX=".tar.bz2"
+
+BACKUP_DIR="${HOME}/shared-cyrosphere/iSnobal/${BACKUP_ORIGIN}/${WATER_YEAR}"
+mkdir -p $BACKUP_DIR
+
+cd ${HOME}/scratch/iSnobal/ERW_subset/output/erw_subset/devel/${WATER_YEAR}/initial_run/${BACKUP_ORIGIN}/
 
 for MONTH in {0..11}; do
   BACKUP_YEAR=$(date -d "${START_MONTH}01 + ${MONTH} month" +%Y%m)
@@ -35,6 +40,6 @@ done
 
 cd ${BACKUP_DIR}
 
-rclone copy . isnoda:ERW_subset/${BACKUP_ORIGIN}/ \
+rclone copy . isnoda:ERW_subset/${BACKUP_ORIGIN}/${WATER_YEAR}/ \
   --transfers ${SLURM_NTASKS} \
   --include "*${BACKUP_SUFFIX}"
