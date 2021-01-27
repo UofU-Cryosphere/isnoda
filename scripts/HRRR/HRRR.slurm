@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=iSnobal
+#SBATCH --job-name=HRRR
 #SBATCH --account=notchpeak-shared-short
 #SBATCH --partition=notchpeak-shared-short
 
@@ -17,8 +17,14 @@
 
 ml wgrib2 rclone
 
+YEAR=2018
+MONTH=09
+
 cd ${HOME}/scratch/iSnobal/hrrr_CBR
-${HOME}/projects/ARS/isnoda/scripts/download_hrrr.sh 2018 09
+${HOME}/projects/ARS/isnoda/scripts/download_hrrr.sh ${YEAR} ${MONTH}
+
+ARCHIVE="hrrr${YEAR}${MONTH}.tar.bz2"
+tar -I pbzip2 -cf ${ARCHIVE} hrrr.${YEAR}${MONTH}[0-3][0-9]
 
 cd ${HOME}/scratch/iSnobal
-rclone sync hrrr_CBR isnoda:HRRR_CBR/ --transfers ${SLURM_NTASKS}
+rclone copy $ARCHIVE isnoda:HRRR_CBR/
