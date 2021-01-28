@@ -1,0 +1,14 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - dask
+  - dask-jobqueue
+  - gdal
+  - h5py
+  - pip
+  - rasterio
+  - xarray
+  - zarr
+  - pip:
+    - mat73
