@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
-from osgeo import osr
 
 from snobedo.lib import ModisGeoTiff
 from snobedo.modis.geotiff_to_zarr import write_zarr
@@ -18,7 +17,7 @@ class ConversionConfig(NamedTuple):
     source_dir: Path
     output_dir: Path
     modis_us: ModisGeoTiff
-    target_srs: osr.SpatialReference
+    target_srs: str
 
 
 def argument_parser():
@@ -49,8 +48,8 @@ def argument_parser():
     )
     parser.add_argument(
         '--t-srs',
-        type=int,
-        default=32613,
+        type=str,
+        default='EPSG:32613',
         help='Target EPSG. Default: EPSG:32613'
     )
 
@@ -58,9 +57,6 @@ def argument_parser():
 
 
 def config_for_arguments(arguments):
-    target_srs = osr.SpatialReference()
-    target_srs.ImportFromEPSG(arguments.t_srs)
-
     output_dir = arguments.source_dir / f'wy{arguments.water_year}-zarr/'
     output_dir.mkdir(exist_ok=True)
 
@@ -69,7 +65,7 @@ def config_for_arguments(arguments):
         source_dir=arguments.source_dir,
         output_dir=output_dir,
         modis_us=ModisGeoTiff(arguments.source_dir),
-        target_srs=target_srs
+        target_srs=arguments.t_srs
     )
 
 

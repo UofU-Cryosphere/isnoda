@@ -71,7 +71,7 @@ def matlab_to_geotiff(source_dir, output_dir, template_file, date, variable):
 
 def warp_to(file_name, target_srs):
     vrt_file = file_name.replace(
-        '.tif', f'_{target_srs.GetAuthorityCode(None)}.vrt'
+        '.tif', f'_{target_srs.split(":")[1]}.vrt'
     )
     gdal.Warp(
         vrt_file, file_name,
