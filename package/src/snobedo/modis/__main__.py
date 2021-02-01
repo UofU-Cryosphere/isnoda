@@ -3,9 +3,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import NamedTuple
 
+import dask
 import numpy as np
 
 from snobedo.lib import ModisGeoTiff
+from snobedo.lib.dask_utils import run_with_client
 from snobedo.modis.geotiff_to_zarr import write_zarr
 from snobedo.modis.matlab_to_geotiff import matlab_to_geotiff, warp_to
 
@@ -76,6 +78,7 @@ def date_range(water_year):
     return np.arange(d0, d1, ONE_DAY).astype(datetime)
 
 
+@dask.delayed
 def write_date(date, config):
     file = matlab_to_geotiff(
         config.source_dir,
@@ -96,8 +99,13 @@ def main():
             f'Given source folder does not exist: {arguments.source_dir}'
         )
 
-    config = config_for_arguments(arguments)
-    [write_date(date, config) for date in date_range(arguments.water_year)]
+    with run_with_client(4, 8):
+        config = config_for_arguments(arguments)
+        files = [
+            write_date(date, config)
+            for date in date_range(arguments.water_year)
+        ]
+        dask.compute(*files)
 
 
 if __name__ == '__main__':
