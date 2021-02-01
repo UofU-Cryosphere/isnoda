@@ -27,7 +27,8 @@ def start_cluster(cores=6, memory=None):
         # Assume local
         from dask.distributed import LocalCluster
 
-        cluster = LocalCluster(memory_limit='1.5GB')
+        memory = memory / cores
+        cluster = LocalCluster(n_workers=cores, memory_limit=f"{memory}G")
         client = Client(cluster)
 
     return client
