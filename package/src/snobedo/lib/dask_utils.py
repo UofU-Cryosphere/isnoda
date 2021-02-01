@@ -1,6 +1,9 @@
-from dask.distributed import Client
+from contextlib import contextmanager
 from pathlib import Path
 
+# Dask workaround for Python 3.9; https://github.com/dask/distributed/pull/4460
+import multiprocessing.popen_spawn_posix  # noqa: F401
+from dask.distributed import Client
 
 CHPC = 'chpc' in str(Path.home())
 
@@ -27,5 +30,14 @@ def start_cluster(cores=6, memory=None):
         cluster = LocalCluster(memory_limit='1.5GB')
         client = Client(cluster)
 
-    # print(cluster.job_script())
     return client
+
+
+@contextmanager
+def run_with_client(cores, memory):
+    client = start_cluster(cores, memory)
+    print(client.dashboard_link)
+    try:
+        yield client
+    finally:
+        client.shutdown()
