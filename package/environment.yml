@@ -10,5 +10,3 @@ dependencies:
   - rasterio
   - xarray
   - zarr
-  - pip:
-    - mat73

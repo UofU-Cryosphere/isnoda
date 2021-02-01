@@ -1,4 +1,7 @@
-import mat73
+from contextlib import contextmanager
+
+import h5py
+import numpy as np
 from osgeo import gdal, gdalconst, gdalnumeric
 
 from snobedo.lib import ModisGeoTiff
@@ -24,10 +27,16 @@ BAND_NO_DATA_VALUE = 65535
 BAND_NUMBER = 1
 
 
+@contextmanager
 def matlab_file(data_dir, date):
-    return data_dir.joinpath(
-        '{date:%Y}', MODIS_MATLAB_FILE
-    ).as_posix().format(date=date)
+    file = h5py.File(
+        data_dir.joinpath('{date:%Y}', MODIS_MATLAB_FILE)
+                .as_posix().format(date=date)
+    )
+
+    yield file
+
+    del file
 
 
 def matlab_to_geotiff(source_dir, output_dir, template_file, date, variable):
@@ -47,15 +56,14 @@ def matlab_to_geotiff(source_dir, output_dir, template_file, date, variable):
     modis_band = geo_tiff.GetRasterBand(BAND_NUMBER)
     modis_band.SetNoDataValue(BAND_NO_DATA_VALUE)
 
-    gdalnumeric.BandWriteArray(
-        modis_band,
-        mat73.loadmat(matlab_file(source_dir, date))[variable]
-    )
+    with matlab_file(source_dir, date) as file:
+        gdalnumeric.BandWriteArray(modis_band, np.array(file[variable]).T)
 
-    modis_band.ComputeStatistics(0)
-    modis_band.FlushCache()
+        modis_band.ComputeStatistics(0)
+        modis_band.FlushCache()
 
-    del modis_band
+        del modis_band
+
     del geo_tiff
 
     return file_name
