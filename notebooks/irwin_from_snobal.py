@@ -1,5 +1,5 @@
 from common import *
-from dask_cluster import start_cluster
+from snobedo.lib.dask_utils import start_cluster
 from snotel_sites import SNOTEL
 
 start_cluster(4, 8)
@@ -28,4 +28,3 @@ albedo_snobal.to_netcdf(
     encoding=encoding,
     compute=True,
 )
-
