@@ -84,8 +84,8 @@ def config_for_arguments(arguments):
 
 
 def date_range(water_year):
-    d0 = datetime(water_year, 9, 1)
-    d1 = datetime(water_year + 1, 10, 1)
+    d0 = datetime(water_year - 1, 9, 30)
+    d1 = datetime(water_year, 10, 1)
 
     return np.arange(d0, d1, ONE_DAY).astype(datetime)
 
