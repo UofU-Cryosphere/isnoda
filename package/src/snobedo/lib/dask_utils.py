@@ -15,23 +15,20 @@ def start_cluster(cores=6, memory=None):
         cluster = SLURMCluster(
             cores=cores,
             processes=cores,
+            n_workers=1,
             project="notchpeak-shared-short",
             queue="notchpeak-shared-short",
-            memory=f"{memory or cores}g",
+            memory=f"{memory or cores}G",
             walltime="2:00:00",
         )
-
-        cluster.scale(1)
-        client = Client(cluster)
     else:
         # Assume local
         from dask.distributed import LocalCluster
 
         memory = memory / cores
         cluster = LocalCluster(n_workers=cores, memory_limit=f"{memory}G")
-        client = Client(cluster)
 
-    return client
+    return Client(cluster)
 
 
 @contextmanager
