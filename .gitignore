@@ -1,5 +1,10 @@
 # Global
 *.out
 
+# Package
+.eggs/
+*.egg
+*.egg-info/
+
 # Dask
 dask-worker-space
