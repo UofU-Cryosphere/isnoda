@@ -54,6 +54,18 @@ def argument_parser():
         default='EPSG:32613',
         help='Target EPSG. Default: EPSG:32613'
     )
+    parser.add_argument(
+        '--cores',
+        type=int,
+        default=4,
+        help='Number of CPU cores to use for parallelization. Default: 4'
+    )
+    parser.add_argument(
+        '--memory',
+        type=int,
+        default=8,
+        help='Amount of memory to allocate for parallelization: Default: 8 GB'
+    )
 
     return parser
 
@@ -99,7 +111,7 @@ def main():
             f'Given source folder does not exist: {arguments.source_dir}'
         )
 
-    with run_with_client(4, 8):
+    with run_with_client(arguments.cores, arguments.memory):
         config = config_for_arguments(arguments)
         files = [
             write_date(date, config)
