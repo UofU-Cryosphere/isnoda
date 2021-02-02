@@ -117,7 +117,7 @@ def main():
             write_date(date, config)
             for date in date_range(arguments.water_year)
         ]
-        dask.compute(*files)
+        dask.compute(files)
 
 
 if __name__ == '__main__':
