@@ -45,6 +45,14 @@ def argument_parser():
              'Example: /data/output/',
     )
     parser.add_argument(
+        '--output-file-name', '-ofn',
+        type=str,
+        default=None,
+        help='Specify a name for the output file (Optional). '
+             'Defaults to the source file name argument without the file '
+             'suffix. Example: snow'
+    )
+    parser.add_argument(
         '--output-time', '-ot',
         type=int,
         default=23,
@@ -67,6 +75,15 @@ def check_required_path_inputs(arguments):
             exit(-1)
 
 
+def output_file(arguments):
+    if arguments.output_file_name is None:
+        file_name = Path(arguments.source_file).stem + OUTPUT_FILE_SUFFIX
+    else:
+        file_name = arguments.output_file_name + OUTPUT_FILE_SUFFIX
+
+    return arguments.output_dir.joinpath(file_name).as_posix()
+
+
 def main():
     arguments = argument_parser().parse_args()
 
@@ -83,8 +100,6 @@ def main():
             output_dir = arguments.output_dir / f'{site}-snotel'
             output_dir.mkdir(exist_ok=True)
 
-            output_file = Path(arguments.source_file).stem + OUTPUT_FILE_SUFFIX
-
             snow = xr.open_mfdataset(
                 arguments.source_dir.joinpath(
                     '*', arguments.source_file
@@ -99,7 +114,7 @@ def main():
                 y=coords['lat'],
                 method=method,
             ).to_zarr(
-                output_dir.joinpath(output_file).as_posix(),
+                output_file(arguments),
                 compute=True
             )
 
