@@ -9,6 +9,7 @@ from snobedo.lib.command_line_helpers import add_dask_options
 from snobedo.lib.dask_utils import run_with_client
 
 OUTPUT_FILE_SUFFIX = '.zarr'
+PATH_INPUT_ARGS = ['source_dir', 'output_dir', 'sites']
 
 
 def argument_parser():
@@ -17,17 +18,18 @@ def argument_parser():
     )
 
     parser.add_argument(
-        '--source-dir',
+        '--source-dir', '-sd',
         required=True,
         type=Path,
         help='Path to iSnobal output.'
              'Example: /data/input/erw_subset/devel/wy2020/runs',
     )
     parser.add_argument(
-        '--source-file',
+        '--source-file', '-sf',
         required=True,
         help='Output file from iSnobal to read the data from. '
-             'Example: snow.nc',
+             'Also accepts wildcards to read multiple. '
+             'Examples: snow.nc, albedo*.nc',
     )
     parser.add_argument(
         '--sites',
@@ -36,14 +38,14 @@ def argument_parser():
         help='File the SNOTEL sites with coordinates.',
     )
     parser.add_argument(
-        '--output-dir',
+        '--output-dir', '-od',
         required=True,
         type=Path,
         help='Path to iSnobal write the output.'
              'Example: /data/output/',
     )
     parser.add_argument(
-        '--output-time',
+        '--output-time', '-ot',
         type=int,
         default=23,
         help='Select a specific output time from the Snobal outputs. '
@@ -54,13 +56,21 @@ def argument_parser():
     return parser
 
 
+def check_required_path_inputs(arguments):
+    for path_arg in PATH_INPUT_ARGS:
+        location = getattr(arguments, path_arg)
+        if not location.exists():
+            print(
+                f'Given {path_arg.replace("_", "-")} argument: {location} '
+                'does not exist.'
+            )
+            exit(-1)
+
+
 def main():
     arguments = argument_parser().parse_args()
 
-    if not arguments.source_dir.exists():
-        raise IOError(
-            f'Given source folder does not exist: {arguments.source_dir}'
-        )
+    check_required_path_inputs(arguments)
 
     sites = json.load(
         open(arguments.sites.as_posix(), 'r')
