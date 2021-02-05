@@ -7,6 +7,8 @@ import dask
 import numpy as np
 
 from snobedo.lib import ModisGeoTiff
+from snobedo.lib.command_line_helpers import add_dask_options, \
+    add_water_year_option
 from snobedo.lib.dask_utils import run_with_client
 from snobedo.modis.geotiff_to_zarr import write_zarr
 from snobedo.modis.matlab_to_geotiff import matlab_to_geotiff, warp_to
@@ -37,12 +39,6 @@ def argument_parser():
              f'MODIS file with name: {ModisGeoTiff.WESTERN_US_TEMPLATE}',
     )
     parser.add_argument(
-        '--water-year',
-        required=True,
-        type=int,
-        help='Water year. Determines the date range to process'
-    )
-    parser.add_argument(
         '--variable',
         required=True,
         type=str,
@@ -54,18 +50,8 @@ def argument_parser():
         default='EPSG:32613',
         help='Target EPSG. Default: EPSG:32613'
     )
-    parser.add_argument(
-        '--cores',
-        type=int,
-        default=4,
-        help='Number of CPU cores to use for parallelization. Default: 4'
-    )
-    parser.add_argument(
-        '--memory',
-        type=int,
-        default=8,
-        help='Amount of memory to allocate for parallelization: Default: 8 GB'
-    )
+    parser = add_dask_options(parser)
+    parser = add_water_year_option(parser)
 
     return parser
 

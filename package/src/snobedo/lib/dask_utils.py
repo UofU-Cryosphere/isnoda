@@ -1,8 +1,6 @@
 from contextlib import contextmanager
 from pathlib import Path
 
-# Dask workaround for Python 3.9; https://github.com/dask/distributed/pull/4460
-import multiprocessing.popen_spawn_posix  # noqa: F401
 from dask.distributed import Client
 
 CHPC = 'chpc' in str(Path.home())

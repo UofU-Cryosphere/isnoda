@@ -6,7 +6,9 @@ dependencies:
   - dask-jobqueue
   - gdal
   - h5py
+  - netCDF4
   - pip
+  - python=3.8
   - rasterio
   - xarray
   - zarr

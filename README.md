@@ -17,6 +17,7 @@ env variables. Also has an install script to download the above components
 Backup of configuration files.
 
 ## Docs
+
 Specific instructions for Mac OS and the high performance compute environment
 at the University of Utah (CHPC).
 
@@ -24,10 +25,20 @@ at the University of Utah (CHPC).
 
 Collection of Jupyter notebooks for mostly output analysis.
 
+## Package
+
+[Snobedo package](package/README.md)
+
 ## Scripts
 
 Helper scripts to download or prepare data and execute the model components.
 
+## Snobal 1D
+
+Example on how to run the one dimensional implementation of Snobal.
+
 ## Development
-Any updates to the conda installation needs to be done on a branch with a `conda-` prefix.
-This will trigger a build on Travis and verifies integrity of changes.
+
+Any updates to the conda installation needs to be done on a branch with
+a `conda-` prefix. This will trigger a build on Travis and verifies integrity
+of changes.

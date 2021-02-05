@@ -1,0 +1,20 @@
+{
+    "Site-Name": {
+        "_comment": "Below example for a point location",
+        "lon": 123,
+        "lat": 456
+    },
+    "Site-Grid": {
+        "_comment": "Below example for a grid location",
+        "lon": [
+            123,
+            454,
+            321
+        ],
+        "lat": [
+            456,
+            787,
+            654
+        ]
+    }
+}
