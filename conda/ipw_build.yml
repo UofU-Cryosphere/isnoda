@@ -1,0 +1,8 @@
+name: ipw_build
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - libgcc=7
+  - openmp
+  - gcc-7   # conda install -c gouarin gcc-7

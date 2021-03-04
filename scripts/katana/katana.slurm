@@ -23,7 +23,7 @@ START_MONTH=10
 
 PROJECT_DIR=${HOME}/project-data/iSnobal
 OUTPUT_DIR=${HOME}/scratch/iSnobal/katana_ERW/
-ARCHIVE_DIR=${HOME}/shared-cyrosphere/iSnobal/
+ARCHIVE_DIR=${HOME}/shared-cryosphere/iSnobal/
 
 for MONTH in {0..11}; do
   START=($(date -d "${START_MONTH}/01/${START_YEAR} + ${MONTH} month" "+%m %Y"))

@@ -26,7 +26,7 @@ BACKUP_ORIGIN="runs"
 
 BACKUP_SUFFIX=".tar.bz2"
 
-BACKUP_DIR="${HOME}/shared-cyrosphere/iSnobal/${BACKUP_ORIGIN}/${WATER_YEAR}"
+BACKUP_DIR="${HOME}/shared-cryosphere/iSnobal/${BACKUP_ORIGIN}/${WATER_YEAR}"
 mkdir -p $BACKUP_DIR
 
 cd ${HOME}/scratch/iSnobal/ERW_subset/output/erw_subset/devel/${WATER_YEAR}/initial_run/${BACKUP_ORIGIN}/
