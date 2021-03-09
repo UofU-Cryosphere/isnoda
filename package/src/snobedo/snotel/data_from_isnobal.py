@@ -1,12 +1,12 @@
 import argparse
 import datetime
-import json
 from pathlib import Path
 
 import xarray as xr
 
 from snobedo.lib.command_line_helpers import add_dask_options
 from snobedo.lib.dask_utils import run_with_client
+from .snotel_locations import SnotelLocations
 
 OUTPUT_FILE_SUFFIX = '.zarr'
 PATH_INPUT_ARGS = ['source_dir', 'output_dir', 'sites']
@@ -89,15 +89,14 @@ def main():
 
     check_required_path_inputs(arguments)
 
-    sites = json.load(
-        open(arguments.sites.as_posix(), 'r')
-    )
+    sites = SnotelLocations.parse_json(arguments.sites.as_posix())
 
     with run_with_client(arguments.cores, arguments.memory):
-        for site, coords in sites.items():
-            method = 'nearest' if (type(coords['lat']) != list) else None
+        for site in sites:
+            print(f"Processing SNOTEL site: {site.name}")
+            method = 'nearest' if (type(site.lat) != list) else None
 
-            output_dir = arguments.output_dir / f'{site}-snotel'
+            output_dir = arguments.output_dir / f'{site.name}-snotel'
             output_dir.mkdir(exist_ok=True)
 
             snow = xr.open_mfdataset(
@@ -110,8 +109,8 @@ def main():
             )
 
             snow.sel(
-                x=coords['lon'],
-                y=coords['lat'],
+                x=site.lon,
+                y=site.lat,
                 method=method,
             ).to_zarr(
                 output_file(arguments),
