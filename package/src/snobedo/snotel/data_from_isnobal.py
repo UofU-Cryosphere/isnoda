@@ -4,9 +4,9 @@ from pathlib import Path
 
 import xarray as xr
 
-from .site_loader import SiteLoader
 from snobedo.lib.command_line_helpers import add_dask_options
 from snobedo.lib.dask_utils import run_with_client
+from .snotel_locations import SnotelLocations
 
 OUTPUT_FILE_SUFFIX = '.zarr'
 PATH_INPUT_ARGS = ['source_dir', 'output_dir', 'sites']
@@ -89,10 +89,11 @@ def main():
 
     check_required_path_inputs(arguments)
 
-    sites = SiteLoader.parse_from_json(arguments.sites.as_posix())
+    sites = SnotelLocations.parse_json(arguments.sites.as_posix())
 
     with run_with_client(arguments.cores, arguments.memory):
         for site in sites:
+            print(f"Processing SNOTEL site: {site.name}")
             method = 'nearest' if (type(site.lat) != list) else None
 
             output_dir = arguments.output_dir / f'{site.name}-snotel'

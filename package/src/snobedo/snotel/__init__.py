@@ -1,7 +1,7 @@
-from .site_loader import SiteLoader
+from .snotel_locations import SnotelLocations
 from .snotel_site import SnotelSite
 
 __all__ = [
-    SiteLoader,
+    SnotelLocations,
     SnotelSite
 ]
