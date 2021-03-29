@@ -57,6 +57,7 @@ def argument_parser():
         type=int,
         default=23,
         help='Select a specific output time from the Snobal outputs. '
+             'An argument value of 0 will get all output hours from each day.'
              'Default: 23',
     )
     parser = add_dask_options(parser)
@@ -104,9 +105,12 @@ def main():
                     '*', arguments.source_file
                 ).as_posix(),
                 parallel=True,
-            ).sel(
-                time=datetime.time(arguments.output_time)
             )
+
+            if arguments.output_time != 0:
+                snow = snow.sel(
+                    time=datetime.time(arguments.output_time)
+                )
 
             snow.sel(
                 x=site.lon,
