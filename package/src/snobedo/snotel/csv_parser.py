@@ -13,6 +13,7 @@ class CsvParser:
     - Snow Density
     - Wind Speed
     - Temperature
+    - Precipitation
 
     """
     DEPTH_COLUMN = 'Depth(m)'
@@ -24,7 +25,8 @@ class CsvParser:
         'SWE(mm)',
         DENSITY_COLUMN,
         'Wind(km/h)',
-        'Air-T(C)'
+        'Air-T(C)',
+        'Precipitation (mm)',
     ]
 
     PD_OPTIONS = dict(
