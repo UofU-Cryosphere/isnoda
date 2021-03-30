@@ -12,6 +12,16 @@ from pathlib import Path, PurePath
 
 from snobedo.lib.dask_utils import start_cluster
 
+
+SNOBAL_DIR = Path.home() / 'scratch/iSnobal/outputs'
+SNOTEL_DIR = Path.home() / 'shared-cryosphere/Snotel'
+FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
+
+# Xarray options
+## Used in comparison to SNOTEL site locations
+COARSEN_OPTS = dict(x=2, y=2, keep_attrs=True)
+
+# Plot settings and helpers
 plt.rcParams.update(
     {
         'axes.labelsize': 10
