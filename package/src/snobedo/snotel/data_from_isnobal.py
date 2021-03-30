@@ -1,12 +1,12 @@
 import argparse
-import datetime
 from pathlib import Path
 
 import xarray as xr
 
 from snobedo.lib.command_line_helpers import add_dask_options
 from snobedo.lib.dask_utils import run_with_client
-from .snotel_locations import SnotelLocations
+from snobedo.lib.isnobal_helpers import day_filter, hour_filter
+from snobedo.snotel.snotel_locations import SnotelLocations
 
 OUTPUT_FILE_SUFFIX = '.zarr'
 PATH_INPUT_ARGS = ['source_dir', 'output_dir', 'sites']
@@ -57,6 +57,7 @@ def argument_parser():
         type=int,
         default=23,
         help='Select a specific output time from the Snobal outputs. '
+             'An argument value of 0 will get all output hours from each day.'
              'Default: 23',
     )
     parser = add_dask_options(parser)
@@ -75,13 +76,16 @@ def check_required_path_inputs(arguments):
             exit(-1)
 
 
-def output_file(arguments):
+def output_file(arguments, site):
+    output_dir = arguments.output_dir / f'{site.name}-snotel'
+    output_dir.mkdir(exist_ok=True)
+
     if arguments.output_file_name is None:
         file_name = Path(arguments.source_file).stem + OUTPUT_FILE_SUFFIX
     else:
         file_name = arguments.output_file_name + OUTPUT_FILE_SUFFIX
 
-    return arguments.output_dir.joinpath(file_name).as_posix()
+    return output_dir.joinpath(file_name).as_posix()
 
 
 def main():
@@ -91,29 +95,34 @@ def main():
 
     sites = SnotelLocations.parse_json(arguments.sites.as_posix())
 
+    mfdataset_args = dict(
+        parallel=True
+    )
+
+    if arguments.output_time == 0:
+        mfdataset_args['preprocess'] = day_filter
+
     with run_with_client(arguments.cores, arguments.memory):
         for site in sites:
             print(f"Processing SNOTEL site: {site.name}")
             method = 'nearest' if (type(site.lat) != list) else None
 
-            output_dir = arguments.output_dir / f'{site.name}-snotel'
-            output_dir.mkdir(exist_ok=True)
-
-            snow = xr.open_mfdataset(
+            dataset = xr.open_mfdataset(
                 arguments.source_dir.joinpath(
                     '*', arguments.source_file
                 ).as_posix(),
-                parallel=True,
-            ).sel(
-                time=datetime.time(arguments.output_time)
+                **mfdataset_args
             )
 
-            snow.sel(
+            if arguments.output_time != 0:
+                dataset = hour_filter(dataset)
+
+            dataset.sel(
                 x=site.lon,
                 y=site.lat,
                 method=method,
             ).to_zarr(
-                output_file(arguments),
+                output_file(arguments, site),
                 compute=True
             )
 
