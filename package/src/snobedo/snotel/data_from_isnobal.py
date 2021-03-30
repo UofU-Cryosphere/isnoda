@@ -1,11 +1,11 @@
 import argparse
-import datetime
 from pathlib import Path
 
 import xarray as xr
 
 from snobedo.lib.command_line_helpers import add_dask_options
 from snobedo.lib.dask_utils import run_with_client
+from snobedo.lib.isnobal_helpers import day_filter, hour_filter
 from snobedo.snotel.snotel_locations import SnotelLocations
 
 OUTPUT_FILE_SUFFIX = '.zarr'
@@ -85,15 +85,6 @@ def output_file(arguments):
     return arguments.output_dir.joinpath(file_name).as_posix()
 
 
-def day_filter(ds):
-    """
-    There is an issue with AWSM (#55 on GitHub), where there is an extra
-    hour in SMRF outputs. This filter removes the additional hour of the day.
-    """
-    ds = ds.sel(time=ds.time[0].dt.strftime('%Y-%m-%d').values)
-    return ds
-
-
 def main():
     arguments = argument_parser().parse_args()
 
@@ -116,7 +107,7 @@ def main():
             output_dir = arguments.output_dir / f'{site.name}-snotel'
             output_dir.mkdir(exist_ok=True)
 
-            snow = xr.open_mfdataset(
+            dataset = xr.open_mfdataset(
                 arguments.source_dir.joinpath(
                     '*', arguments.source_file
                 ).as_posix(),
@@ -124,11 +115,9 @@ def main():
             )
 
             if arguments.output_time != 0:
-                snow = snow.sel(
-                    time=datetime.time(arguments.output_time)
-                )
+                dataset = hour_filter(dataset)
 
-            snow.sel(
+            dataset.sel(
                 x=site.lon,
                 y=site.lat,
                 method=method,
