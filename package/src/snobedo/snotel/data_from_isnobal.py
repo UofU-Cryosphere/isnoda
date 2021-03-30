@@ -6,7 +6,7 @@ import xarray as xr
 
 from snobedo.lib.command_line_helpers import add_dask_options
 from snobedo.lib.dask_utils import run_with_client
-from .snotel_locations import SnotelLocations
+from snobedo.snotel.snotel_locations import SnotelLocations
 
 OUTPUT_FILE_SUFFIX = '.zarr'
 PATH_INPUT_ARGS = ['source_dir', 'output_dir', 'sites']
