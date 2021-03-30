@@ -76,13 +76,16 @@ def check_required_path_inputs(arguments):
             exit(-1)
 
 
-def output_file(arguments):
+def output_file(arguments, site):
+    output_dir = arguments.output_dir / f'{site.name}-snotel'
+    output_dir.mkdir(exist_ok=True)
+
     if arguments.output_file_name is None:
         file_name = Path(arguments.source_file).stem + OUTPUT_FILE_SUFFIX
     else:
         file_name = arguments.output_file_name + OUTPUT_FILE_SUFFIX
 
-    return arguments.output_dir.joinpath(file_name).as_posix()
+    return output_dir.joinpath(file_name).as_posix()
 
 
 def main():
@@ -104,9 +107,6 @@ def main():
             print(f"Processing SNOTEL site: {site.name}")
             method = 'nearest' if (type(site.lat) != list) else None
 
-            output_dir = arguments.output_dir / f'{site.name}-snotel'
-            output_dir.mkdir(exist_ok=True)
-
             dataset = xr.open_mfdataset(
                 arguments.source_dir.joinpath(
                     '*', arguments.source_file
@@ -122,7 +122,7 @@ def main():
                 y=site.lat,
                 method=method,
             ).to_zarr(
-                output_file(arguments),
+                output_file(arguments, site),
                 compute=True
             )
 
