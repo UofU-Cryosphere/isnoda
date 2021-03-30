@@ -85,12 +85,28 @@ def output_file(arguments):
     return arguments.output_dir.joinpath(file_name).as_posix()
 
 
+def day_filter(ds):
+    """
+    There is an issue with AWSM (#55 on GitHub), where there is an extra
+    hour in SMRF outputs. This filter removes the additional hour of the day.
+    """
+    ds = ds.sel(time=ds.time[0].dt.strftime('%Y-%m-%d').values)
+    return ds
+
+
 def main():
     arguments = argument_parser().parse_args()
 
     check_required_path_inputs(arguments)
 
     sites = SnotelLocations.parse_json(arguments.sites.as_posix())
+
+    mfdataset_args = dict(
+        parallel=True
+    )
+
+    if arguments.output_time == 0:
+        mfdataset_args['preprocess'] = day_filter
 
     with run_with_client(arguments.cores, arguments.memory):
         for site in sites:
@@ -104,7 +120,7 @@ def main():
                 arguments.source_dir.joinpath(
                     '*', arguments.source_file
                 ).as_posix(),
-                parallel=True,
+                **mfdataset_args
             )
 
             if arguments.output_time != 0:
