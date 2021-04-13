@@ -3,7 +3,8 @@ from pathlib import Path
 
 import xarray as xr
 
-from snobedo.lib.command_line_helpers import add_dask_options
+from snobedo.lib.command_line_helpers \
+    import add_dask_options, check_paths_presence
 from snobedo.lib.dask_utils import run_with_client
 from snobedo.lib.isnobal_helpers import day_filter, hour_filter
 from snobedo.snotel.snotel_locations import SnotelLocations
@@ -65,17 +66,6 @@ def argument_parser():
     return parser
 
 
-def check_required_path_inputs(arguments):
-    for path_arg in PATH_INPUT_ARGS:
-        location = getattr(arguments, path_arg)
-        if not location.exists():
-            print(
-                f'Given {path_arg.replace("_", "-")} argument: {location} '
-                'does not exist.'
-            )
-            exit(-1)
-
-
 def output_file(arguments, site):
     output_dir = arguments.output_dir / f'{site.name}-snotel'
     output_dir.mkdir(exist_ok=True)
@@ -91,7 +81,7 @@ def output_file(arguments, site):
 def main():
     arguments = argument_parser().parse_args()
 
-    check_required_path_inputs(arguments)
+    check_paths_presence(arguments, PATH_INPUT_ARGS)
 
     sites = SnotelLocations.parse_json(arguments.sites.as_posix())
 
