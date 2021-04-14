@@ -44,3 +44,22 @@ def add_water_year_option(parser):
     )
 
     return parser
+
+
+def check_paths_presence(arguments, required_paths):
+    """
+    Verify that required paths given as command line arguments exist.
+    The required paths variable names have to match to options from the
+    command line. Will exit the program once one path is not found or missing.
+
+    :param arguments: Paths given via command line arguments
+    :param required_paths: List of required paths
+    """
+    for path_arg in required_paths:
+        location = getattr(arguments, path_arg)
+        if not location.exists():
+            print(
+                f'Given {path_arg.replace("_", "-")} argument: {location} '
+                'does not exist.'
+            )
+            exit(-1)

@@ -6,16 +6,14 @@ import xarray as xr
 from snobedo.lib.command_line_helpers \
     import add_dask_options, check_paths_presence
 from snobedo.lib.dask_utils import run_with_client
-from snobedo.lib.isnobal_helpers import day_filter, hour_filter
-from snobedo.snotel.snotel_locations import SnotelLocations
 
-OUTPUT_FILE_SUFFIX = '.zarr'
-PATH_INPUT_ARGS = ['source_dir', 'output_dir', 'sites']
+OUTPUT_FILE_SUFFIX = '.nc'
+PATH_INPUT_ARGS = ['source_dir', 'output_dir']
 
 
 def argument_parser():
     parser = argparse.ArgumentParser(
-        description='Extract SNOTEL site data from iSnobal files to zarr.',
+        description='Combine iSnobal input or output NetCDF files.',
     )
 
     parser.add_argument(
@@ -33,12 +31,6 @@ def argument_parser():
              'Examples: snow.nc, albedo*.nc',
     )
     parser.add_argument(
-        '--sites',
-        required=True,
-        type=Path,
-        help='File the SNOTEL sites with coordinates.',
-    )
-    parser.add_argument(
         '--output-dir', '-od',
         required=True,
         type=Path,
@@ -53,21 +45,13 @@ def argument_parser():
              'Defaults to the source file name argument without the file '
              'suffix. Example: snow'
     )
-    parser.add_argument(
-        '--output-time', '-ot',
-        type=int,
-        default=23,
-        help='Select a specific output time from the Snobal outputs. '
-             'An argument value of 0 will get all output hours from each day.'
-             'Default: 23',
-    )
     parser = add_dask_options(parser)
 
     return parser
 
 
-def output_file(arguments, site):
-    output_dir = arguments.output_dir / f'{site.name}-snotel'
+def output_file(arguments):
+    output_dir = arguments.output_dir
     output_dir.mkdir(exist_ok=True)
 
     if arguments.output_file_name is None:
@@ -83,38 +67,16 @@ def main():
 
     check_paths_presence(arguments, PATH_INPUT_ARGS)
 
-    sites = SnotelLocations.parse_json(arguments.sites.as_posix())
-
-    mfdataset_args = dict(
-        parallel=True
-    )
-
-    if arguments.output_time == 0:
-        mfdataset_args['preprocess'] = day_filter
-
     with run_with_client(arguments.cores, arguments.memory):
-        for site in sites:
-            print(f"Processing SNOTEL site: {site.name}")
-            method = 'nearest' if (type(site.lat) != list) else None
-
-            dataset = xr.open_mfdataset(
-                arguments.source_dir.joinpath(
-                    '*', arguments.source_file
-                ).as_posix(),
-                **mfdataset_args
-            )
-
-            if arguments.output_time != 0:
-                dataset = hour_filter(dataset)
-
-            dataset.sel(
-                x=site.lon,
-                y=site.lat,
-                method=method,
-            ).to_zarr(
-                output_file(arguments, site),
-                compute=True
-            )
+        xr.open_mfdataset(
+            arguments.source_dir.joinpath(
+                '*', arguments.source_file
+            ).as_posix(),
+            parallel=True
+        ).to_netcdf(
+            output_file(arguments),
+            compute=True
+        )
 
 
 if __name__ == '__main__':
