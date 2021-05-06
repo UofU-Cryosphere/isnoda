@@ -29,13 +29,21 @@ BACKUP_SUFFIX=".tar.bz2"
 BACKUP_DIR="${HOME}/shared-cryosphere/iSnobal/${BACKUP_ORIGIN}/${WATER_YEAR}"
 mkdir -p $BACKUP_DIR
 
-cd ${HOME}/scratch/iSnobal/ERW_subset/output/erw_subset/devel/${WATER_YEAR}/initial_run/${BACKUP_ORIGIN}/
+cd ${HOME}/scratch/iSnobal/backup/${WATER_YEAR}/initial_run/${BACKUP_ORIGIN}/
+
+if [ $? != 0 ]; then
+  exit -1
+fi
 
 for MONTH in {0..11}; do
   BACKUP_YEAR=$(date -d "${START_MONTH}01 + ${MONTH} month" +%Y%m)
 
   tar -I pbzip2 -cf ${BACKUP_DIR}/${BACKUP_PREFIX}${BACKUP_YEAR}${BACKUP_SUFFIX} \
     ${BACKUP_PREFIX}${BACKUP_YEAR}[0-3][0-9]
+
+  if [ $? != 0 ]; then
+    exit -1
+  fi
 done
 
 cd ${BACKUP_DIR}
