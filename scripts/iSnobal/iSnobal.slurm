@@ -5,7 +5,7 @@
 #SBATCH --partition=notchpeak-guest
 
 #SBATCH --time=1:00:00
-#SBATCH --ntasks=16
+#SBATCH --ntasks=24
 #SBATCH --mem=4G
 
 #SBATCH --mail-type=FAIL,END
