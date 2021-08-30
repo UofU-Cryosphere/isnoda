@@ -20,11 +20,11 @@ ml wgrib2 rclone
 YEAR=2018
 MONTH=09
 
-cd ${HOME}/scratch/iSnobal/hrrr_CBR
-${HOME}/projects/ARS/isnoda/scripts/download_hrrr.sh ${YEAR} ${MONTH}
+cd ${HOME}/skiles-group1/HRRR_CBR
+${HOME}/projects/ARS/isnoda/scripts/HRRR/download_hrrr.sh ${YEAR} ${MONTH}
 
 ARCHIVE="hrrr${YEAR}${MONTH}.tar.bz2"
 tar -I pbzip2 -cf ${ARCHIVE} hrrr.${YEAR}${MONTH}[0-3][0-9]
 
-cd ${HOME}/scratch/iSnobal
 rclone copy $ARCHIVE isnoda:HRRR_CBR/
+rm $ARCHIVE
