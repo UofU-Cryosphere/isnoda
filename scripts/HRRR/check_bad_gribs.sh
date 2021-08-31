@@ -2,8 +2,14 @@
 #
 # Quick check of GRIB files if they are readable with GDAL.
 #
+# Uses the first parameter for directory to check and moves unreadable
+# files into a 'corrupt' directory.
+#
+# Example to check current directory:
+#   ./check_bad_gribs.sh $(pwd)
+#
 
-for file in /iSnobal/hrrr_ars/hrrr.201710*/*.grib2; 
+for file in ${1}/*.grib2;
 do
   origin=$(gdalinfo $file | grep Origin) 
   if [ $? -ne 0 ]; then
@@ -13,4 +19,3 @@ do
     echo $file
   fi
 done
-
