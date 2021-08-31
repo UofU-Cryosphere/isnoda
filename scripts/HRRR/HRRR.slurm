@@ -23,6 +23,11 @@ MONTH=09
 cd ${HOME}/skiles-group1/HRRR_CBR
 ${HOME}/projects/ARS/isnoda/scripts/HRRR/download_hrrr.sh ${YEAR} ${MONTH}
 
+if [ $? -ne 0 ]; then
+  >&2 echo "ERROR processing ${YEAR}${MONTH}"
+  exit
+fi
+
 ARCHIVE="hrrr${YEAR}${MONTH}.tar.bz2"
 tar -I pbzip2 -cf ${ARCHIVE} hrrr.${YEAR}${MONTH}[0-3][0-9]
 

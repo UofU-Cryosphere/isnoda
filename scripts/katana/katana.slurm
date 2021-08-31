@@ -46,6 +46,11 @@ for MONTH in {0..11}; do
     ${INPUT_DIR} \
     ${OUTPUT_DIR} 1>&2
 
+  if [ $? -ne 0 ]; then
+    >&2 echo "ERROR processing ${YEAR}${MONTH}"
+    continue
+  fi
+
   echo "  Archiving"
   ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
 
