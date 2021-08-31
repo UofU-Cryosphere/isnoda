@@ -23,6 +23,7 @@ START_MONTH=10
 
 PROJECT_DIR=${HOME}/project-data/iSnobal
 OUTPUT_DIR=${HOME}/scratch/iSnobal/katana_ERW/
+INPUT_DIR=${HOME}/skiles-group1/HRRR_CBR/
 ARCHIVE_DIR=${HOME}/shared-cryosphere/iSnobal/
 
 for MONTH in {0..11}; do
@@ -34,8 +35,6 @@ for MONTH in {0..11}; do
   MONTH_END=${END[0]}
   YEAR_END=${END[1]}
 
-  ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
-
   echo "Processing: ${YEAR}-${MONTH}"
 
   cd ${PROJECT_DIR}/katana
@@ -44,10 +43,11 @@ for MONTH in {0..11}; do
   cp katana.ini ${OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
 
   ./singularity_katana.sh ${PROJECT_DIR}/ERW/topo/basin_setup/ \
-    ${HOME}/scratch/iSnobal/hrrr_CBR \
+    ${INPUT_DIR} \
     ${OUTPUT_DIR} 1>&2
 
   echo "  Archiving"
+  ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
 
   cd ${OUTPUT_DIR}
   tar -I pbzip2 -cf ${ARCHIVE_DIR}/katana/${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
@@ -55,6 +55,7 @@ for MONTH in {0..11}; do
 
   echo "  Backup"
 
-  cd ${ARCHIVE_DIR}
-  rclone sync --include '*.bz2' katana/ isnoda:ERW_subset/katana/ --transfers 6
+  cd ${ARCHIVE_DIR}/katana
+  rclone copy --include '*.bz2' ${ARCHIVE} isnoda:ERW_subset/katana/
+  rm ${ARCHIVE}
 done
