@@ -28,7 +28,7 @@ if [ $? -ne 0 ]; then
   exit
 fi
 
-ARCHIVE="hrrr${YEAR}${MONTH}.tar.bz2"
+ARCHIVE="hrrr-${YEAR}${MONTH}.tar.bz2"
 tar -I pbzip2 -cf ${ARCHIVE} hrrr.${YEAR}${MONTH}[0-3][0-9]
 
 rclone copy $ARCHIVE isnoda:HRRR_CBR/
