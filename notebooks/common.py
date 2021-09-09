@@ -13,10 +13,11 @@ from pathlib import Path, PurePath
 
 from snobedo.lib.dask_utils import start_cluster
 
+SHARED_STORE = '/uufs/chpc.utah.edu/common/home/skiles-group1'
 
-SNOBAL_DIR = Path.home() / 'scratch/iSnobal/outputs'
+SNOBAL_DIR = Path(f'{SHARED_STORE}/erw_isnobal')
 SNOTEL_DIR = Path.home() / 'shared-cryosphere/Snotel'
-HRRR_DIR = Path.home() / 'shared-cryosphere/HRRR_WY'
+HRRR_DIR = Path(f'{SHARED_STORE}/HRRR_CBR')
 FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
 
 # Xarray options
