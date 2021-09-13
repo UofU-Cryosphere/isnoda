@@ -2,6 +2,7 @@ import argparse
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 from snobedo.lib.command_line_helpers import add_dask_options
@@ -18,9 +19,13 @@ OUTPUT_FILES = [
     'vapor_pressure.nc',
     'wind_speed.nc',
 ]
-MERGE_FILE_NAME = 'smrf_{day}.nc'
+DOT_NC = '.nc'
+MERGE_FILE_NAME = 'smrf_{day}' + DOT_NC
 COMBINED_FOLDER = 'combined'
-CDO_COMMAND = ['cdo', '-P', '4', '-z', 'zip_4', 'merge']
+
+CDO_MERGE = ['cdo', '-P', '4', '-z', 'zip_4', 'merge']
+CDO_VERIFY = ['cdo', '-P', '4', 'diffn']
+CDO_SELECT = '-selname,{var}'
 
 
 def argument_parser():
@@ -62,19 +67,36 @@ def combined_file_name(day_folder):
         return outfile
 
 
+def verify_merge(in_files, outfile):
+    for in_file in in_files:
+        variable = in_file.split('/')[-1].replace(DOT_NC, '')
+        call = subprocess.run(
+            CDO_VERIFY + [CDO_SELECT.format(var=variable), outfile, in_file],
+            stderr=subprocess.PIPE, stdout=subprocess.PIPE, text=True
+        )
+
+        if call.returncode != 0:
+            print(f"  ERROR - Combining file {in_file}", file=sys.stderr)
+            print(call.stderr)
+            return None
+
+    return in_files
+
+
 def combine_files(day_folder, outfile):
     day_files = [(day_folder / file).as_posix() for file in OUTPUT_FILES]
     call = subprocess.run(
-        CDO_COMMAND + day_files + [outfile],
+        CDO_MERGE + day_files + [outfile],
         stderr=subprocess.PIPE, stdout=subprocess.PIPE, text=True
     )
 
-    if call.returncode == 0:
-        print(f"Combined files saved to: {outfile}")
-        return day_files
-    else:
+    if call.returncode != 0:
         print(call.stderr)
         return []
+
+    print(f"Combined files saved to: {outfile}")
+    day_files = verify_merge(day_files, outfile)
+    return day_files
 
 
 def main():
@@ -105,3 +127,5 @@ def main():
                 for file in day_files:
                     print(f'  Delete file: {file}')
                     os.remove(file)
+        else:
+            sys.exit(1)
