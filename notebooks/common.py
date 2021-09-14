@@ -17,13 +17,13 @@ SHARED_STORE = '/uufs/chpc.utah.edu/common/home/skiles-group1'
 
 SNOBAL_DIR = Path(f'{SHARED_STORE}/erw_isnobal')
 SNOTEL_DIR = Path.home() / 'shared-cryosphere/Snotel'
-HRRR_DIR = Path(f'{SHARED_STORE}/HRRR_CBR')
+HRRR_DIR = Path(f'{SHARED_STORE}/HRRR_water_years')
 FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
 
 # Xarray options
 # Used in comparison to SNOTEL site locations
-COARSEN_OPTS = dict(x=2, y=2, keep_attrs=True)
-RESAMPLE_1_DAY_OPTS = dict(time='1D', base=23, keep_attrs=True)
+COARSEN_OPTS = dict(x=2, y=2)
+RESAMPLE_1_DAY_OPTS = dict(time='1D', base=23)
 
 
 # HRRR helpers
