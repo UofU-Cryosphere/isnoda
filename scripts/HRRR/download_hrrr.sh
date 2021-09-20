@@ -15,16 +15,19 @@
 
 HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
 UofU_ARCHIVE='UofU'
+AWS_ARCHIVE='AWS'
 
 set_archive_url() {
   if [ $1 == 'UofU' ]; then
       ARCHIVE_URL="https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/${FILE_NAME}"
+  elif [ $1 == 'AWS' ]; then
+      ARCHIVE_URL="https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.${DATE}/conus/${FILE_NAME}"
   elif [ $1 == 'Google' ]; then
       ARCHIVE_URL="https://storage.googleapis.com/high-resolution-rapid-refresh/hrrr.${DATE}/conus/${FILE_NAME}"
   fi
 }
 
-if [ ! -z "$1" ] && [ ! -z "$2" ] && [[ $2 != $UofU_ARCHIVE ]]; then
+if [ ! -z "$1" ] && [ ! -z "$2" ] && [[ $2 != @($UofU_ARCHIVE|$AWS_ARCHIVE) ]]; then
   YEAR=$1
   MONTH=$2
   LAST_DAY=$(date -d "${MONTH}/01/${YEAR} + 1 month - 1 day" +%d)
@@ -37,6 +40,8 @@ fi
 
 if [ ! -z "$3" ] || [[ $2 = $UofU_ARCHIVE ]]; then
   ARCHIVE=$UofU_ARCHIVE
+elif [ ! -z "$3" ] || [[ $2 = $AWS_ARCHIVE ]]; then
+  ARCHIVE=$AWS_ARCHIVE
 else
   ARCHIVE='Google'
 fi
@@ -54,6 +59,11 @@ for DATE in "${DATES[@]}"; do
     for FIELD in {0..1}; do
         FILE_NAME="hrrr.t$(printf "%02d" $HOUR)z.wrfsfcf0${FIELD}.grib2"
 
+        # Check for existing file and that it is not zero in size
+        if [ -s "${FILE_NAME}" ]; then
+          continue
+        fi
+
         TMP_FILE="${FILE_NAME}_tmp"
         mkfifo $TMP_FILE
 
@@ -64,8 +74,7 @@ for DATE in "${DATES[@]}"; do
 
         rm $TMP_FILE
 
-        printf "$URL"
-
+        # printf "$URL"
         printf "${FILE_NAME} created \n"
     done
   done
