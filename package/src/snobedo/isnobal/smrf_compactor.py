@@ -54,10 +54,10 @@ def argument_parser():
 
 def combined_file_name(day_folder):
     outfile = (
-            day_folder /
-            MERGE_FILE_NAME.format(
-                day=day_folder.name.replace(DAY_FOLDER_PREFIX, '')
-            )
+        day_folder /
+        MERGE_FILE_NAME.format(
+            day=day_folder.name.replace(DAY_FOLDER_PREFIX, '')
+        )
     )
 
     if outfile.exists():
