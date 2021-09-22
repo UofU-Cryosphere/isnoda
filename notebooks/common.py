@@ -9,9 +9,13 @@ import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 import matplotlib.font_manager as font_manager
 
+import hvplot.xarray
+pd.options.plotting.backend = 'holoviews'
+
 from pathlib import Path, PurePath
 
 from snobedo.lib.dask_utils import start_cluster
+from snobedo.snotel import SnotelLocations
 
 SHARED_STORE = '/uufs/chpc.utah.edu/common/home/skiles-group1'
 
