@@ -29,7 +29,7 @@ adjust_time() {
 
 #  printf "\nProcessing: ${HRRR_FILE}\n"
 #  echo "  Filter to: ${TMP_FILE}"
-  wgrib2 $1 -match 'APCP:surface:5-6' -set_date +5hr -grib ${TMP_FILE} > /dev/null
+  wgrib2 $1 -match 'APCP:surface:5-6' -set_date +5hr -set_ftime "0-1 hour acc fcst" -grib ${TMP_FILE} > /dev/null
 
   HRRR_DATETIME=$(wgrib2 -t ${TMP_FILE} | cut -d= -f2 | uniq)
   HRRR_DAY=${HRRR_DATETIME:0:-2}
