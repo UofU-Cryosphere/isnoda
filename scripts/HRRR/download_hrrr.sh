@@ -71,7 +71,7 @@ for DATE in "${DATES[@]}"; do
 
         set_archive_url ${ARCHIVE}
         wget -nv --no-check-certificate ${ARCHIVE_URL} -O $TMP_FILE | \
-        wgrib2 $TMP_FILE -v0 -ncpu ${SLURM_NTASKS} -small_grib -112.322:-105.628 35.556:43.452 - | \
+        wgrib2 $TMP_FILE -v0 -ncpu ${SLURM_NTASKS} -set_grib_type same -small_grib -112.322:-105.628 35.556:43.452 - | \
         wgrib2 - -v0 -ncpu ${SLURM_NTASKS} -match "$HRRR_VARS" -grib $FILE_NAME
 
         rm $TMP_FILE
