@@ -14,6 +14,8 @@
 # https://www.sciencebase.gov/catalog/item/4f4e4a38e4b07f02db61cebb
 
 HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
+HRRR_FC_HOURS=( 1 6 )
+
 UofU_ARCHIVE='UofU'
 AWS_ARCHIVE='AWS'
 
@@ -56,7 +58,7 @@ for DATE in "${DATES[@]}"; do
   pushd $FOLDER
 
   for HOUR in {0..23}; do
-    for FIELD in {0..1}; do
+    for FIELD in "${HRRR_FC_HOURS[@]}"; do
         FILE_NAME="hrrr.t$(printf "%02d" $HOUR)z.wrfsfcf0${FIELD}.grib2"
 
         # Check for existing file and that it is not zero in size
