@@ -23,6 +23,7 @@ source load_conda_env snobedo
 SOURCE_FOLDER=/uufs/chpc.utah.edu/common/home/skiles-group1/erw_isnobal/wy2018/erw
 
 smrf_compactor -sd ${SOURCE_FOLDER}
+smrf_compactor -sd ${SOURCE_FOLDER} -eb
 
 parallel --jobs ${OMP_NUM_THREADS} nccopy -s -u -d4 {} {.}_c.nc ::: ${SOURCE_FOLDER}/run*/{em,precip,snow}.nc
 rename _c.nc .nc ${SOURCE_FOLDER}/run*/{em,precip,snow}_c.nc
