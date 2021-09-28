@@ -21,13 +21,14 @@ ml rclone
 START_YEAR=2019
 START_MONTH=10
 
-PROJECT_DIR=${HOME}/project-data/iSnobal
-
-OUTPUT_DIR=${HOME}/skiles-group1/katana_ERW/
+## Update these variables with the actual paths ##
 INPUT_DIR=${HOME}/skiles-group1/HRRR_CBR/
 
-BASIN_SETUP=${PROJECT_DIR}/ERW/topo/basin_setup/
-KATANA_DIR=${PROJECT_DIR}/katana
+BASIN_SETUP=/path/to/basin_setup/
+
+KATANA_DIR=/path/to/katana/config_and_image/
+KATANA_OUTPUT_DIR=/path/to/katana/output/
+## -------------------------------------------- ##
 KATANA_INI=${KATANA_DIR}/katana.ini
 
 BACKUP_DESTINATION="isnoda:ERW_subset/katana/"
@@ -48,11 +49,11 @@ for MONTH in {0..11}; do
   sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" ${KATANA_INI}
 
   # Backup the used configuration of the processed month
-  cp ${KATANA_INI} ${OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
+  cp ${KATANA_INI} ${KATANA_OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
 
   ${KATANA_DIR}/katana_singularity.sh ${BASIN_SETUP} \
     ${INPUT_DIR} \
-    ${OUTPUT_DIR} 1>&2
+    ${KATANA_OUTPUT_DIR} 1>&2
 
   if [ $? -ne 0 ]; then
     >&2 echo "ERROR processing ${YEAR}${MONTH}"
@@ -70,8 +71,8 @@ for MONTH in {0..11}; do
   echo "  Archiving"
   ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
 
-  cd ${OUTPUT_DIR}
-  tar -I pbzip2 -cf ${OUTPUT_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
+  cd ${KATANA_OUTPUT_DIR}
+  tar -I pbzip2 -cf ${KATANA_OUTPUT_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
   cp katana.log katana_${YEAR}${MONTH}.log
 
   echo "  Backup to remote destination: ${BACKUP_DESTINATION}"
