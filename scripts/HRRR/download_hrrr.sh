@@ -8,7 +8,7 @@
 #
 # The third is optional and can specify the archive source. Default
 # is to get from Google and can be changed to the University of Utah by
-# by passing 'UofU'.
+# by passing 'UofU' or Amazon with 'AWS'.
 
 # Colorado Basin River bounding box from:
 # https://www.sciencebase.gov/catalog/item/4f4e4a38e4b07f02db61cebb
@@ -18,20 +18,21 @@ HRRR_FC_HOURS=( 1 6 )
 
 UofU_ARCHIVE='UofU'
 AWS_ARCHIVE='AWS'
+Google_ARCHIVE='Google'
 
 OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 
 set_archive_url() {
-  if [ $1 == 'UofU' ]; then
+  if [ $1 == ${UofU_ARCHIVE} ]; then
       ARCHIVE_URL="https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/${FILE_NAME}"
-  elif [ $1 == 'AWS' ]; then
+  elif [ $1 == ${AWS_ARCHIVE} ]; then
       ARCHIVE_URL="https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.${DATE}/conus/${FILE_NAME}"
-  elif [ $1 == 'Google' ]; then
+  elif [ $1 == ${Google_ARCHIVE} ]; then
       ARCHIVE_URL="https://storage.googleapis.com/high-resolution-rapid-refresh/hrrr.${DATE}/conus/${FILE_NAME}"
   fi
 }
 
-if [ ! -z "$1" ] && [ ! -z "$2" ] && [[ $2 != @($UofU_ARCHIVE|$AWS_ARCHIVE) ]]; then
+if [[ $2 != @($UofU_ARCHIVE|$AWS_ARCHIVE|$Google_ARCHIVE) ]]; then
   YEAR=$1
   MONTH=$2
   LAST_DAY=$(date -d "${MONTH}/01/${YEAR} + 1 month - 1 day" +%d)
@@ -42,12 +43,12 @@ else
   DATES=($1)
 fi
 
-if [ ! -z "$3" ] || [[ $2 = $UofU_ARCHIVE ]]; then
-  ARCHIVE=$UofU_ARCHIVE
-elif [ ! -z "$3" ] || [[ $2 = $AWS_ARCHIVE ]]; then
-  ARCHIVE=$AWS_ARCHIVE
+if [[ "$2" == "${UofU_ARCHIVE}" ]] || [[ "$3" == "${UofU_ARCHIVE}" ]]; then
+  ARCHIVE=${UofU_ARCHIVE}
+elif [[ "$2" == "${AWS_ARCHIVE}" ]] || [[ "$3" == "${AWS_ARCHIVE}" ]]; then
+  ARCHIVE=${AWS_ARCHIVE}
 else
-  ARCHIVE='Google'
+  ARCHIVE=${Google_ARCHIVE}
 fi
 
 printf "Getting files from: ${ARCHIVE}\n"
