@@ -12,6 +12,7 @@
 
 # Colorado Basin River bounding box from:
 # https://www.sciencebase.gov/catalog/item/4f4e4a38e4b07f02db61cebb
+#
 
 HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
 HRRR_FC_HOURS=( 1 6 )
@@ -19,6 +20,7 @@ HRRR_FC_HOURS=( 1 6 )
 UofU_ARCHIVE='UofU'
 AWS_ARCHIVE='AWS'
 Google_ARCHIVE='Google'
+ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE)
 
 OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 
@@ -32,7 +34,36 @@ set_archive_url() {
   fi
 }
 
-if [[ $2 != @($UofU_ARCHIVE|$AWS_ARCHIVE|$Google_ARCHIVE) ]]; then
+check_file_in_archive() {
+  set_archive_url $1
+  STATUS_CODE=$(curl -s -o /dev/null -I -w "%{http_code}" ${ARCHIVE_URL})
+
+  if [ "${STATUS_CODE}" == "404" ]; then
+    >&2 printf " - missing on $1\n"
+    touch "$FILE_NAME.missing"
+    return 1
+  fi
+
+  return 0
+}
+
+check_alternate_archive() {
+    for ALT_ARCHIVE in "${ARCHIVES[@]}"; do
+      if [[ "${ALT_ARCHIVE}" == "${ARCHIVE}" ]]; then
+        continue
+      fi
+
+      >&2 printf "    Checking alternate archive:"
+      check_file_in_archive ${ALT_ARCHIVE}
+      if [ $? -eq 0 ]; then
+        return 0
+      fi
+    done
+
+    return 1
+}
+
+if [[ ! -z $2 ]] && [[ $2 != @($UofU_ARCHIVE|$AWS_ARCHIVE|$Google_ARCHIVE) ]]; then
   YEAR=$1
   MONTH=$2
   LAST_DAY=$(date -d "${MONTH}/01/${YEAR} + 1 month - 1 day" +%d)
@@ -72,11 +103,30 @@ for DATE in "${DATES[@]}"; do
           continue
         fi
 
-        set_archive_url ${ARCHIVE}
-        STATUS_CODE=$(curl -s -o /dev/null -I -w "%{http_code}" ${ARCHIVE_URL})
+        check_file_in_archive ${ARCHIVE}
 
-        if [ "${STATUS_CODE}" == "404" ]; then
-          >&2 printf " - missing on ${ARCHIVE}\n"
+        if [ $? -eq 1 ]; then
+          check_alternate_archive
+        fi
+
+        if [ $? -eq 1 ]; then
+          >&2 printf "  ** File not available **\n"
+
+          DAY_HOUR=$(date -u -d "${DATE} ${DAY_HOUR}:00:00 1 hour ago" +%H)
+          DATE=$(date -u -d "${DATE} ${DAY_HOUR}:00:00 1 hour ago" +%Y%m%d)
+          FILE_NAME="hrrr.t${DAY_HOUR}z.wrfsfcf0$(($FC_HOUR + 1)).grib2"
+
+          >&2 printf "  ** Checking previous hour: ${FILE_NAME}"
+
+          check_file_in_archive $ARCHIVE
+
+          if [ $? -eq 1 ]; then
+            check_alternate_archive
+          fi
+        fi
+
+        if [ $? -eq 1 ]; then
+          >&2 printf "  ** File not present in previous hour\n"
           continue
         fi
 
