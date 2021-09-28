@@ -19,6 +19,8 @@ HRRR_FC_HOURS=( 1 6 )
 UofU_ARCHIVE='UofU'
 AWS_ARCHIVE='AWS'
 
+OMP_NUM_THREADS=${SLURM_NTASKS:-4}
+
 set_archive_url() {
   if [ $1 == 'UofU' ]; then
       ARCHIVE_URL="https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/${FILE_NAME}"
@@ -55,31 +57,45 @@ for DATE in "${DATES[@]}"; do
 
   FOLDER="hrrr.${DATE}"
   mkdir -p $FOLDER
-  pushd $FOLDER
+  pushd $FOLDER > /dev/null
 
-  for HOUR in {0..23}; do
-    for FIELD in "${HRRR_FC_HOURS[@]}"; do
-        FILE_NAME="hrrr.t$(printf "%02d" $HOUR)z.wrfsfcf0${FIELD}.grib2"
+  for DAY_HOUR in {0..23}; do
+    for FC_HOUR in "${HRRR_FC_HOURS[@]}"; do
+        FILE_NAME="hrrr.t$(printf "%02d" $DAY_HOUR)z.wrfsfcf0${FC_HOUR}.grib2"
+
+        printf "  File: ${FILE_NAME}"
 
         # Check for existing file and that it is not zero in size
         if [ -s "${FILE_NAME}" ]; then
+          >&1 printf " exists \n"
+          continue
+        fi
+
+        set_archive_url ${ARCHIVE}
+        STATUS_CODE=$(curl -s -o /dev/null -I -w "%{http_code}" ${ARCHIVE_URL})
+
+        if [ "${STATUS_CODE}" == "404" ]; then
+          >&2 printf " - missing on ${ARCHIVE}\n"
           continue
         fi
 
         TMP_FILE="${FILE_NAME}_tmp"
         mkfifo $TMP_FILE
 
-        set_archive_url ${ARCHIVE}
-        wget -nv --no-check-certificate ${ARCHIVE_URL} -O $TMP_FILE | \
-        wgrib2 $TMP_FILE -v0 -ncpu ${SLURM_NTASKS} -set_grib_type same -small_grib -112.322:-105.628 35.556:43.452 - | \
-        wgrib2 - -v0 -ncpu ${SLURM_NTASKS} -match "$HRRR_VARS" -grib $FILE_NAME
+        printf '\n'
+        wget -q --no-check-certificate ${ARCHIVE_URL} -O $TMP_FILE | \
+        wgrib2 $TMP_FILE -v0 -ncpu ${OMP_NUM_THREADS} -set_grib_type same \
+               -small_grib -112.322:-105.628 35.556:43.452 - | \
+        wgrib2 - -v0 -ncpu ${OMP_NUM_THREADS} -match "$HRRR_VARS" \
+               -grib $FILE_NAME >&1
 
         rm $TMP_FILE
 
-        # printf "$URL"
-        printf "${FILE_NAME} created \n"
+        if [ $? -eq 0 ]; then
+          >&1 printf " created \n"
+        fi
     done
   done
 
-  popd
+  popd > /dev/null
 done
