@@ -9,17 +9,19 @@
 #   6-hour forecast: hrrr.t00z.wrfsfcf06.grib2
 #   Result: hrrr.t05z.wrfsfcf01.apcp06.grib2
 #
-# Usage:
-# ~/extract_precip.sh path/to/HRRR/downloads/hrrr.*
+# Usage example to process all wrfsfcf06.grib2 files:
+#   ~/extract_precip.sh path/to/HRRR/downloads/hrrr.* 6
 #
 
 # For wgrib
 export OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 export OMP_WAIT_POLICY=PASSIVE
-
+export FORECAST_HOUR=${2}
+export WGRIB_MATCH="APCP:surface:$(($2 - 1))-${FORECAST_HOUR}"
 
 extract_apcp_fc06() {
-  parallel --jobs ${OMP_NUM_THREADS} wgrib2 {} -match 'APCP:surface:5-6' -grib {.}.apcp.grib2 ::: $1
+  parallel --jobs ${OMP_NUM_THREADS} wgrib2 {} -match $WGRIB_MATCH \
+           -grib {.}.apcp.grib2 ::: $1
 }
 
 adjust_time() {
@@ -33,7 +35,10 @@ adjust_time() {
 
 #  printf "\nProcessing: ${HRRR_FILE}\n"
 #  echo "  Filter to: ${TMP_FILE}"
-  wgrib2 $1 -match 'APCP:surface:5-6' -set_date +5hr -set_ftime "0-1 hour acc fcst" -grib ${TMP_FILE} > /dev/null
+  wgrib2 $1 -match ${WGRIB_MATCH} \
+            -set_date "+$(($FORECAST_HOUR - 1))hr" \
+            -set_ftime "0-1 hour acc fcst" \
+            -grib ${TMP_FILE} > /dev/null
 
   HRRR_DATETIME=$(wgrib2 -t ${TMP_FILE} | cut -d= -f2 | uniq)
   HRRR_DAY=${HRRR_DATETIME:0:-2}
@@ -43,7 +48,7 @@ adjust_time() {
   mkdir -p "${DEST_FOLDER}/hrrr.${HRRR_DAY}"
 
   DEST_FILE="${DEST_FOLDER}/hrrr.${HRRR_DAY}/hrrr.t${HRRR_HOUR}z.wrfsfcf01.${APCP_FILE}"
-#  echo "Moving to: ${DEST_FILE}"
+#  echo "  Moving to: ${DEST_FILE}"
   mv ${TMP_FILE} ${DEST_FILE}
 
   if [ "$HRRR_HOUR" == "23" ]; then
@@ -51,9 +56,15 @@ adjust_time() {
   fi
 }
 
+if [[ -z $2 ]]; then
+  echo "Missing required second parameter with forecast hour"
+  echo "  Usage example: ./extract_precip.sh hrrr.2020* 7   "
+  exit 1
+fi
+
 export -f adjust_time
 while [ ! -z "$1" ]; do
-  parallel --jobs ${OMP_NUM_THREADS} adjust_time ::: ${1}/*wrfsfcf06.grib2
+  parallel --jobs ${OMP_NUM_THREADS} adjust_time ::: ${1}/*wrfsfcf0${FORECAST_HOUR}.grib2
   shift
 done
 
