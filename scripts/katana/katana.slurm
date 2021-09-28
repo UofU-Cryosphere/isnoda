@@ -22,9 +22,15 @@ START_YEAR=2019
 START_MONTH=10
 
 PROJECT_DIR=${HOME}/project-data/iSnobal
-OUTPUT_DIR=${HOME}/scratch/iSnobal/katana_ERW/
+
+OUTPUT_DIR=${HOME}/skiles-group1/katana_ERW/
 INPUT_DIR=${HOME}/skiles-group1/HRRR_CBR/
-ARCHIVE_DIR=${HOME}/shared-cryosphere/iSnobal/
+
+BASIN_SETUP=${PROJECT_DIR}/ERW/topo/basin_setup/
+KATANA_DIR=${PROJECT_DIR}/katana
+KATANA_INI=${KATANA_DIR}/katana.ini
+
+BACKUP_DESTINATION="isnoda:ERW_subset/katana/"
 
 for MONTH in {0..11}; do
   START=($(date -d "${START_MONTH}/01/${START_YEAR} + ${MONTH} month" "+%m %Y"))
@@ -37,12 +43,14 @@ for MONTH in {0..11}; do
 
   echo "Processing: ${YEAR}-${MONTH}"
 
-  cd ${PROJECT_DIR}/katana
-  sed -i -e "s/^start_date: .* UTC/start_date: ${YEAR}-${MONTH}-01 00:00:00 UTC/g" katana.ini
-  sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" katana.ini
-  cp katana.ini ${OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
+  # Update the config to the month processed
+  sed -i -e "s/^start_date: .* UTC/start_date: ${YEAR}-${MONTH}-01 00:00:00 UTC/g" ${KATANA_INI}
+  sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" ${KATANA_INI}
 
-  ./singularity_katana.sh ${PROJECT_DIR}/ERW/topo/basin_setup/ \
+  # Backup the used configuration of the processed month
+  cp ${KATANA_INI} ${OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
+
+  ${KATANA_DIR}/singularity_katana.sh ${BASIN_SETUP} \
     ${INPUT_DIR} \
     ${OUTPUT_DIR} 1>&2
 
@@ -51,16 +59,25 @@ for MONTH in {0..11}; do
     continue
   fi
 
+  ## ------------------------------------------------------------------ ##
+  # Below archiving requires the `rclone` command to be setup. It also
+  # uses the `pbzip2` command to create the archive with parallel
+  # processes.
+  # Currently this uses a remote destination with the alias `isnoda`.
+  # The destination can be changed via the $BACKUP_DESTINATION variable.
+  ## ------------------------------------------------------------------ ##
+
   echo "  Archiving"
   ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
 
   cd ${OUTPUT_DIR}
-  tar -I pbzip2 -cf ${ARCHIVE_DIR}/katana/${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
+  tar -I pbzip2 -cf ${OUTPUT_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
   cp katana.log katana_${YEAR}${MONTH}.log
 
-  echo "  Backup"
+  echo "  Backup to remote destination: ${BACKUP_DESTINATION}"
 
-  cd ${ARCHIVE_DIR}/katana
-  rclone copy --include '*.bz2' ${ARCHIVE} isnoda:ERW_subset/katana/
-  rm ${ARCHIVE}
+  rclone copy --include '*.bz2' ${ARCHIVE} ${BACKUP_DESTINATION}
+  if [ $? -eq 0 ]; then
+    rm ${ARCHIVE}
+  end
 done
