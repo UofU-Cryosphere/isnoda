@@ -50,7 +50,7 @@ for MONTH in {0..11}; do
   # Backup the used configuration of the processed month
   cp ${KATANA_INI} ${OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
 
-  ${KATANA_DIR}/singularity_katana.sh ${BASIN_SETUP} \
+  ${KATANA_DIR}/katana_singularity.sh ${BASIN_SETUP} \
     ${INPUT_DIR} \
     ${OUTPUT_DIR} 1>&2
 
