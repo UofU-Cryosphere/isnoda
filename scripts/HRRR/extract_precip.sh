@@ -8,6 +8,10 @@
 # Example:
 #   6-hour forecast: hrrr.t00z.wrfsfcf06.grib2
 #   Result: hrrr.t05z.wrfsfcf01.apcp06.grib2
+#
+# Usage:
+# ~/extract_precip.sh path/to/HRRR/downloads/hrrr.*
+#
 
 # For wgrib
 export OMP_NUM_THREADS=${SLURM_NTASKS:-4}
@@ -49,7 +53,7 @@ adjust_time() {
 
 export -f adjust_time
 while [ ! -z "$1" ]; do
-  parallel --jobs ${OMP_NUM_THREADS} adjust_time ::: $1/*wrfsfcf06.grib2
+  parallel --jobs ${OMP_NUM_THREADS} adjust_time ::: ${1}/*wrfsfcf06.grib2
   shift
 done
 
