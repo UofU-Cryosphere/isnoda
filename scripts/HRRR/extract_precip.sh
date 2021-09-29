@@ -10,14 +10,21 @@
 #   Result: hrrr.t05z.wrfsfcf01.apcp06.grib2
 #
 # Usage example to process all wrfsfcf06.grib2 files:
-#   ~/extract_precip.sh path/to/HRRR/downloads/hrrr.* 6
+#   ~/extract_precip.sh 6 path/to/HRRR/downloads/hrrr.*
 #
+
+if ! [[ $1 =~ ^[0-9]*$ ]]; then
+  echo "Missing required parameter with forecast hour"
+  echo "  Usage: extract_precip.sh <FORECAST_HOUR> <FILE_OR_PATTERN> "
+  echo "    example: 7 ./extract_precip.sh hrrr.2020*"
+  exit 1
+fi
 
 # For wgrib
 export OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 export OMP_WAIT_POLICY=PASSIVE
-export FORECAST_HOUR=${2}
-export WGRIB_MATCH="APCP:surface:$(($2 - 1))-${FORECAST_HOUR}"
+export FORECAST_HOUR=${1}
+export WGRIB_MATCH="APCP:surface:$((FORECAST_HOUR - 1))-${FORECAST_HOUR}"
 
 extract_apcp_fc06() {
   parallel --jobs ${OMP_NUM_THREADS} wgrib2 {} -match $WGRIB_MATCH \
@@ -56,15 +63,9 @@ adjust_time() {
   fi
 }
 
-if [[ -z $2 ]]; then
-  echo "Missing required second parameter with forecast hour"
-  echo "  Usage example: ./extract_precip.sh hrrr.2020* 7   "
-  exit 1
-fi
-
 export -f adjust_time
-while [ ! -z "$1" ]; do
-  parallel --jobs ${OMP_NUM_THREADS} adjust_time ::: ${1}/*wrfsfcf0${FORECAST_HOUR}.grib2
+while [ ! -z "$2" ]; do
+  parallel --jobs ${OMP_NUM_THREADS} adjust_time ::: ${2}/*wrfsfcf0${FORECAST_HOUR}.grib2
   shift
 done
 
