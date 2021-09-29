@@ -13,6 +13,9 @@
 # Colorado Basin River bounding box from:
 # https://www.sciencebase.gov/catalog/item/4f4e4a38e4b07f02db61cebb
 #
+# List days after a download, where there are not 48 files for a day:
+# find -L . -name *.grib2 -type f | cut -d/ -f2 | uniq -c | grep -v '48 ' | tr -s ' ' | cut -d '.' -f 2
+#
 
 HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
 HRRR_FC_HOURS=( 1 6 )
@@ -25,12 +28,18 @@ ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE)
 OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 
 set_archive_url() {
+  if [[ ! -v ALT_DATE ]]; then
+    local HRRR_DAY=${DATE}
+  else
+    local HRRR_DAY=${ALT_DATE}
+  fi
+
   if [ $1 == ${UofU_ARCHIVE} ]; then
-      ARCHIVE_URL="https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${DATE}/${FILE_NAME}"
+      ARCHIVE_URL="https://pando-rgw01.chpc.utah.edu/hrrr/sfc/${HRRR_DAY}/${FILE_NAME}"
   elif [ $1 == ${AWS_ARCHIVE} ]; then
-      ARCHIVE_URL="https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.${DATE}/conus/${FILE_NAME}"
+      ARCHIVE_URL="https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.${HRRR_DAY}/conus/${FILE_NAME}"
   elif [ $1 == ${Google_ARCHIVE} ]; then
-      ARCHIVE_URL="https://storage.googleapis.com/high-resolution-rapid-refresh/hrrr.${DATE}/conus/${FILE_NAME}"
+      ARCHIVE_URL="https://storage.googleapis.com/high-resolution-rapid-refresh/hrrr.${HRRR_DAY}/conus/${FILE_NAME}"
   fi
 }
 
@@ -40,10 +49,11 @@ check_file_in_archive() {
 
   if [ "${STATUS_CODE}" == "404" ]; then
     >&2 printf " - missing on $1\n"
-    touch "$FILE_NAME.missing"
     return 1
   fi
 
+  >&2 printf "\n"
+  unset ALT_DATE
   return 0
 }
 
@@ -60,7 +70,21 @@ check_alternate_archive() {
       fi
     done
 
+    unset ALT_DATE
+    touch "${FILE_NAME}.missing"
     return 1
+}
+
+check_file_existence(){
+  # Check for existing file and that it is not zero in size
+  if [[ -s "${FILE_NAME}" ]]; then
+    >&1 printf " exists \n"
+    return 0
+  elif [[ -e "${FILE_NAME}.missing" ]]; then
+    >&1 printf " missing in archives \n"
+    return 0
+  fi
+  return 1
 }
 
 if [[ ! -z $2 ]] && [[ $2 != @($UofU_ARCHIVE|$AWS_ARCHIVE|$Google_ARCHIVE) ]]; then
@@ -97,9 +121,8 @@ for DATE in "${DATES[@]}"; do
 
         printf "  File: ${FILE_NAME}"
 
-        # Check for existing file and that it is not zero in size
-        if [ -s "${FILE_NAME}" ]; then
-          >&1 printf " exists \n"
+        check_file_existence
+        if [[ $? -eq 0 ]]; then
           continue
         fi
 
@@ -112,22 +135,32 @@ for DATE in "${DATES[@]}"; do
         if [ $? -eq 1 ]; then
           >&2 printf "  ** File not available **\n"
 
-          DAY_HOUR=$(date -u -d "${DATE} ${DAY_HOUR}:00:00 1 hour ago" +%H)
-          DATE=$(date -u -d "${DATE} ${DAY_HOUR}:00:00 1 hour ago" +%Y%m%d)
-          FILE_NAME="hrrr.t${DAY_HOUR}z.wrfsfcf0$(($FC_HOUR + 1)).grib2"
+          # Try a previous hour of the day when getting the F06 forecast
+          if [[ ${FC_HOUR} -eq 6 ]]; then
+            NEW_DATE=$(date -u -d "${DATE} $(printf "%02d" $DAY_HOUR):00:00 1 hour ago" "+%Y%m%d%H")
+            ALT_DATE=${NEW_DATE:0:-2}
+            FILE_NAME="hrrr.t${NEW_DATE:(-2)}z.wrfsfcf0$(($FC_HOUR + 1)).grib2"
 
-          >&2 printf "  ** Checking previous hour: ${FILE_NAME}"
+            >&2 printf "  ** Checking previous hour: hrrr.${ALT_DATE}/${FILE_NAME}"
 
-          check_file_in_archive $ARCHIVE
+            check_file_existence
+            if [[ $? -eq 0 ]]; then
+              unset ALT_DATE
+              continue
+            fi
+            check_file_in_archive $ARCHIVE
 
-          if [ $? -eq 1 ]; then
-            check_alternate_archive
+            if [[ $? -eq 1 ]]; then
+              check_alternate_archive
+
+              if [[ $? -eq 1 ]]; then
+                >&2 printf "  ** File not present in previous hour\n"
+                continue
+              fi
+            fi
+          else
+            continue
           fi
-        fi
-
-        if [ $? -eq 1 ]; then
-          >&2 printf "  ** File not present in previous hour\n"
-          continue
         fi
 
         TMP_FILE="${FILE_NAME}_tmp"
