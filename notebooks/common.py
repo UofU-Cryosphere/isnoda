@@ -9,6 +9,9 @@ import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 import matplotlib.font_manager as font_manager
 
+import holoviews as hv
+from holoviews import dim, opts
+
 from pathlib import Path, PurePath
 
 from snobedo.lib.dask_utils import start_cluster
