@@ -37,7 +37,7 @@ for NEXT in {0..2}; do
 
   >&1 echo "  Archiving"
 
-  ARCHIVE="hrrr-${YEAR}${CURRENT_MONTHMONTH}.tar.bz2"
+  ARCHIVE="hrrr-${YEAR}${CURRENT_MONTH}.tar.bz2"
   tar -I pbzip2 -cf ${ARCHIVE} hrrr.${YEAR}${CURRENT_MONTH}[0-3][0-9]
 
   >&1 echo "  Copy to remote"
