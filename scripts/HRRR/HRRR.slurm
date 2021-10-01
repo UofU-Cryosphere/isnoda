@@ -26,6 +26,8 @@ cd ${HOME}/skiles-group1/HRRR_CBR
 for NEXT in {0..2}; do
   CURRENT_MONTH=$(date -d "${YEAR}/${MONTH}/01 + ${NEXT} month" +%m)
 
+  >&1 echo "Processing: ${YEAR}${CURRENT_MONTH}"
+
   ${HOME}/projects/ARS/isnoda/scripts/HRRR/download_hrrr.sh ${YEAR} ${CURRENT_MONTH}
 
   if [ $? -ne 0 ]; then
@@ -33,8 +35,12 @@ for NEXT in {0..2}; do
     exit
   fi
 
+  >&1 echo "  Archiving"
+
   ARCHIVE="hrrr-${YEAR}${CURRENT_MONTHMONTH}.tar.bz2"
   tar -I pbzip2 -cf ${ARCHIVE} hrrr.${YEAR}${CURRENT_MONTH}[0-3][0-9]
+
+  >&1 echo "  Copy to remote"
 
   rclone copy $ARCHIVE isnoda:HRRR_CBR/
   rm $ARCHIVE
