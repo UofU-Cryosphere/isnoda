@@ -1,12 +1,5 @@
 import numpy as np
-from pathlib import Path
-from osgeo import gdal, gdalnumeric
 from numba import njit, prange
-
-dates = ['20190407_1m']
-FILE_PREFIX = 'depth_difference_'
-HOME = Path.home() / 'scratch/iSnobal/ASO-data/'
-SNOW_DIFF = f'{FILE_PREFIX}{dates[0]}.tif'
 
 ORIGINAL_RESOLUTION = 50
 X_RESOLUTION_OFFSET = 39
@@ -49,22 +42,3 @@ def get_mask(y_dim, x_dim):
     mask_y = np.tile(reduce_y(y_dim), (x_dim, 1)).T
 
     return reduce_x_y(mask_x, mask_y)
-
-
-if __name__ == '__main__':
-    file = gdal.Open(HOME.joinpath(SNOW_DIFF).as_posix())
-
-    mask = get_mask(file.RasterYSize, file.RasterXSize)
-
-    band = file.GetRasterBand(1)
-
-    values = np.ma.masked_values(
-        gdalnumeric.BandReadAsArray(band),
-        band.GetNoDataValue(),
-        copy=False
-    )
-    del band
-
-    print(
-        values[mask].size
-    )
