@@ -15,6 +15,7 @@ SHARED_STORE = '/uufs/chpc.utah.edu/common/home/skiles-group1'
 
 SNOBAL_DIR = Path(f'{SHARED_STORE}/erw_isnobal')
 SNOTEL_DIR = Path.home() / 'shared-cryosphere/Snotel'
+CBRFC_DIR = Path.home() / 'shared-cryosphere/CBRFC'
 HRRR_DIR = Path(f'{SHARED_STORE}/HRRR_water_years')
 FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
 
