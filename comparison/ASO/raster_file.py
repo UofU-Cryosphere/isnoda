@@ -1,8 +1,8 @@
 import errno
-import functools
-import numpy as np
 import os
-from osgeo import gdal, gdalnumeric
+
+import numpy as np
+from osgeo import gdal, gdal_array
 
 
 class RasterFile(object):
@@ -119,55 +119,10 @@ class RasterFile(object):
 
         band = self.file.GetRasterBand(band_number)
         values = np.ma.masked_values(
-            gdalnumeric.BandReadAsArray(band),
+            gdal_array.BandReadAsArray(band),
             band.GetNoDataValue(),
             copy=False
         )
 
         del band
         return values
-
-    def get_raster_attribute(self, attribute, **kwargs):
-        raster = gdal.DEMProcessing(
-            '', self.file, attribute, format='MEM', **kwargs
-        )
-        raster_band = raster.GetRasterBand(1)
-        raster_values = np.ma.masked_values(
-            gdalnumeric.BandReadAsArray(raster_band),
-            raster_band.GetNoDataValue(),
-            copy=False
-        )
-
-        del raster
-        del raster_band
-
-        return raster_values.view(dtype=np.half)
-
-    @functools.lru_cache(16)
-    def hill_shade(self, **kwargs):
-        return self.get_raster_attribute('hillshade', **kwargs)
-
-    @property
-    def slope(self):
-        if self._slope is None:
-            self._slope = self.get_raster_attribute('slope')
-        return self._slope
-
-    @property
-    def aspect(self):
-        if self._aspect is None:
-            self._aspect = self.get_raster_attribute('aspect')
-        return self._aspect
-
-    def join_masks(self, attribute, other):
-        """
-        Extend the numpy mask for given attribute with mask from given other
-        masked numpy array.
-
-        Note: This will *permanently* change the mask.
-
-        :param attribute: name of property to change the mask
-        :param other: Masked numpy array to extend the mask with
-        """
-        attr = getattr(self, attribute)
-        attr.mask = np.ma.mask_or(attr.mask, other.mask)
