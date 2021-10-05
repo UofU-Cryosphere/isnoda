@@ -4,11 +4,17 @@ import pandas as pd
 import xarray as xr
 
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 import matplotlib.font_manager as font_manager
 
+import holoviews as hv
+from holoviews import dim, opts
 from pathlib import Path
 
+from pathlib import Path, PurePath
+
+from snobedo.lib.dask_utils import start_cluster
 from snobedo.snotel import SnotelLocations
 
 SHARED_STORE = '/uufs/chpc.utah.edu/common/home/skiles-group1'
@@ -91,4 +97,5 @@ def add_legend_box(ax, entries):
 
 ## Use hvplot
 def use_hvplot():
+    import hvplot.xarray
     pd.options.plotting.backend = 'holoviews'
