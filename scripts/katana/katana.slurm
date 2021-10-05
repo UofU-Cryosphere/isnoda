@@ -80,5 +80,5 @@ for MONTH in {0..11}; do
   rclone copy --include '*.bz2' ${ARCHIVE} ${BACKUP_DESTINATION}
   if [ $? -eq 0 ]; then
     rm ${ARCHIVE}
-  end
+  fi
 done
