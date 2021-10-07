@@ -98,4 +98,5 @@ def add_legend_box(ax, entries):
 ## Use hvplot
 def use_hvplot():
     import hvplot.xarray
+    import hvplot.pandas
     pd.options.plotting.backend = 'holoviews'
