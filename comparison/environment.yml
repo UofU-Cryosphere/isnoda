@@ -1,0 +1,23 @@
+name: snow_viz
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - xarray
+  - dask-jobqueue
+  - netcdf4
+  - cfgrib
+  - gdal
+  - hvplot
+  - nc-time-axis
+  - pandas
+  - dask
+  - palettable
+  - python
+  - zarr
+  - numpy
+  - matplotlib
+  - numba
+  - ipykernel
+  - rasterio
+  - scipy
