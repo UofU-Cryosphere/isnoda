@@ -17,11 +17,14 @@ from pathlib import Path, PurePath
 from snobedo.lib.dask_utils import start_cluster
 from snobedo.snotel import SnotelLocations
 
+from raster_file import RasterFile
+
 SHARED_STORE = '/uufs/chpc.utah.edu/common/home/skiles-group1'
 
 SNOBAL_DIR = Path(f'{SHARED_STORE}/erw_isnobal')
 SNOTEL_DIR = Path.home() / 'shared-cryosphere/Snotel'
 CBRFC_DIR = Path.home() / 'shared-cryosphere/CBRFC'
+ASO_DIR = Path.home() / 'shared-cryosphere/ASO-data'
 HRRR_DIR = Path(f'{SHARED_STORE}/HRRR_water_years')
 FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
 
@@ -30,6 +33,18 @@ FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
 COARSEN_OPTS = dict(x=2, y=2)
 RESAMPLE_1_DAY_OPTS = dict(time='1D', base=23)
 
+## CBRFC zones
+# Corresponds to values in classification tif
+ALEC2HLF = 1
+ALEC2HMF = 2
+ALEC2HUF = 3
+
+def cbrfc_zones():
+    zones = RasterFile(CBRFC_DIR / 'ERW_CBRFC_zones.tif')
+    zone_data = zones.band_values()
+    zone_data[zone_data==241] = 0
+
+    return zone_data
 
 # HRRR helpers
 def hrrr_pixel_index(hrrr_file, site):
@@ -37,10 +52,8 @@ def hrrr_pixel_index(hrrr_file, site):
     y_index = np.abs(hrrr_file.latitude.values - site.lat)
     return np.unravel_index((x_index + y_index).argmin(), x_index.shape)
 
-
 def hrrr_longitude(longitude):
     return longitude % 360
-
 
 @dask.delayed
 def hrrr_snotel_pixel(file, x_pixel_index, y_pixel_index):
