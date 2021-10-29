@@ -23,8 +23,8 @@ source load_conda_env snobedo
 # Path to iSnobal output up to the daily outputs (e.g. runYYYYMMDD)
 SOURCE_FOLDER=/path/to/iSnobal/output
 
-smrf_compactor -sd ${SOURCE_FOLDER}
-smrf_compactor -sd ${SOURCE_FOLDER} -eb
+smrf_compactor -sd ${SOURCE_FOLDER} --delete-originals
+smrf_compactor -sd ${SOURCE_FOLDER} -eb --delete-originals
 
 # Add compression to remaining files, not processed by the above
 # `smrf_compactor` call. Utilizes the `parallel` command and tools from `cdo`.
