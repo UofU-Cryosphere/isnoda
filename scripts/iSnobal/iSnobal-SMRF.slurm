@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=iSnobal
+#SBATCH --job-name=SMRF-compact
 #SBATCH --account=notchpeak-gpu
 #SBATCH --partition=notchpeak-gpu
 
-#SBATCH --time=2:00:00
-#SBATCH --ntasks=8
-#SBATCH --mem=8G
+#SBATCH --time=4:00:00
+#SBATCH --ntasks=12
+#SBATCH --mem=4G
 
 #SBATCH --mail-type=FAIL,END
 #SBATCH --mail-user=user@utah.edu
@@ -20,7 +20,8 @@ export OMP_NUM_THREADS=${SLURM_NTASKS}
 ml gcc/8.3.0 intel-mpi/2019.8.254 cdo/1.9.9
 source load_conda_env snobedo
 
-SOURCE_FOLDER=/uufs/chpc.utah.edu/common/home/skiles-group1/erw_isnobal/wy2018/erw
+# Path to iSnobal output up to the daily outputs (e.g. runYYYYMMDD)
+SOURCE_FOLDER=/path/to/iSnobal/output
 
 smrf_compactor -sd ${SOURCE_FOLDER}
 smrf_compactor -sd ${SOURCE_FOLDER} -eb
