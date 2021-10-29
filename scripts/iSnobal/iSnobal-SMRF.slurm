@@ -17,7 +17,7 @@
 
 export OMP_NUM_THREADS=${SLURM_NTASKS}
 
-module load cdo
+ml gcc/8.3.0 intel-mpi/2019.8.254 cdo/1.9.9
 source load_conda_env snobedo
 
 SOURCE_FOLDER=/uufs/chpc.utah.edu/common/home/skiles-group1/erw_isnobal/wy2018/erw
