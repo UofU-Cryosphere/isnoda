@@ -19,8 +19,15 @@ OUTPUT_FILES = [
     'vapor_pressure.nc',
     'wind_speed.nc',
 ]
+OUTPUT_FILES_EB = [
+    'albedo_ir.nc',
+    'albedo_vis.nc',
+    'net_solar.nc',
+]
+
 DOT_NC = '.nc'
 MERGE_FILE_NAME = 'smrf_{day}' + DOT_NC
+MERGE_FILE_NAME_EB = 'smrf_energy_balance_{day}' + DOT_NC
 COMBINED_FOLDER = 'combined'
 
 CDO_MERGE = ['cdo', '-P', '4', '-z', 'zip_4', 'merge']
@@ -47,24 +54,33 @@ def argument_parser():
         required=False,
         help='Delete instead of moving the original files.'
     )
+    parser.add_argument(
+        '--energy-balance', '-eb',
+        action='store_true',
+        required=False,
+        help='Compress all energy balance related files into one.'
+    )
     parser = add_dask_options(parser)
 
     return parser
 
 
-def combined_file_name(day_folder):
+def combined_file_name(day_folder, energy_balance_files=False):
+    if energy_balance_files:
+        files = MERGE_FILE_NAME_EB
+    else:
+        files = MERGE_FILE_NAME
+
     outfile = (
             day_folder /
-            MERGE_FILE_NAME.format(
-                day=day_folder.name.replace(DAY_FOLDER_PREFIX, '')
-            )
+            files.format(day=day_folder.name.replace(DAY_FOLDER_PREFIX, ''))
     )
 
     if outfile.exists():
         print(f"Output file {outfile.as_posix()} already exists - Skipping")
         return None
     else:
-        return outfile
+        return outfile.as_posix()
 
 
 def verify_merge(in_files, outfile):
@@ -83,8 +99,27 @@ def verify_merge(in_files, outfile):
     return in_files
 
 
-def combine_files(day_folder, outfile):
-    day_files = [(day_folder / file).as_posix() for file in OUTPUT_FILES]
+def combine_files(day_folder, energy_balance_files=False):
+    """
+    Combine the individual output files for given day.
+
+    :param day_folder: PathObject to location of individual files
+    :param energy_balance_files:
+        Boolean flag to combine energy balance files or the default list.
+
+    :return: List of combined files
+    """
+    outfile = combined_file_name(day_folder, energy_balance_files)
+
+    if outfile is None:
+        return
+
+    if energy_balance_files:
+        output_files = OUTPUT_FILES_EB
+    else:
+        output_files = OUTPUT_FILES
+
+    day_files = [(day_folder / file).as_posix() for file in output_files]
     call = subprocess.run(
         CDO_MERGE + day_files + [outfile],
         stderr=subprocess.PIPE, stdout=subprocess.PIPE, text=True
@@ -110,12 +145,7 @@ def main():
     day_folders = arguments.source_dir.glob(DAY_FOLDER_PREFIX + '*')
 
     for day in day_folders:
-        outfile = combined_file_name(day)
-
-        if outfile is None:
-            continue
-
-        day_files = combine_files(day, outfile.as_posix())
+        day_files = combine_files(day, arguments.energy_balance)
         if day_files:
             if not arguments.delete_originals:
                 destination = (day / COMBINED_FOLDER)
