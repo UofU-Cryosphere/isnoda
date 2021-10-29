@@ -27,3 +27,6 @@ smrf_compactor -sd ${SOURCE_FOLDER} -eb
 
 parallel --jobs ${OMP_NUM_THREADS} nccopy -s -u -d4 {} {.}_c.nc ::: ${SOURCE_FOLDER}/run*/{em,precip,snow}.nc
 rename _c.nc .nc ${SOURCE_FOLDER}/run*/{em,precip,snow}_c.nc
+
+# Remove all empty log folders
+find ${SOURCE_FOLDER} -type d -empty -delete
