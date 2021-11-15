@@ -39,6 +39,9 @@ ALEC2HLF = 1
 ALEC2HMF = 2
 ALEC2HUF = 3
 
+# CBRFC values are deliverd in inches
+INCH_TO_MM = 25.4
+
 def cbrfc_zones():
     zones = RasterFile(CBRFC_DIR / 'ERW_CBRFC_zones.tif')
     zone_data = zones.band_values()
