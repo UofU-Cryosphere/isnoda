@@ -19,14 +19,16 @@ from snobedo.snotel import SnotelLocations
 
 from raster_file import RasterFile
 
-SHARED_STORE = '/uufs/chpc.utah.edu/common/home/skiles-group1'
+SHARED_STORE = PurePath('/uufs/chpc.utah.edu/common/home/skiles-group1')
+DATA_DIR = SHARED_STORE.joinpath('jmeyer')
 
-SNOBAL_DIR = Path(f'{SHARED_STORE}/erw_isnobal')
-SNOTEL_DIR = Path.home() / 'shared-cryosphere/Snotel'
-CBRFC_DIR = Path.home() / 'shared-cryosphere/CBRFC'
-ASO_DIR = Path.home() / 'shared-cryosphere/ASO-data'
-HRRR_DIR = Path(f'{SHARED_STORE}/HRRR_water_years')
-FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
+HRRR_DIR = SHARED_STORE.joinpath('HRRR_water_years')
+SNOBAL_DIR = SHARED_STORE.joinpath('erw_isnobal')
+
+ASO_DIR = DATA_DIR.joinpath('ASO-data')
+CBRFC_DIR = DATA_DIR.joinpath('CBRFC')
+SNOTEL_DIR = DATA_DIR.joinpath( 'Snotel')
+FIGURES_DIR = DATA_DIR.joinpath('figures')
 
 # Xarray options
 # Used in comparison to SNOTEL site locations
