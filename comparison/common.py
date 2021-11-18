@@ -14,7 +14,7 @@ from pathlib import Path
 
 from pathlib import Path, PurePath
 
-from snobedo.lib.dask_utils import start_cluster
+from snobedo.lib.dask_utils import start_cluster, client_ip_and_port
 from snobedo.snotel import SnotelLocations
 
 from raster_file import RasterFile
