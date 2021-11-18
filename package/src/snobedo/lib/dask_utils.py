@@ -29,6 +29,15 @@ def start_cluster(cores=6, memory=None):
     return Client(cluster)
 
 
+def client_ip_and_port(client):
+    """
+    Print client IP and Port information as string.
+
+    :param client: Instance of dask.distributed.Client
+    """
+    print(client.dashboard_link.split('/')[2])
+
+
 @contextmanager
 def run_with_client(cores, memory):
     client = start_cluster(cores, memory)
