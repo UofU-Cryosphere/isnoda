@@ -144,7 +144,9 @@ def main():
 
     for day in day_folders:
         day_files = combine_files(day, arguments.energy_balance)
-        if len(day_files):
+        if day_files is None:
+            sys.exit(1)
+        elif len(day_files):
             if not arguments.delete_originals:
                 destination = (day / COMBINED_FOLDER)
                 destination.mkdir(exist_ok=True)
@@ -157,5 +159,3 @@ def main():
                     os.remove(file)
         elif len(day_files) == 0:
             continue
-        else:
-            sys.exit(1)
