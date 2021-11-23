@@ -14,11 +14,6 @@ class RasterFile(object):
         self._extent = None
         self._xy_meshgrid = None
 
-        self._mad = None
-
-        self._slope = None
-        self._aspect = None
-
     @property
     def file(self):
         return self._file
@@ -105,9 +100,7 @@ class RasterFile(object):
     def band_values(self, **kwargs):
         """
         Method to read band from arguments or from initialized raster.
-        Will mask values defined in the band NoDataValue and store this mask
-        with the `current_mask` property if the band is the same as the
-        initialized one.
+        Will mask values defined in the band NoDataValue.
 
         :param kwargs:
             'band_number': band_number to read instead of the one given with
