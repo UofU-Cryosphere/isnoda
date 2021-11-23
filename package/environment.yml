@@ -8,7 +8,8 @@ dependencies:
   - h5py
   - netCDF4
   - pip
-  - python=3.8
-  - rasterio
+  - python
   - xarray
   - zarr
+  - pip:
+      - git+https://github.com/UofU-Cryosphere/snow-rs.git@main

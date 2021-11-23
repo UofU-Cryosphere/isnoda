@@ -5,8 +5,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-from snobedo.lib.command_line_helpers import add_dask_options
-
 DAY_FOLDER_PREFIX = 'run'
 OUTPUT_FILES = [
     'air_temp.nc',
@@ -60,7 +58,6 @@ def argument_parser():
         required=False,
         help='Compress all energy balance related files into one.'
     )
-    parser = add_dask_options(parser)
 
     return parser
 
