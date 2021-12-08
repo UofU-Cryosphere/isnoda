@@ -4,18 +4,16 @@ channels:
   - defaults
 dependencies:
   - beautifulsoup4
-  - bumpversion
   - cfgrib
   - coloredlogs
   - cython
   - dateparser=0.7.2
-  - jinja2
+  - gcc=8.5.0
   - make
-  - matplotlib
-  - mock
   - nco
   - netCDF4
-  - numpy
+  - numpy=1.19
+  - openmpi=4.1.2
   - pandas
   - pip
   - progressbar2
@@ -28,10 +26,6 @@ dependencies:
   - setuptools_scm<4.2
   - scipy
   - siphon
-  - sphinxcontrib-bibtex
-  - sphinxcontrib-websupport
   - urllib3
   - utm
   - xarray
-  - pip:
-    - sphinx_rtd_theme
