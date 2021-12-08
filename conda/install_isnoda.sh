@@ -57,6 +57,7 @@ done
 declare -a packages=(
   "inicheck"
   "spatialnc"
+  "topocalc"
 )
 
 for package in "${packages[@]}"
