@@ -45,3 +45,5 @@ before_script:
 
 script:
   - $TRAVIS_BUILD_DIR/conda/install_isnoda.sh
+  - inicheck -f $HOME/isnoda/awsm/awsm/tests/basins/Lakes/config.ini -m awsm
+
