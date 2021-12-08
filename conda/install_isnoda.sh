@@ -18,24 +18,41 @@ mkdir -p ${ISNODA_HOME}
 
 cd $ISNODA_HOME
 
-# Python based repositories
+######
+# GitHub repositories
+# Will install from source
+######
+
 declare -a repositories=(
-  "https://github.com/USDA-ARS-NWRC/awsm.git"
-  "https://github.com/USDA-ARS-NWRC/smrf.git"
+  "https://github.com/UofU-Cryosphere/awsm.git"
+  "https://github.com/UofU-Cryosphere/smrf.git"
   "https://github.com/USDA-ARS-NWRC/pysnobal.git"
-  "https://github.com/USDA-ARS-NWRC/weather_forecast_retrieval.git"
+  "https://github.com/UofU-Cryosphere/weather_forecast_retrieval.git"
 )
+
+# Make sure to use the conda installed GCC
+export CC=$(which gcc)
 
 for repository in "${repositories[@]}"
 do
-  git clone --depth 1 ${repository}
-done
+  IFS='/'; FOLDER=(${repository}) 
+  IFS='.'; FOLDER=(${FOLDER[-1]})
+  unset IFS;
 
-for repository in $(find . -maxdepth 1 ! -path . -type d); do
-  pushd ${repository}
+  echo "Installing: ${FOLDER}"
+
+  if [[ ! -d ${FOLDER} ]]; then
+    git clone --depth 1 ${repository}
+  fi
+
+  pushd ${FOLDER}
   pip install -v --no-deps -e .
   popd
 done
+
+#######
+# ISNOBAL components not available via conda package
+#######
 
 declare -a packages=(
   "inicheck"
@@ -48,13 +65,15 @@ do
 done
 
 # IPW
-git clone --depth 1 https://github.com/USDA-ARS-NWRC/ipw.git
-pushd ipw
+# Remove comments below if point model should be installed
 
-./configure
-export IPW=`pwd`
-export WORKDIR=${IPW}/tmp
-make
-make install
-
-popd
+#git clone --depth 1 https://github.com/USDA-ARS-NWRC/ipw.git
+#pushd ipw
+#
+#./configure
+#export IPW=`pwd`
+#export WORKDIR=${IPW}/tmp
+#make
+#make install
+#
+#popd
