@@ -30,6 +30,9 @@ CBRFC_DIR = DATA_DIR.joinpath('CBRFC')
 SNOTEL_DIR = DATA_DIR.joinpath( 'Snotel')
 FIGURES_DIR = DATA_DIR.joinpath('figures')
 
+# Plot styles
+BOKEH_FONT=dict(fontsize={'title': 14, 'labels': 12, 'xticks': 12, 'yticks': 12, 'legend': 12})
+
 # Xarray options
 # Used in comparison to SNOTEL site locations
 COARSEN_OPTS = dict(x=2, y=2)
