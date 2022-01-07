@@ -104,12 +104,13 @@ def combine_files(day_folder, energy_balance_files=False):
     :param energy_balance_files:
         Boolean flag to combine energy balance files or the default list.
 
-    :return: List of combined files
+    :return: List of files, the list will be empty if the combined files
+             are already present. A `None` return value indicates an error
     """
     outfile = combined_file_name(day_folder, energy_balance_files)
 
     if outfile is None:
-        return
+        return []
 
     if energy_balance_files:
         output_files = OUTPUT_FILES_EB
@@ -124,7 +125,7 @@ def combine_files(day_folder, energy_balance_files=False):
 
     if call.returncode != 0:
         print(call.stderr)
-        return []
+        return
 
     print(f"Combined files saved to: {outfile}")
     day_files = verify_merge(day_files, outfile)
@@ -143,7 +144,9 @@ def main():
 
     for day in day_folders:
         day_files = combine_files(day, arguments.energy_balance)
-        if day_files:
+        if day_files is None:
+            sys.exit(1)
+        elif len(day_files):
             if not arguments.delete_originals:
                 destination = (day / COMBINED_FOLDER)
                 destination.mkdir(exist_ok=True)
@@ -154,5 +157,5 @@ def main():
                 for file in day_files:
                     print(f'  Delete file: {file}')
                     os.remove(file)
-        else:
-            sys.exit(1)
+        elif len(day_files) == 0:
+            continue

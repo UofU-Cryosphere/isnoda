@@ -17,7 +17,7 @@
 
 export OMP_NUM_THREADS=${SLURM_NTASKS}
 
-ml gcc/8.3.0 intel-mpi/2019.8.254 cdo/1.9.9
+ml cdo/2.0.0
 source load_conda_env snobedo
 
 # Path to iSnobal output up to the daily outputs (e.g. runYYYYMMDD)

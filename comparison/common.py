@@ -1,4 +1,3 @@
-import datetime
 import dask
 import numpy as np
 import pandas as pd
@@ -9,21 +8,51 @@ import matplotlib.dates as mdates
 import matplotlib.patches as mpatches
 import matplotlib.font_manager as font_manager
 
+import holoviews as hv
+from holoviews import dim, opts
+from pathlib import Path
+
 from pathlib import Path, PurePath
 
-from snobedo.lib.dask_utils import start_cluster
+from snobedo.lib.dask_utils import start_cluster, client_ip_and_port
+from snobedo.snotel import SnotelLocations
 
+from raster_file import RasterFile
 
-SNOBAL_DIR = Path.home() / 'scratch/iSnobal/outputs'
-SNOTEL_DIR = Path.home() / 'shared-cryosphere/Snotel'
-HRRR_DIR = Path.home() / 'shared-cryosphere/HRRR_WY'
-FIGURES_DIR = Path.home() / 'shared-cryosphere/figures'
+SHARED_STORE = PurePath('/uufs/chpc.utah.edu/common/home/skiles-group1')
+DATA_DIR = SHARED_STORE.joinpath('jmeyer')
+
+HRRR_DIR = SHARED_STORE.joinpath('HRRR_water_years')
+SNOBAL_DIR = SHARED_STORE.joinpath('erw_isnobal')
+
+ASO_DIR = DATA_DIR.joinpath('ASO-data')
+CBRFC_DIR = DATA_DIR.joinpath('CBRFC')
+SNOTEL_DIR = DATA_DIR.joinpath( 'Snotel')
+FIGURES_DIR = DATA_DIR.joinpath('figures')
+
+# Plot styles
+BOKEH_FONT=dict(fontsize={'title': 14, 'labels': 12, 'xticks': 12, 'yticks': 12, 'legend': 12})
 
 # Xarray options
 # Used in comparison to SNOTEL site locations
-COARSEN_OPTS = dict(x=2, y=2, keep_attrs=True)
-RESAMPLE_1_DAY_OPTS = dict(time='1D', base=23, keep_attrs=True)
+COARSEN_OPTS = dict(x=2, y=2)
+RESAMPLE_1_DAY_OPTS = dict(time='1D', base=23)
 
+## CBRFC zones
+# Corresponds to values in classification tif
+ALEC2HLF = 1
+ALEC2HMF = 2
+ALEC2HUF = 3
+
+# CBRFC values are deliverd in inches
+INCH_TO_MM = 25.4
+
+def cbrfc_zones():
+    zones = RasterFile(CBRFC_DIR / 'ERW_CBRFC_zones.tif')
+    zone_data = zones.band_values()
+    zone_data[zone_data==241] = 0
+
+    return zone_data
 
 # HRRR helpers
 def hrrr_pixel_index(hrrr_file, site):
@@ -31,10 +60,8 @@ def hrrr_pixel_index(hrrr_file, site):
     y_index = np.abs(hrrr_file.latitude.values - site.lat)
     return np.unravel_index((x_index + y_index).argmin(), x_index.shape)
 
-
 def hrrr_longitude(longitude):
     return longitude % 360
-
 
 @dask.delayed
 def hrrr_snotel_pixel(file, x_pixel_index, y_pixel_index):
@@ -83,8 +110,14 @@ def legend_text(label, value, color='none'):
 def add_legend_box(ax, entries):
     ax.legend(
         handles=entries,
-        loc='upper right',
+        loc='upper left',
         prop=font_manager.FontProperties(
             family='monospace', style='normal', size=8
         ),
     )
+
+## Use hvplot
+def use_hvplot():
+    import hvplot.xarray
+    import hvplot.pandas
+    pd.options.plotting.backend = 'holoviews'
