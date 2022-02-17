@@ -5,20 +5,21 @@ channels:
 dependencies:
   - beautifulsoup4
   - cfgrib
+  - cftime=1.5.2
   - coloredlogs
   - cython
-  - dateparser=0.7.2
+  - dateparser=0.7.4
   - gcc=8.5.0
   - make
   - nco
   - netCDF4
-  - numpy=1.20
+  - numpy=1.20.3
   - openmpi=4.1.2
-  - pandas
+  - pandas=1.3.5
   - pip
   - progressbar2
   - pykrige
-  - python
+  - python=3.7
   - pytz
   - pyyaml
   - regex
@@ -28,4 +29,5 @@ dependencies:
   - siphon
   - urllib3
   - utm
-  - xarray
+  - xarray=0.15.1
+
