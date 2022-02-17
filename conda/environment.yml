@@ -18,7 +18,7 @@ dependencies:
   - pip
   - progressbar2
   - pykrige
-  - python
+  - python=3.7
   - pytz
   - pyyaml
   - regex
