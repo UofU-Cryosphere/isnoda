@@ -3,8 +3,21 @@ channels:
   - conda-forge
 dependencies:
   - cmake
+  - colorama
+  - coloredlogs
   - gcc_linux-64=7
-  - gdal
+  - gdal=3.3
+  - geopandas<0.10
   - mpich
-  - python
+  - netcdf4>=1.4.1
+  - numpy<1.20
+  - pandas>=1.0
   - pip
+  - pyshp=1.2.12
+  - python=3.7
+  - rioxarray>=0.3.1
+  - xarray>=0.16.2
+  - pip:
+      - inicheck>=0.9,<0.10.0
+      - spatialnc>=0.3.0,<0.4.0
+      - cftime<1.1.0
