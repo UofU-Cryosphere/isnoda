@@ -1,0 +1,10 @@
+name: basin_setup
+channels:
+  - conda-forge
+dependencies:
+  - cmake
+  - gcc_linux-64=7
+  - gdal
+  - mpich
+  - python
+  - pip
