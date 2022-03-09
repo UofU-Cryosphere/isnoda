@@ -47,3 +47,12 @@ __NOTE__: Make sure to activate the conda environment before installing tauDEM.
   ```
 * After this the binaries for tauDEM are in the `build_install` directory:
   `/data/iSnobal/tauDEM/build_install`
+
+## `basin_setup` Installation
+
+Install the basin package.<br>
+__IMPORTANT__: The `--no-dpes` enforces to use the installed conda packages
+and skips the installation via pip.
+```shell
+pip install --no-deps .
+```
