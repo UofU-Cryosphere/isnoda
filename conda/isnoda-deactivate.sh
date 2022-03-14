@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 for ISNODA_PATH in "${IPW_PATH}/sbin" "${IPW_PATH}/bin"; do
-  PATH="${PATH//$ISNODA_PATH:}"
+  export PATH="${PATH//\:$ISNODA_PATH}"
 done
 
 unset IPW
