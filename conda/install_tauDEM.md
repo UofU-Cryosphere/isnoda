@@ -51,7 +51,7 @@ __NOTE__: Make sure to activate the conda environment before installing tauDEM.
 ## `basin_setup` Installation
 
 Install the basin package.<br>
-__IMPORTANT__: The `--no-dpes` enforces to use the installed conda packages
+__IMPORTANT__: The `--no-deps` enforces to use the installed conda packages
 and skips the installation via pip.
 ```shell
 pip install --no-deps .
