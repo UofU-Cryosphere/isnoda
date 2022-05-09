@@ -8,7 +8,7 @@ dependencies:
   - gcc_linux-64=7
   - gdal=3.3
   - geopandas<0.10
-  - mpich
+  - mpich=3.4
   - netcdf4>=1.4.1
   - numpy<1.20
   - pandas>=1.0
