@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/244989084.svg)](https://zenodo.org/badge/latestdoi/244989084)
 [![Build Status](https://travis-ci.com/UofU-Cryosphere/isnoda.svg?branch=master)](https://travis-ci.com/UofU-Cryosphere/isnoda)
 
 # iSnoda
