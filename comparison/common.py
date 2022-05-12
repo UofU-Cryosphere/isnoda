@@ -47,6 +47,12 @@ ALEC2HUF = 3
 # CBRFC values are deliverd in inches
 INCH_TO_MM = 25.4
 
+def aspect_classes():
+    aspects = RasterFile(DATA_DIR / 'project-data/iSnobal/ERW/aspect_class_ERW.tif')
+    aspects_data = aspects.band_values()
+
+    return aspects_data
+
 def cbrfc_zones():
     zones = RasterFile(CBRFC_DIR / 'ERW_CBRFC_zones.tif')
     zone_data = zones.band_values()
