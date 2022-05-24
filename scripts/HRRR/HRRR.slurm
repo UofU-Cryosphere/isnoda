@@ -41,9 +41,4 @@ for NEXT in {0..2}; do
 
   ARCHIVE="hrrr-${CURRENT_YEAR}${CURRENT_MONTH}.tar.bz2"
   tar -I pbzip2 -cf ${ARCHIVE} hrrr.${CURRENT_YEAR}${CURRENT_MONTH}[0-3][0-9]
-
-  >&1 echo "  Copy to remote"
-
-  rclone copy $ARCHIVE isnoda:HRRR_CBR/
-  rm $ARCHIVE
 done
