@@ -13,3 +13,4 @@ dependencies:
   - zarr
   - pip:
       - git+https://github.com/UofU-Cryosphere/snow-rs.git@main
+      - spatialnc
