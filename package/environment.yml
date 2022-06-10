@@ -5,7 +5,6 @@ dependencies:
   - dask
   - dask-jobqueue
   - gdal
-  - h5py
   - netCDF4
   - parallel
   - pip
