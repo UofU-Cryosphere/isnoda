@@ -79,6 +79,11 @@ class HrrrDswrf:
 
             counter = 0
             for band in range(1, self.grib_file.RasterCount + 1):
+                # Metadata:
+                # * GRIB_REF_TIME is in UTC, indicated by the 'Z' in field
+                #   GRIB_IDS
+                # * GRIB_VALID_TIME is the timestamp indicating the 'up to'
+                #   valid time
                 timestep = datetime.fromtimestamp(
                     int(
                         self.grib_metadata(
