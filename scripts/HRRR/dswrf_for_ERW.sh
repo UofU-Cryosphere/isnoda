@@ -22,12 +22,18 @@ combine_day() {
   echo $DAY
   pushd $DAY > /dev/null
 
-  cat ${HRRR_PATTERN} | wgrib2 - -match "DSWRF:surface" -grib - | \
+  TMP_FILE="${DAY}_f06.grib2"
+
+  cat ${HRRR_PATTERN} | wgrib2 - -match "DSWRF:surface" -grib $TMP_FILE
+
   dswrf_for_day --topo "${TOPO_FILE}" \
+                --hrrr_in ${TMP_FILE} \
                 --nc_out "${NC_OUT_PREFIX}_${DAY}.hrrr.dswrf.nc"
 
+  rm $TMP_FILE
   popd > /dev/null
 }
 
 export -f combine_day
 parallel --jobs ${OMP_NUM_THREADS} combine_day ::: ${2}
+
