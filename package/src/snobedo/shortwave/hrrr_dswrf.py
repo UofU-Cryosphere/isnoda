@@ -19,9 +19,6 @@ class HrrrDswrf:
     @grib_file.setter
     def grib_file(self, grib_file=None):
         if grib_file is None:
-            # NOTE: Reading from stdin by GDAL from a piped WGRIB2 will
-            #       log an error to the output, which can be safely ignored.
-            #       See: https://github.com/OSGeo/gdal/issues/5912
             grib_file = self.VSISTDIN
 
         self._grib_file = self.gdal_warp_and_cut(grib_file)
