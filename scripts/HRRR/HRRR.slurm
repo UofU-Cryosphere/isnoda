@@ -16,7 +16,7 @@
 #SBATCH --error=slurm-%j.err-%N
 
 export OMP_NUM_THREADS=${SLURM_NTASKS}
-ml wgrib2 rclone
+ml wgrib2
 
 YEAR=2018
 MONTH=09
