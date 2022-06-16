@@ -30,7 +30,7 @@ class Topo:
             self.y = np.ma.masked_array(self.y, dem.variables['mask'][:] == 0)
 
             # Lat, Lon for the center of the DEM
-            self.lat, self.long = to_latlon(
+            self.lat, self.lon = to_latlon(
                 self.x.mean(),
                 self.y.mean(),
                 int(dem.variables['projection'].utm_zone_number),
