@@ -31,7 +31,7 @@ class TopoShade:
             cosz, azimuth, rad_vec = sunang(
                 timestep,
                 topo.lat,
-                topo.long
+                topo.lon
             )
 
             if cosz > 0:
