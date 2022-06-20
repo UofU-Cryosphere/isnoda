@@ -13,7 +13,7 @@ class TopoShade:
         self._illumination_angels = {}
         self._azimuth = {}
         self._zenith = {}
-        self._topo_file = topo_file_path
+        self.topo = topo_file_path
 
     @property
     def azimuth(self):
@@ -28,33 +28,32 @@ class TopoShade:
         return self._zenith
 
     @property
-    def topo_file(self):
-        return self._topo_file
+    def topo(self):
+        return self._topo
+
+    @topo.setter
+    def topo(self, file_path):
+        self._topo = Topo(file_path)
 
     def calculate(self, time_range):
-        topo = Topo({
-            'filename': self._topo_file,
-            'northern_hemisphere': True,
-            'gradient_method': 'gradient_d8'
-        })
 
         for timestep in time_range:
             timestep = timestep
             cosine_zenith, azimuth, rad_vec = sunang(
                 timestep,
-                topo.lat,
-                topo.lon
+                self.topo.lat,
+                self.topo.lon
             )
 
             if cosine_zenith > 0:
                 illumination_angle = shade(
-                    topo.sin_slope,
-                    topo.aspect,
+                    self.topo.sin_slope,
+                    self.topo.aspect,
                     azimuth,
                     cosine_zenith
                 )
             else:
-                illumination_angle = np.zeros(topo.x.shape)
+                illumination_angle = np.zeros(self.topo.x.shape)
                 azimuth = 0
                 cosine_zenith = 1
 
@@ -87,7 +86,7 @@ class TopoShade:
     def save_illumination_angles(self, out_file_path):
         time_range = list(self.illumination_angles.keys())
 
-        with WriteNC.for_topo(out_file_path, self.topo_file) as outfile:
+        with WriteNC.for_topo(out_file_path, self.topo.topo_file) as outfile:
             illumination_field = self.add_illumination_angle(outfile)
             azimuth_field = self.add_time_variable(
                 'azimuth', 'Solar azimuth angle; 0 -> South', 'degrees',
