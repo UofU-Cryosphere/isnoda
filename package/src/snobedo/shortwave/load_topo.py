@@ -10,13 +10,21 @@ class Topo:
 
     See smrf.data.load_topo for the full version.
     """
-    def __init__(self, topo_config):
-        self.topoConfig = topo_config
+    def __init__(self, topo_file):
+        self.topoConfig = {
+            'filename': topo_file,
+            'northern_hemisphere': True,
+            'gradient_method': 'gradient_d8'
+        }
         self.read_file()
         self.gradient()
 
+    @property
+    def topo_file(self):
+        return self.topoConfig['filename']
+
     def read_file(self):
-        with Dataset(self.topoConfig['filename']) as dem:
+        with Dataset(self.topo_file) as dem:
             self.dem = dem['dem'][:].astype(np.float64)
 
             self.x, self.y = np.meshgrid(
