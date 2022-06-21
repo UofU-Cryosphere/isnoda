@@ -17,7 +17,7 @@ shade_for_day() {
   echo $START
   END=$(date -I -d "${START} + 1 day")
   topo_shade_for_day -t $TOPO_FILE \
-                     -nc "${NC_OUT_PREFIX}_$(date -d $START +%Y%m%d).nc" \
+                     -nc "${NC_OUT_PREFIX}.$(date -d $START +%Y%m%d).nc" \
                      -sd $START -ed $END
 }
 
