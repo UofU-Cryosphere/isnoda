@@ -35,6 +35,15 @@ def argument_parser():
         type=Path,
         help='Path to the target netCDF destination file.'
     )
+    parser.add_argument(
+        '--solar-method', '-sm',
+        required=False,
+        type=str,
+        choices=[TopoShade.SolarMethods.SKYFIELD, TopoShade.SolarMethods.SMRF],
+        default=TopoShade.SolarMethods.SKYFIELD,
+        help='Method to use for solar calculations. '
+             'Default: skyfield; option: SMRF'
+    )
 
     return parser
 
@@ -47,12 +56,7 @@ def time_range_for(start, end):
         dtype='datetime64[s]'
     )
 
-    # Make the timestamps UTC time.
-    # SMRF calculations and HRRR data are delivered in that time zone.
-    return [
-        datetime.fromisoformat(str(r)).replace(tzinfo=timezone.utc)
-        for r in time_range
-    ]
+    return [datetime.fromisoformat(str(r)) for r in time_range]
 
 
 def main():
@@ -61,7 +65,9 @@ def main():
     if not arguments.topo.exists():
         raise IOError('Path to topo file does not exist')
 
-    topo_shade = TopoShade(arguments.topo)
+    topo_shade = TopoShade(
+        arguments.topo.as_posix(), arguments.solar_method
+    )
     topo_shade.calculate(
         time_range_for(arguments.start_date, arguments.end_date)
     )
