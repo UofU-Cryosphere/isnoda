@@ -1,19 +1,35 @@
 import math
 
 import numpy as np
+import pytz
 from topocalc.shade import shade
 
 from snobedo.data import WriteNC
 from snobedo.shortwave.load_topo import Topo
 from snobedo.shortwave.sunang import sunang
+from snobedo.shortwave.sun_position import SunPosition
 
 
 class TopoShade:
-    def __init__(self, topo_file_path):
+    class SolarMethods:
+        SMRF = 'SMRF'
+        SKYFIELD = 'skyfield'
+
+    def __init__(self, topo_file_path, solar_method=SolarMethods.SKYFIELD):
+        """
+        Calculate topographic shading
+
+        :param topo_file_path: Topo instance
+        :param solar_method: Method to use for solar angles
+                             Options:
+                             * skyfield (default)
+                             * SMRF
+        """
         self._illumination_angels = {}
         self._azimuth = {}
         self._zenith = {}
         self.topo = topo_file_path
+        self._solar_method = solar_method
 
     @property
     def azimuth(self):
@@ -36,9 +52,47 @@ class TopoShade:
         self._topo = Topo(file_path)
 
     def calculate(self, time_range):
+        if self._solar_method is self.SolarMethods.SKYFIELD:
+            self.solar_skyfield(time_range)
+        elif self._solar_method is self.SolarMethods.SMRF:
+            self.solar_smrf(time_range)
 
+    def solar_skyfield(self, time_range):
+        sun_position = SunPosition(
+            self.topo.lat, self.topo.lon, self.topo.dem.mean(),
+        )
+
+        sun_angles = sun_position.for_day(time_range[0])
+
+        for timestep, (zenith, azimuth) in sun_angles.items():
+            # Convert to TopoLib expected values:
+            # * Cosine for zenith
+            # * Azimuth with 0 pointing to the South
+            if zenith is not None:
+                zenith = math.cos(math.radians(90 - zenith.degrees))
+                if azimuth.degrees > 180:
+                    azimuth = -(azimuth.degrees % 180)
+                else:
+                    azimuth = 180 - azimuth.degrees
+
+                illumination_angle = shade(
+                    self.topo.sin_slope,
+                    self.topo.aspect,
+                    azimuth,
+                    zenith
+                )
+            else:
+                illumination_angle = 0
+                azimuth = -181
+                zenith = 0
+
+            self.azimuth[timestep] = azimuth
+            self.zenith[timestep] = math.degrees(math.acos(zenith))
+            self.illumination_angles[timestep] = illumination_angle
+
+    def solar_smrf(self, time_range):
         for timestep in time_range:
-            timestep = timestep
+            timestep = timestep.astimezone(pytz.UTC)
             cosine_zenith, azimuth, rad_vec = sunang(
                 timestep,
                 self.topo.lat,
@@ -54,7 +108,7 @@ class TopoShade:
                 )
             else:
                 illumination_angle = np.zeros(self.topo.x.shape)
-                azimuth = 0
+                azimuth = -181
                 cosine_zenith = 1
 
             self.azimuth[timestep] = azimuth
