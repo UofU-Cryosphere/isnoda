@@ -130,7 +130,10 @@ class SunPosition:
                     sun_rise - utc_start
                 )
                 # Use half of the amount of time after sunrise in this hour
-                sun_up_in_hour = 60 - (60 - minutes_to_sunrise) // 2
+                if minutes_to_sunrise < 59:
+                    sun_up_in_hour = 60 - (60 - minutes_to_sunrise) // 2
+                else:
+                    sun_up_in_hour = 59
                 utc_start = utc_start.replace(minute=int(sun_up_in_hour))
                 result[utc_start] = self.at_time(
                     self.timescale.from_datetime(utc_start)
