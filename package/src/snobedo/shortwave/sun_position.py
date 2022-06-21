@@ -65,7 +65,15 @@ class SunPosition:
         """
         astrometric = self.observer.at(time).observe(self.sun)
         altitude, azimuth, _distance = astrometric.apparent().altaz()
-        return altitude, azimuth
+
+        # For days, where the sunrise/sunset is close to the full hour, the
+        # altitude comes back negative with the body of the sun mostly
+        # below the horizon. Filtering these days and consider the sun
+        # not completely up or already down
+        if altitude.degrees < 0:
+            return None, None
+        else:
+            return altitude, azimuth
 
     def for_day(self, day):
         """
