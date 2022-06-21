@@ -66,10 +66,10 @@ class TopoShade:
 
         for timestep, (zenith, azimuth) in sun_angles.items():
             # Convert to TopoLib expected values:
-            # * Cosine for zenith
+            # * Cosine for zenith, and horizon at 90
             # * Azimuth with 0 pointing to the South
             if zenith is not None:
-                zenith = math.cos(math.radians(90 - zenith.degrees))
+                zenith = 90 - zenith.degrees
                 if azimuth.degrees > 180:
                     azimuth = -(azimuth.degrees % 180)
                 else:
@@ -79,7 +79,7 @@ class TopoShade:
                     self.topo.sin_slope,
                     self.topo.aspect,
                     azimuth,
-                    zenith
+                    math.cos(math.radians(zenith))
                 )
             else:
                 illumination_angle = 0
@@ -87,7 +87,7 @@ class TopoShade:
                 zenith = 0
 
             self.azimuth[timestep] = azimuth
-            self.zenith[timestep] = math.degrees(math.acos(zenith))
+            self.zenith[timestep] = zenith
             self.illumination_angles[timestep] = illumination_angle
 
     def solar_smrf(self, time_range):
