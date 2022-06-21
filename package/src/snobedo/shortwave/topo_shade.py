@@ -52,9 +52,9 @@ class TopoShade:
         self._topo = Topo(file_path)
 
     def calculate(self, time_range):
-        if self._solar_method is self.SolarMethods.SKYFIELD:
+        if self._solar_method == self.SolarMethods.SKYFIELD:
             self.solar_skyfield(time_range)
-        elif self._solar_method is self.SolarMethods.SMRF:
+        elif self._solar_method == self.SolarMethods.SMRF:
             self.solar_smrf(time_range)
 
     def solar_skyfield(self, time_range):
