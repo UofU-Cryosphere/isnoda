@@ -64,7 +64,7 @@ class TopoShade:
     @staticmethod
     def add_illumination_angle(outfile):
         field = outfile.createVariable(
-            'illumination_angle', 'f8', ('time', 'y', 'x',), zlib=True
+            'illumination_angle', 'f', ('time', 'y', 'x',), zlib=True
         )
         field.setncattr('long_name', 'Local illumination angle')
         field.setncattr(
@@ -78,7 +78,7 @@ class TopoShade:
 
     @staticmethod
     def add_time_variable(name, description, units, outfile):
-        field = outfile.createVariable(name, 'f8', 'time', zlib=True)
+        field = outfile.createVariable(name, 'f', 'time', zlib=True)
         field.setncattr('long_name', description)
         field.setncattr('units', units)
         return field
