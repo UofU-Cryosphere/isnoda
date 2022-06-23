@@ -7,6 +7,7 @@ ir_in = veg_ir_beam + veg_ir_diffuse;\
 vis_in = veg_vis_beam + veg_vis_diffuse;\
 ir_snow = (veg_ir_beam + veg_ir_diffuse) * (1 - albedo_ir);\
 vis_snow = (veg_vis_beam + veg_vis_diffuse) * (1 - albedo_vis);\
+albedo = (0.67 * albedo_vis) + (0.33 * albedo_ir);\
 sum_snow = ir_snow + vis_snow;\
 "
 
