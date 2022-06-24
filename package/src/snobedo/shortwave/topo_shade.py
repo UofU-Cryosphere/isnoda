@@ -4,7 +4,7 @@ import numpy as np
 import pytz
 from topocalc.shade import shade
 
-from snobedo.data import WriteNC
+from snobedo.output import NetCDF
 from snobedo.shortwave.load_topo import Topo
 from snobedo.shortwave.sunang import sunang
 from snobedo.shortwave.sun_position import SunPosition
@@ -140,7 +140,7 @@ class TopoShade:
     def save_illumination_angles(self, out_file_path):
         time_range = list(self.illumination_angles.keys())
 
-        with WriteNC.for_topo(out_file_path, self.topo.topo_file) as outfile:
+        with NetCDF.for_topo(out_file_path, self.topo.topo_file) as outfile:
             illumination_field = self.add_illumination_angle(outfile)
             azimuth_field = self.add_time_variable(
                 'azimuth', 'Solar azimuth angle; 0 -> South', 'degrees',
@@ -154,7 +154,7 @@ class TopoShade:
             counter = 0
 
             for key in time_range:
-                outfile['time'][counter] = WriteNC.date_to_number(
+                outfile['time'][counter] = NetCDF.date_to_number(
                     key, outfile, counter == 0
                 )
                 illumination_field[counter, :, :] = \
