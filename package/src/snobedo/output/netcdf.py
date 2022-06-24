@@ -5,7 +5,7 @@ import netCDF4
 from spatialnc.proj import add_proj, add_proj_from_file
 
 
-class WriteNC:
+class NetCDF:
     VARIABLE_X = 'x'
     VARIABLE_Y = 'y'
     VARIABLE_TIME = 'time'
@@ -20,7 +20,7 @@ class WriteNC:
         Yields the created file to the calling block
 
         Example:
-            with WriteNC.for_topo('out.nc', topo.nc') as file:
+            with NetCDF.for_topo('out.nc', topo.nc') as file:
                 file.createVariable(...)
 
         Arguments:
@@ -31,37 +31,37 @@ class WriteNC:
         with netCDF4.Dataset(output_path, 'w') as outfile:
             with netCDF4.Dataset(topo_file) as topo:
                 outfile.createDimension(
-                    WriteNC.VARIABLE_X,
-                    topo.variables[WriteNC.VARIABLE_X].size
+                    NetCDF.VARIABLE_X,
+                    topo.variables[NetCDF.VARIABLE_X].size
                 )
                 x = outfile.createVariable(
-                    WriteNC.VARIABLE_X, 'f4', (WriteNC.VARIABLE_X,)
+                    NetCDF.VARIABLE_X, 'f4', (NetCDF.VARIABLE_X,)
                 )
                 x.setncattr('units', 'meters')
                 x.setncattr('description', 'UTM, east west')
                 x.setncattr('long_name', 'x coordinate')
 
                 outfile.createDimension(
-                    WriteNC.VARIABLE_Y,
-                    topo.variables[WriteNC.VARIABLE_Y].size
+                    NetCDF.VARIABLE_Y,
+                    topo.variables[NetCDF.VARIABLE_Y].size
                 )
                 y = outfile.createVariable(
-                    WriteNC.VARIABLE_Y, 'f4', (WriteNC.VARIABLE_Y,)
+                    NetCDF.VARIABLE_Y, 'f4', (NetCDF.VARIABLE_Y,)
                 )
                 y.setncattr('units', 'meters')
                 y.setncattr('description', 'UTM, north south')
                 y.setncattr('long_name', 'y coordinate')
 
-                x[:] = topo.variables[WriteNC.VARIABLE_X][:]
-                y[:] = topo.variables[WriteNC.VARIABLE_Y][:]
+                x[:] = topo.variables[NetCDF.VARIABLE_X][:]
+                y[:] = topo.variables[NetCDF.VARIABLE_Y][:]
 
-            outfile.createDimension(WriteNC.VARIABLE_TIME)
+            outfile.createDimension(NetCDF.VARIABLE_TIME)
             time = outfile.createVariable(
-                WriteNC.VARIABLE_TIME, 'f8', (WriteNC.VARIABLE_TIME,)
+                NetCDF.VARIABLE_TIME, 'f8', (NetCDF.VARIABLE_TIME,)
             )
             time.setncattr('calendar', 'standard')
             time.setncattr('time_zone', str(timezone.utc))
-            time.setncattr('long_name', WriteNC.VARIABLE_TIME)
+            time.setncattr('long_name', NetCDF.VARIABLE_TIME)
 
             yield outfile
 
@@ -70,13 +70,13 @@ class WriteNC:
     @staticmethod
     def date_to_number(date, outfile, add_units=False):
         if add_units:
-            outfile[WriteNC.VARIABLE_TIME].setncattr(
+            outfile[NetCDF.VARIABLE_TIME].setncattr(
                 'units',
                 'hours since {}'.format(str(date))
             )
 
         return netCDF4.date2num(
             date,
-            outfile[WriteNC.VARIABLE_TIME].units,
-            outfile[WriteNC.VARIABLE_TIME].calendar
+            outfile[NetCDF.VARIABLE_TIME].units,
+            outfile[NetCDF.VARIABLE_TIME].calendar
         )

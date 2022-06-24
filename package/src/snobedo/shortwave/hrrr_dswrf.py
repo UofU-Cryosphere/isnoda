@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from osgeo import gdal, osr
 
-from snobedo.data import WriteNC
+from snobedo.output import NetCDF
 
 
 class HrrrDswrf:
@@ -66,7 +66,7 @@ class HrrrDswrf:
     def save(self, out_file_path):
         metadata = self.grib_metadata(self.grib_file, 1)
 
-        with WriteNC.for_topo(out_file_path, self._topo_file) as outfile:
+        with NetCDF.for_topo(out_file_path, self._topo_file) as outfile:
             field = outfile.createVariable(
                 'DSWRF', 'f8', ('time', 'y', 'x',), zlib=True
             )
@@ -89,7 +89,7 @@ class HrrrDswrf:
                     )
                 ).astimezone(timezone.utc)
 
-                outfile['time'][counter] = WriteNC.date_to_number(
+                outfile['time'][counter] = NetCDF.date_to_number(
                     timestep, outfile, counter == 0
                 )
                 field[counter, :, :] = self.grib_file.GetRasterBand(band)\
