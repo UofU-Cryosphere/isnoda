@@ -30,6 +30,11 @@ class HrrrDswrf:
 
     @property
     def time_range(self):
+        """
+        Get all forecasted hours as Datetime for given grib file.
+
+        :return: Array with Datetime objects
+        """
         if len(self._time_range) == 0:
             for band in self.bands_from_grib_file:
                 self._time_range.append(self.timestep_for_band(band))
@@ -73,9 +78,23 @@ class HrrrDswrf:
 
     @staticmethod
     def grib_metadata(infile, band):
+        # Metadata:
+        # * GRIB_REF_TIME is in UTC, indicated by the 'Z' in field
+        #   GRIB_IDS
+        # * GRIB_VALID_TIME is the timestamp indicating the 'up to'
+        #   valid time
         return infile.GetRasterBand(band).GetMetadata()
 
     def timestep_for_band(self, band):
+        """
+        Get forecasted time for given band. This is the actual GRIB forecast
+        hour and when already converted when reading data that is for hours
+        beyond 1.
+
+        :param band: Band from warped and cut grib file
+
+        :return: Datetime object converted to UTC timezone
+        """
         return datetime.fromtimestamp(
             int(
                 self.grib_metadata(
@@ -85,6 +104,11 @@ class HrrrDswrf:
         ).astimezone(timezone.utc)
 
     def save(self, out_file_path):
+        """
+        Save as netCDF with projection from initialized Topo
+
+        :param out_file_path: String - Full path where file will be saved.
+        """
         metadata = self.grib_metadata(self.grib_file, 1)
 
         with NetCDF.for_topo(out_file_path, self._topo_file) as outfile:
@@ -97,11 +121,6 @@ class HrrrDswrf:
 
             counter = 0
             for band in self.bands_from_grib_file:
-                # Metadata:
-                # * GRIB_REF_TIME is in UTC, indicated by the 'Z' in field
-                #   GRIB_IDS
-                # * GRIB_VALID_TIME is the timestamp indicating the 'up to'
-                #   valid time
                 timestep = self.timestep_for_band(band)
 
                 outfile['time'][counter] = NetCDF.date_to_number(
