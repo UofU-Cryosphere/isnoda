@@ -24,7 +24,8 @@ combine_day() {
 
   cat ${HRRR_PATTERN} | wgrib2 - -match "DSWRF:surface" -inv /dev/null -grib - | \
   dswrf_for_day --topo "${TOPO_FILE}" \
-                --nc_out "${NC_OUT_PREFIX}_${DAY}.dswrf.nc"
+                --nc_out "${NC_OUT_PREFIX}_${DAY}.dswrf.nc" \
+                --add-shading
 
   popd > /dev/null
 }
