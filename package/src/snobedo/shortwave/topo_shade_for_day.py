@@ -71,4 +71,4 @@ def main():
     topo_shade.calculate(
         time_range_for(arguments.start_date, arguments.end_date)
     )
-    topo_shade.save_illumination_angles(arguments.nc_out)
+    topo_shade.save(arguments.nc_out)
