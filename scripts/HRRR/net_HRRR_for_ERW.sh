@@ -25,7 +25,7 @@ export DSWRF_OUT=${4}
 function net_hrrr_for_month() {
   CDO_COMMAND='cdo -z zip4 -O'
   SMRF_SELECT="select,name=albedo"
-  NET_MATH="aexpr,net_HRRR=albedo*illumination_angle*DSWRF"
+  NET_MATH="aexpr,net_HRRR=(1-albedo)*illumination_angle*DSWRF"
 
   ERW_HRRR="${DSWRF_IN}/ERW_hrrr"
   ERW_MONTH="${DSWRF_OUT}/ERW_dswrf"
