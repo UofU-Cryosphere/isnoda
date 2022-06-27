@@ -79,7 +79,9 @@ class SunPosition:
         """
         Calculate the sun altitude and azimuth for every hour and initialized
         position (lat, lon, elevation), skipping times when the sun has set
-        for the day.
+        for the day. Hours where the sun is rising or setting will use the
+        middle of the portion that the sun is up to calculate the sun position.
+        Hours with full sun use the middle of that hour.
 
         * Altitude angle above (zenith), below (nadir), or at the horizon:
           Zenith -> +90°
@@ -121,7 +123,9 @@ class SunPosition:
             # Hours after sunrise until sunset
             if sun_up and (sun_set - utc_start) > self.ONE_HOUR:
                 result[utc_start] = self.at_time(
-                    self.timescale.from_datetime(utc_start)
+                    self.timescale.from_datetime(
+                        utc_start.replace(minute=30)
+                    )
                 )
             # Sunrise hour
             elif utc_start < sun_rise and \
@@ -133,12 +137,13 @@ class SunPosition:
                 if minutes_to_sunrise < 59:
                     sun_up_in_hour = 60 - (60 - minutes_to_sunrise) // 2
                 else:
+                    # Edge case when sunrise is just short of the full hour
                     sun_up_in_hour = 59
-                utc_start = utc_start.replace(minute=int(sun_up_in_hour))
                 result[utc_start] = self.at_time(
-                    self.timescale.from_datetime(utc_start)
+                    self.timescale.from_datetime(
+                        utc_start.replace(minute=int(sun_up_in_hour))
+                    )
                 )
-                utc_start = utc_start.replace(minute=0)
                 sun_up = True
             # Sunset hour
             elif sun_set > utc_start and (sun_set - utc_start) < self.ONE_HOUR:
@@ -147,17 +152,17 @@ class SunPosition:
                 )
                 # Use half of the amount of time until sunset in this hour
                 sun_up_in_hour = minutes_to_sunset // 2
-                utc_start = utc_start.replace(minute=sun_up_in_hour)
                 result[utc_start] = self.at_time(
-                    self.timescale.from_datetime(utc_start)
+                    self.timescale.from_datetime(
+                        utc_start.replace(minute=sun_up_in_hour)
+                    )
                 )
-                utc_start = utc_start.replace(minute=0)
             else:
                 result[utc_start] = (None, None)
 
             utc_start += self.ONE_HOUR
 
-        return result
+        return result, sun_rise, sun_set
 
     @staticmethod
     def timedelta_to_minutes(delta):
