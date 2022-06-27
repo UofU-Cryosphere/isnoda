@@ -37,6 +37,7 @@ function net_hrrr_for_month() {
   if [[ $? != 0 ]]; then
     exit 1
   fi
+  MONTH=$(date -d "${CURRENT_MONTH}" +%m)
   MONTH_SELECTOR=$(date -d "${CURRENT_MONTH}" +%Y%m)
   LAST_DAY=$(date -d "${CURRENT_MONTH} - 1 day" +%Y%m%d)
 
@@ -53,7 +54,7 @@ function net_hrrr_for_month() {
 
   echo "  Merge DSWRF and Albedo"
   MERGE_FILE="${DSWRF_OUT}/HRRR_SMRF.${MONTH_SELECTOR}.nc"
-  $CDO_COMMAND merge ${MONTH_FILE} ${SMRF_MONTH} ${MERGE_FILE}
+  $CDO_COMMAND merge -selmonth,${MONTH} ${MONTH_FILE} -selmonth,${MONTH} ${SMRF_MONTH} ${MERGE_FILE}
 
   echo "  Calculate Net Solar HRRR"
   MONTH_CALC_FILE="${DSWRF_OUT}/net_HRRR.${MONTH_SELECTOR}.nc"
