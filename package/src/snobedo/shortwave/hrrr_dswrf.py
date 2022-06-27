@@ -11,6 +11,7 @@ class HrrrDswrf:
     def __init__(self, topo_file_path, grib_file_path=None):
         self._topo_file = topo_file_path
         self.grib_file = grib_file_path
+        self._time_range = []
 
     @property
     def grib_file(self):
@@ -22,6 +23,17 @@ class HrrrDswrf:
             grib_file = self.VSISTDIN
 
         self._grib_file = self.gdal_warp_and_cut(grib_file)
+
+    @property
+    def bands_from_grib_file(self):
+        return range(1, self.grib_file.RasterCount + 1)
+
+    @property
+    def time_range(self):
+        if len(self._time_range) == 0:
+            for band in self.bands_from_grib_file:
+                self._time_range.append(self.timestep_for_band(band))
+        return self._time_range
 
     @staticmethod
     def gdal_osr_authority(spatial_info):
@@ -63,6 +75,15 @@ class HrrrDswrf:
     def grib_metadata(infile, band):
         return infile.GetRasterBand(band).GetMetadata()
 
+    def timestep_for_band(self, band):
+        return datetime.fromtimestamp(
+            int(
+                self.grib_metadata(
+                    self.grib_file, band
+                )['GRIB_VALID_TIME']
+            )
+        ).astimezone(timezone.utc)
+
     def save(self, out_file_path):
         metadata = self.grib_metadata(self.grib_file, 1)
 
@@ -75,19 +96,13 @@ class HrrrDswrf:
             field.setncattr('units', metadata['GRIB_UNIT'])
 
             counter = 0
-            for band in range(1, self.grib_file.RasterCount + 1):
+            for band in self.bands_from_grib_file:
                 # Metadata:
                 # * GRIB_REF_TIME is in UTC, indicated by the 'Z' in field
                 #   GRIB_IDS
                 # * GRIB_VALID_TIME is the timestamp indicating the 'up to'
                 #   valid time
-                timestep = datetime.fromtimestamp(
-                    int(
-                        self.grib_metadata(
-                            self.grib_file, band
-                        )['GRIB_VALID_TIME']
-                    )
-                ).astimezone(timezone.utc)
+                timestep = self.timestep_for_band(band)
 
                 outfile['time'][counter] = NetCDF.date_to_number(
                     timestep, outfile, counter == 0
