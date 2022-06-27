@@ -62,7 +62,7 @@ class TopoShade:
             self.topo.lat, self.topo.lon, self.topo.dem.mean(),
         )
 
-        sun_angles = sun_position.for_day(time_range[0])
+        sun_angles, sun_rise, sun_set = sun_position.for_day(time_range[0])
 
         for timestep, (zenith, azimuth) in sun_angles.items():
             # Convert to TopoLib expected values:
