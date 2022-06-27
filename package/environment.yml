@@ -4,7 +4,7 @@ channels:
 dependencies:
   - dask
   - dask-jobqueue
-  - gdal
+  - gdal=3.5
   - netCDF4
   - parallel
   - pip
