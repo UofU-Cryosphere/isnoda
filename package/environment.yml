@@ -2,6 +2,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - cdo
   - dask
   - dask-jobqueue
   - gdal=3.5
