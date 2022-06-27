@@ -66,8 +66,8 @@ function net_hrrr_for_month() {
     echo "  ** Error processing ${MONTH_SELECTOR} **"
   else
     # TODO: Execute these once tested and happy
-    echo "rm ${MONTH_FILE}"
-    echo "rm ${SMRF_MONTH}"
+    rm ${MONTH_FILE}
+    rm ${SMRF_MONTH}
     echo "rm ${MERGE_FILE}"
   fi
 }
