@@ -116,7 +116,7 @@ class TopoShade:
             self.illumination_angles[timestep] = illumination_angle
 
     @staticmethod
-    def add_illumination_angle(outfile):
+    def add_illumination_angle_field(outfile):
         field = outfile.createVariable(
             'illumination_angle', 'f', ('time', 'y', 'x',), zlib=True
         )
@@ -128,6 +128,9 @@ class TopoShade:
         field.setncattr(
             'units', '1: no illumination; 0: full illumination'
         )
+        field.setncattr(
+            'grid_mapping', 'projection'
+        )
         return field
 
     @staticmethod
@@ -137,28 +140,42 @@ class TopoShade:
         field.setncattr('units', units)
         return field
 
-    def save_illumination_angles(self, out_file_path):
+    def add_illumination_angles(self, outfile):
+        """
+        Add calculated shade to given output file as netCDF variable.
+
+        :param outfile: netCDF file instance where variable will be added to.
+        """
         time_range = list(self.illumination_angles.keys())
 
+        illumination_field = self.add_illumination_angle_field(outfile)
+        azimuth_field = self.add_time_variable(
+            'azimuth', 'Solar azimuth angle; 0 -> South', 'degrees',
+            outfile
+        )
+        zenith_field = self.add_time_variable(
+            'zenith', 'Solar zenith angle; 90 -> Horizon', 'degrees',
+            outfile
+        )
+
+        counter = 0
+
+        for key in time_range:
+            outfile['time'][counter] = NetCDF.date_to_number(
+                key, outfile, counter == 0
+            )
+            illumination_field[counter, :, :] = \
+                self.illumination_angles[key]
+            azimuth_field[counter] = self.azimuth[key]
+            zenith_field[counter] = self.zenith[key]
+            counter += 1
+
+    def save(self, out_file_path):
+        """
+        Save calculated shade as netCDF.
+
+        :param out_file_path:  String - Full path where output file should be
+                               saved to.
+        """
         with NetCDF.for_topo(out_file_path, self.topo.topo_file) as outfile:
-            illumination_field = self.add_illumination_angle(outfile)
-            azimuth_field = self.add_time_variable(
-                'azimuth', 'Solar azimuth angle; 0 -> South', 'degrees',
-                outfile
-            )
-            zenith_field = self.add_time_variable(
-                'zenith', 'Solar zenith angle; 90 -> Horizon', 'degrees',
-                outfile
-            )
-
-            counter = 0
-
-            for key in time_range:
-                outfile['time'][counter] = NetCDF.date_to_number(
-                    key, outfile, counter == 0
-                )
-                illumination_field[counter, :, :] = \
-                    self.illumination_angles[key]
-                azimuth_field[counter] = self.azimuth[key]
-                zenith_field[counter] = self.zenith[key]
-                counter += 1
+            self.add_illumination_angles(outfile)
