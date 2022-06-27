@@ -2,8 +2,7 @@ import argparse
 from pathlib import Path
 import netCDF4
 
-from snobedo.shortwave.hrrr_dswrf import HrrrDswrf
-from snobedo.shortwave.topo_shade import TopoShade
+from snobedo.shortwave import HrrrDswrf, TopoShade
 
 
 def argument_parser():
