@@ -1,7 +1,9 @@
 import argparse
 from pathlib import Path
+import netCDF4
 
 from snobedo.shortwave.hrrr_dswrf import HrrrDswrf
+from snobedo.shortwave.topo_shade import TopoShade
 
 
 def argument_parser():
@@ -28,6 +30,11 @@ def argument_parser():
         type=Path,
         help='Path to target netCDF destination file.'
     )
+    parser.add_argument(
+        '--add-shading', '-shading',
+        action=argparse.BooleanOptionalAction,
+        help='Add calculated topographic shading to netCDF output as variable.'
+    )
 
     return parser
 
@@ -47,3 +54,9 @@ def main():
 
     hrrr_dswrf = HrrrDswrf(arguments.topo.as_posix(), hrrr_in)
     hrrr_dswrf.save(arguments.nc_out)
+
+    if arguments.add_shading:
+        topo_shade = TopoShade(arguments.topo.as_posix())
+        topo_shade.calculate(hrrr_dswrf.time_range)
+        with netCDF4.Dataset(arguments.nc_out, 'a') as outfile:
+            topo_shade.add_illumination_angles(outfile)
