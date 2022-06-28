@@ -4,7 +4,7 @@ from osgeo import gdal, osr
 from snobedo.output import NetCDF
 
 
-class HrrrDswrf:
+class HrrrParameter:
     VSISTDIN = '/vsistdin/'
     MEM_TIFF = '/vsimem/grib.tif'
 

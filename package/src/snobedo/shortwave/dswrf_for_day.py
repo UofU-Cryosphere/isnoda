@@ -2,7 +2,8 @@ import argparse
 from pathlib import Path
 import netCDF4
 
-from snobedo.shortwave import HrrrDswrf, TopoShade
+from snobedo.input import HrrrParameter
+from snobedo.shortwave import TopoShade
 
 
 def argument_parser():
@@ -51,7 +52,7 @@ def main():
     if arguments.hrrr_in:
         hrrr_in = arguments.hrrr_in.as_posix()
 
-    hrrr_dswrf = HrrrDswrf(arguments.topo.as_posix(), hrrr_in)
+    hrrr_dswrf = HrrrParameter(arguments.topo.as_posix(), hrrr_in)
     hrrr_dswrf.save(arguments.nc_out)
 
     if arguments.add_shading:
