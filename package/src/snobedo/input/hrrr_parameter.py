@@ -1,4 +1,6 @@
+import random
 from datetime import datetime, timezone
+
 from osgeo import gdal, osr
 
 from snobedo.output import NetCDF
@@ -6,10 +8,11 @@ from snobedo.output import NetCDF
 
 class HrrrParameter:
     VSISTDIN = '/vsistdin/'
-    MEM_TIFF = '/vsimem/grib.tif'
+    MEM_TIFF = '/vsimem/grib_%i.tif'
 
     def __init__(self, topo_file_path, grib_file_path=None):
         self._topo_file = topo_file_path
+        self._mem_tif = self.MEM_TIFF % random.getrandbits(32)
         self.grib_file = grib_file_path
         self._time_range = []
 
@@ -74,7 +77,7 @@ class HrrrParameter:
             multithread=True,
         )
 
-        return gdal.Warp(self.MEM_TIFF, in_file, options=options)
+        return gdal.Warp(self._mem_tif, in_file, options=options)
 
     @staticmethod
     def grib_metadata(infile, band):
@@ -129,4 +132,4 @@ class HrrrParameter:
                     .ReadAsArray()
                 counter += 1
 
-        gdal.Unlink(self.MEM_TIFF)
+        gdal.Unlink(self._mem_tif)
