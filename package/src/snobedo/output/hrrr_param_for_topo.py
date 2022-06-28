@@ -8,7 +8,8 @@ from snobedo.shortwave import TopoShade
 
 def argument_parser():
     parser = argparse.ArgumentParser(
-        description='Extract DSWRF variable from HRRR output for given day'
+        description='Extract variable from HRRR output for given day and'
+                    'interpolate for given topo.'
     )
 
     parser.add_argument(
@@ -52,11 +53,11 @@ def main():
     if arguments.hrrr_in:
         hrrr_in = arguments.hrrr_in.as_posix()
 
-    hrrr_dswrf = HrrrParameter(arguments.topo.as_posix(), hrrr_in)
-    hrrr_dswrf.save(arguments.nc_out)
+    hrrr_param = HrrrParameter(arguments.topo.as_posix(), hrrr_in)
+    hrrr_param.save(arguments.nc_out)
 
     if arguments.add_shading:
         topo_shade = TopoShade(arguments.topo.as_posix())
-        topo_shade.calculate(hrrr_dswrf.time_range)
+        topo_shade.calculate(hrrr_param.time_range)
         with netCDF4.Dataset(arguments.nc_out, 'a') as outfile:
             topo_shade.add_illumination_angles(outfile)
