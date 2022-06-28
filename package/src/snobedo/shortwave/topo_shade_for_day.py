@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
-from snobedo.shortwave.topo_shade import TopoShade
+from snobedo.shortwave import TopoShade
 
 
 def argument_parser():
