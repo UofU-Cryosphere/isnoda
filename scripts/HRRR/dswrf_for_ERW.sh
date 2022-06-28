@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Combine DSWRF for a day and crop to ERW
+# Iterate over daily HRRR grib files, extract DSWRF, and crop to ERW topo.
 #
 # NOTE: First argument needs to bin quotes to prevent shell expansion
 #
