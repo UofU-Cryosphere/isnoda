@@ -113,9 +113,8 @@ class HrrrParameter:
 
         with NetCDF.for_topo(out_file_path, self._topo_file) as outfile:
             field = outfile.createVariable(
-                'DSWRF', 'f8', ('time', 'y', 'x',), zlib=True
+                metadata['GRIB_ELEMENT'], 'f8', ('time', 'y', 'x',), zlib=True
             )
-            field.setncattr('long_name', 'HRRR - DSWRF')
             field.setncattr('description', metadata['GRIB_COMMENT'])
             field.setncattr('units', metadata['GRIB_UNIT'])
 
