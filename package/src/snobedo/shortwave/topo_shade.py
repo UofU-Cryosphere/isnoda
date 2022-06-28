@@ -5,7 +5,7 @@ import pytz
 from topocalc.shade import shade
 
 from snobedo.output import NetCDF
-from snobedo.shortwave.load_topo import Topo
+from snobedo.input import SmrfTopo
 from snobedo.shortwave.sunang import sunang
 from snobedo.shortwave.sun_position import SunPosition
 
@@ -49,7 +49,7 @@ class TopoShade:
 
     @topo.setter
     def topo(self, file_path):
-        self._topo = Topo(file_path)
+        self._topo = SmrfTopo(file_path)
 
     def calculate(self, time_range):
         if self._solar_method == self.SolarMethods.SKYFIELD:

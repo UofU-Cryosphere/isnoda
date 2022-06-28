@@ -4,7 +4,7 @@ from topocalc import gradient
 from utm import to_latlon
 
 
-class Topo:
+class SmrfTopo:
     """
     Copied elements from SMRF to feed into TopoLib shade calculation.
 
