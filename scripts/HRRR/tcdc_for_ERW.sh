@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 # Iterate over daily HRRR grib files, extract TCDC, and crop to ERW topo.
 #
-# NOTE: First argument needs to bin quotes to prevent shell expansion
+# NOTES:
+# - First argument needs to bin quotes to prevent shell expansion
+# - Months argument are relative to the start month of october
 #
 # Arguments:
-#   ./tcdc_for_ERW.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX> <WATER_YEAR> <SNOBAL_OUT>
+#   ./tcdc_for_ERW.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX> <WATER_YEAR> <MONTHS> <SNOBAL_OUT>
 # Sample call:
 #   ./tcdc_for_ERW.sh /path/to/topo \
 #                     "hrrr.YYYYMM*" \
 #                     "hrrr.t*.f06.grib2" \
 #                     /write/to/here/file_prefix \
 #                     2021 \
+#                     "1 2 3" \
 #                     /input/read/from/isnobal
 #
 
@@ -54,7 +57,7 @@ fi
 export WATER_START_MONTH=10
 
 export TCDC_IN=${4}
-export TCDC_OUT=${6}
+export TCDC_OUT=${7}
 
 # Merge by month to get one file per day starting at midnight MST.
 # The 6-hour forecast requires to add the last day of the previous month
@@ -81,6 +84,11 @@ function tcdc_for_month() {
   MONTH_FILE="${ERW_MONTH}.${MONTH_SELECTOR}.nc"
   ${CDO_COMMAND} mergetime ${TCDC_IN}.${LAST_DAY}* ${TCDC_IN}.${MONTH_SELECTOR}* ${MONTH_FILE}
 
+  if [[ $? != 0 ]]; then
+    echo "  ** Error merging month ${MONTH_SELECTOR} **"
+    exit 1
+  fi
+
   echo "  Split by day MST"
   ${CDO_COMMAND} splitday ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
 
@@ -92,4 +100,4 @@ function tcdc_for_month() {
 }
 
 export -f tcdc_for_month
-parallel --jobs ${OMP_NUM_THREADS} tcdc_for_month ::: {0..11}
+parallel --jobs ${OMP_NUM_THREADS} tcdc_for_month ::: ${6}
