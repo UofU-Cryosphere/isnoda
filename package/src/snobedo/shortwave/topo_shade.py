@@ -6,7 +6,7 @@ from topocalc.shade import shade
 
 from snobedo.output import NetCDF
 from snobedo.input import SmrfTopo
-from snobedo.shortwave.sunang import sunang
+from snobedo.shortwave.smrf_sunang import sunang
 from snobedo.shortwave.sun_position import SunPosition
 
 
