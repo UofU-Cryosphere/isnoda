@@ -4,10 +4,10 @@ import numpy as np
 import pytz
 from topocalc.shade import shade
 
-from snobedo.output import NetCDF
 from snobedo.input import SmrfTopo
+from snobedo.output import NetCDF
+from snobedo.shortwave import SunPosition
 from snobedo.shortwave.smrf_sunang import sunang
-from snobedo.shortwave.sun_position import SunPosition
 
 
 class TopoShade:
