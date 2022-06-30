@@ -63,7 +63,8 @@ export TCDC_OUT=${7}
 # The 6-hour forecast requires to add the last day of the previous month
 function tcdc_for_month() {
   CDO_COMMAND='cdo -z zip4 -O'
-  CDO_MATH='-expr,TCDC="TCDC*0.01"'
+  # SMRF uses 1.0 as clear sky and 0.0 as full cloud cover
+  CDO_MATH='-expr,TCDC="(100-TCDC)*0.01"'
 
   TCDC_IN="${TCDC_IN}_hrrr"
   ERW_MONTH="${TCDC_OUT}/ERW_TCDC"
