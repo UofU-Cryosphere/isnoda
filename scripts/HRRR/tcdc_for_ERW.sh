@@ -82,7 +82,7 @@ function tcdc_for_month() {
 
   echo "  Merge month"
   MONTH_FILE="${ERW_MONTH}.${MONTH_SELECTOR}.nc"
-  ${CDO_COMMAND} mergetime ${TCDC_IN}.${LAST_DAY}* ${TCDC_IN}.${MONTH_SELECTOR}* ${MONTH_FILE}
+  ${CDO_COMMAND} mergetime -selmonth,${MONTH} ${TCDC_IN}.${LAST_DAY}* ${TCDC_IN}.${MONTH_SELECTOR}* ${MONTH_FILE}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error merging month ${MONTH_SELECTOR} **"
