@@ -63,6 +63,7 @@ export TCDC_OUT=${7}
 # The 6-hour forecast requires to add the last day of the previous month
 function tcdc_for_month() {
   CDO_COMMAND='cdo -z zip4 -O'
+  CDO_MATH='-expr,TCDC="TCDC*0.01"'
 
   TCDC_IN="${TCDC_IN}_hrrr"
   ERW_MONTH="${TCDC_OUT}/ERW_TCDC"
@@ -89,8 +90,8 @@ function tcdc_for_month() {
     exit 1
   fi
 
-  echo "  Split by day MST"
-  ${CDO_COMMAND} splitday -selmonth,${MONTH} ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
+  echo "  Split by day MST and convert to fraction"
+  ${CDO_COMMAND} splitday -selmonth,${MONTH} ${CDO_MATH} ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error processing ${MONTH_SELECTOR} **"
