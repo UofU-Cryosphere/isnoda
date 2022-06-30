@@ -29,7 +29,7 @@ function net_hrrr_for_month() {
 
   ERW_HRRR="${DSWRF_IN}/ERW_hrrr"
   ERW_MONTH="${DSWRF_OUT}/ERW_dswrf"
-  ERW_DAY_MST="${DSWRF_OUT}/net_HRRR.MST"
+  ERW_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
 
   pushd "${DSWRF_OUT}" || exit
 
