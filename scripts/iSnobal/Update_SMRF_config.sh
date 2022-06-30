@@ -8,3 +8,5 @@ for smfrcnf in */config.ini; do
   sed -i "211s/.*/variables:                     net_solar, cloud_factor, albedo_vis, albedo_ir, veg_ir_beam, veg_ir_diffuse, veg_vis_beam, veg_vis_diffuse/" $smfrcnf; 
 done
 
+# To remove a specific line
+# sed '<LineNumber>d' file > file
