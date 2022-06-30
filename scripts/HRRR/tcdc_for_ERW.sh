@@ -28,7 +28,7 @@ HRRR_GLOB=${2}
 export HRRR_PATTERN=${3}
 export NC_OUT_PREFIX=${4}
 
-combine_day() {
+get_day() {
   DAY=$1
   echo $DAY
   pushd $DAY > /dev/null
@@ -40,8 +40,8 @@ combine_day() {
   popd > /dev/null
 }
 
-export -f combine_day
-parallel --jobs ${OMP_NUM_THREADS} combine_day ::: ${HRRR_GLOB}
+export -f get_day
+parallel --jobs ${OMP_NUM_THREADS} get_day ::: ${HRRR_GLOB}
 
 ## Part 2 - Organize by MST
 
