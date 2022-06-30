@@ -90,7 +90,7 @@ function tcdc_for_month() {
   fi
 
   echo "  Split by day MST"
-  ${CDO_COMMAND} splitday ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
+  ${CDO_COMMAND} splitday -selmonth,${MONTH} ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error processing ${MONTH_SELECTOR} **"
