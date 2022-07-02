@@ -10,7 +10,6 @@ OUTPUT_FILES = [
     'air_temp.nc',
     'cloud_factor.nc',
     'percent_snow.nc',
-    'precip.nc',
     'precip_temp.nc',
     'precip.nc',
     'snow_density.nc',
