@@ -15,8 +15,10 @@
 #SBATCH --output=slurm-%j.out-%N
 #SBATCH --error=slurm-%j.err-%N
 
+# For pbzip2
+source load_conda_env gmt
+
 export OMP_NUM_THREADS=${SLURM_NTASKS}
-ml rclone
 
 START_YEAR=2019
 START_MONTH=10
@@ -28,10 +30,9 @@ BASIN_SETUP=/path/to/basin_setup/
 
 KATANA_DIR=/path/to/katana/config_and_image/
 KATANA_OUTPUT_DIR=/path/to/katana/output/
+KATANA_ARCHIVE_DIR=/path/to/katana/output_backup/
 ## -------------------------------------------- ##
 KATANA_INI=${KATANA_DIR}/katana.ini
-
-BACKUP_DESTINATION="isnoda:ERW_subset/katana/"
 
 for MONTH in {0..11}; do
   START=($(date -d "${START_MONTH}/01/${START_YEAR} + ${MONTH} month" "+%m %Y"))
@@ -60,25 +61,10 @@ for MONTH in {0..11}; do
     continue
   fi
 
-  ## ------------------------------------------------------------------ ##
-  # Below archiving requires the `rclone` command to be setup. It also
-  # uses the `pbzip2` command to create the archive with parallel
-  # processes.
-  # Currently this uses a remote destination with the alias `isnoda`.
-  # The destination can be changed via the $BACKUP_DESTINATION variable.
-  ## ------------------------------------------------------------------ ##
-
   echo "  Archiving"
   ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
 
   cd ${KATANA_OUTPUT_DIR}
-  tar -I pbzip2 -cf ${KATANA_OUTPUT_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
+  tar -I pbzip2 -cf ${KATANA_ARCHIVE_DIR_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
   cp katana.log katana_${YEAR}${MONTH}.log
-
-  echo "  Backup to remote destination: ${BACKUP_DESTINATION}"
-
-  rclone copy --include '*.bz2' ${ARCHIVE} ${BACKUP_DESTINATION}
-  if [ $? -eq 0 ]; then
-    rm ${ARCHIVE}
-  fi
 done
