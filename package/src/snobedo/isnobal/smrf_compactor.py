@@ -8,7 +8,6 @@ from pathlib import Path
 DAY_FOLDER_PREFIX = 'run'
 OUTPUT_FILES = [
     'air_temp.nc',
-    'cloud_factor.nc',
     'percent_snow.nc',
     'precip_temp.nc',
     'precip.nc',
