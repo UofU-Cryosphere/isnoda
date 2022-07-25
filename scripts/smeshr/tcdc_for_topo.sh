@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Iterate over daily HRRR grib files, extract TCDC, and crop to ERW topo.
+# Does the following sequence:
+# * Extract TCDC from given HRRR files for given topo extent
+# * Calculates the cloud factor in format expected by iSnobal
+# * Creates daily output files organized in MST time zone
 #
 # NOTES:
 # - First argument needs to bin quotes to prevent shell expansion
