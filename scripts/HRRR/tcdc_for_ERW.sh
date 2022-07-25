@@ -64,11 +64,12 @@ export TCDC_OUT=${7}
 function tcdc_for_month() {
   CDO_COMMAND='cdo -z zip4 -O'
   # SMRF uses 1.0 as clear sky and 0.0 as full cloud cover
-  CDO_MATH='-expr,TCDC="(100-TCDC)*0.01"'
+  CDO_MATH="TCDC=(100-TCDC)*0.01"
 
-  TCDC_IN="${TCDC_IN}_hrrr"
+  # Need to add the 'hrrr' back in as it stems from the HRRR folder pattern
+  TCDC_IN="${TCDC_IN}hrrr"
   ERW_MONTH="${TCDC_OUT}/ERW_TCDC"
-  ERW_DAY_MST="${TCDC_OUT}tcdc.MST"
+  ERW_DAY_MST="${TCDC_OUT}/tcdc.MST"
 
   pushd "${TCDC_OUT}" || exit
 
@@ -92,10 +93,10 @@ function tcdc_for_month() {
   fi
 
   echo "  Split by day MST and convert to fraction"
-  ${CDO_COMMAND} splitday -selmonth,${MONTH} ${CDO_MATH} ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
+  ${CDO_COMMAND} splitday -selmonth,${MONTH} -expr,"${CDO_MATH}" ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
-    echo "  ** Error processing ${MONTH_SELECTOR} **"
+    echo "  ** Error splitting ${MONTH_SELECTOR} **"
   else
     rm ${MONTH_FILE}
   fi
@@ -103,3 +104,4 @@ function tcdc_for_month() {
 
 export -f tcdc_for_month
 parallel --jobs ${OMP_NUM_THREADS} tcdc_for_month ::: ${6}
+
