@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Script to prepare net_solar.nc from HRRR as expected to ingest for iSnobal
+# Script to prepare net_solar.nc from HRRR data in expected format by iSnobal
+# Uses time-decay albedo outputs from SMRF, compacted by the `smrf_compactor`
+# command.
+#
 # Iterates over one water year.
 # Example call:
 #   ./net_HRRR_for_ERW.sh <YYYY> <DSWRF_in> <albedo_in> <DSWRF_out>
@@ -25,6 +28,7 @@ export DSWRF_OUT=${4}
 function net_hrrr_for_month() {
   CDO_COMMAND='cdo -z zip4 -O'
   SMRF_SELECT="select,name=albedo"
+  SMRF_ALBEDO_MATH="albedo=(0.67 * albedo_vis) + (0.33 * albedo_ir);"
   NET_MATH="aexpr,net_solar=(1-albedo)*illumination_angle*DSWRF"
 
   ERW_HRRR="${DSWRF_IN}/ERW_hrrr"
@@ -48,9 +52,9 @@ function net_hrrr_for_month() {
   ${CDO_COMMAND} mergetime ${ERW_HRRR}.${LAST_DAY}* ${ERW_HRRR}.${MONTH_SELECTOR}* ${MONTH_FILE}
 
   echo "  Fetch Albedo"
-  SMRF_ALBEDO="${SMRF_IN}/run${MONTH_SELECTOR}*/smrf_solar_al.nc"
+  SMRF_EB="${SMRF_IN}/run${MONTH_SELECTOR}*/smrf_energy_balance*.nc"
   SMRF_MONTH="${DSWRF_OUT}/SMRF_albedo.${MONTH_SELECTOR}.nc"
-  ${CDO_COMMAND} ${SMRF_SELECT} ${SMRF_ALBEDO} ${SMRF_MONTH}
+  ${CDO_COMMAND} -expr="${SMRF_ALBEDO_MATH}" ${SMRF_EB} ${SMRF_MONTH}
 
   echo "  Merge DSWRF and Albedo"
   MERGE_FILE="${DSWRF_OUT}/HRRR_SMRF.${MONTH_SELECTOR}.nc"
