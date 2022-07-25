@@ -25,9 +25,8 @@ dependencies:
   - regex
   - requests
   - setuptools_scm<4.2
-  - scipy
+  - scipy<1.7.0
   - siphon
   - urllib3
   - utm
   - xarray=0.15.1
-
