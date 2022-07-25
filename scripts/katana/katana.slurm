@@ -65,6 +65,10 @@ for MONTH in {0..11}; do
   ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
 
   cd ${KATANA_OUTPUT_DIR}
+
+  find data${YEAR}${MONTH}[0-3][0-9] -name *hrrr* -delete
+  find data${YEAR}${MONTH}[0-3][0-9] -name *.prj -delete
+
   tar -I pbzip2 -cf ${KATANA_ARCHIVE_DIR_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
   cp katana.log katana_${YEAR}${MONTH}.log
 done
