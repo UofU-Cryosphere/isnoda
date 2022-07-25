@@ -5,10 +5,10 @@
 #
 # Iterates over one water year.
 # Example call:
-#   ./net_HRRR_for_topo.sh <YYYY> <DSWRF_in> <albedo_in> <DSWRF_out>
-#   ./net_HRRR_for_topo.sh 2021 /path/to/DSWRF /path/to/SMRF /path/to/destination
+#   ./net_HRRR_for_ERW.sh <YYYY> <DSWRF_in> <albedo_in> <DSWRF_out>
+#   ./net_HRRR_for_ERW.sh 2021 /path/to/DSWRF /path/to/SMRF /path/to/destination
 
-export OMP_NUM_THREADS=${SLURM_NTASKS:-4}
+export OMP_NUM_THREADS=6
 export OMP_WAIT_POLICY=PASSIVE
 
 if [[ -z "$1" ]]; then
@@ -27,12 +27,13 @@ export DSWRF_OUT=${4}
 # The 6-hour forecast requires to add the last day of the previous month
 function net_hrrr_for_month() {
   CDO_COMMAND='cdo -z zip4 -O'
-  SMRF_SELECT="select,name=albedo"
-  SMRF_ALBEDO_MATH="albedo=(0.67 * albedo_vis) + (0.33 * albedo_ir);"
-  NET_MATH="aexpr,net_solar=(1-albedo)*illumination_angle*DSWRF"
+  HRRR_SELECT="-select,name=illumination_angle,DSWRF"
+  SMRF_SELECT="-select,name=albedo_vis,albedo_ir"
+  NET_MATH="\
+albedo=(0.67*albedo_vis)+(0.33*albedo_ir);\
+net_solar=(1-albedo)*illumination_angle*DSWRF;\
+"
 
-  ERW_HRRR="${DSWRF_IN}/ERW_hrrr"
-  ERW_MONTH="${DSWRF_OUT}/ERW_dswrf"
   ERW_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
 
   pushd "${DSWRF_OUT}" || exit
@@ -47,22 +48,37 @@ function net_hrrr_for_month() {
 
   echo "Processing: ${MONTH_SELECTOR}"
 
-  echo "  Merge month"
-  MONTH_FILE="${ERW_MONTH}.${MONTH_SELECTOR}.nc"
-  ${CDO_COMMAND} mergetime ${ERW_HRRR}.${LAST_DAY}* ${ERW_HRRR}.${MONTH_SELECTOR}* ${MONTH_FILE}
+  echo "  Merge HRRR month"
+  MONTH_FILE="${DSWRF_OUT}/dswrf.${MONTH_SELECTOR}.nc"
+  ${CDO_COMMAND} mergetime ${HRRR_SELECT} ${DSWRF_IN}.${LAST_DAY}* ${DSWRF_IN}.${MONTH_SELECTOR}* ${MONTH_FILE}
+
+  if [[ $? != 0 ]]; then
+    echo "  ** Error merging HRRR month **"
+    exit 1
+  fi
 
   echo "  Fetch Albedo"
   SMRF_EB="${SMRF_IN}/run${MONTH_SELECTOR}*/smrf_energy_balance*.nc"
-  SMRF_MONTH="${DSWRF_OUT}/SMRF_albedo.${MONTH_SELECTOR}.nc"
-  ${CDO_COMMAND} -expr="${SMRF_ALBEDO_MATH}" ${SMRF_EB} ${SMRF_MONTH}
+  SMRF_MERGE="${DSWRF_OUT}/SMRF.${MONTH_SELECTOR}.nc"
+  ${CDO_COMMAND} ${SMRF_SELECT} ${SMRF_EB} ${SMRF_MERGE}
+
+  if [[ $? != 0 ]]; then
+    echo "  ** Error fetching Albedo **"
+    exit 1
+  fi
 
   echo "  Merge DSWRF and Albedo"
   MERGE_FILE="${DSWRF_OUT}/HRRR_SMRF.${MONTH_SELECTOR}.nc"
-  $CDO_COMMAND merge -selmonth,${MONTH} ${MONTH_FILE} -selmonth,${MONTH} ${SMRF_MONTH} ${MERGE_FILE}
+  $CDO_COMMAND merge -selmonth,${MONTH} ${MONTH_FILE} -selmonth,${MONTH} ${SMRF_MERGE} ${MERGE_FILE}
+
+  if [[ $? != 0 ]]; then
+    echo "  ** Error merging SRMF and DSWRF **"
+    exit 1
+  fi
 
   echo "  Calculate Net Solar HRRR"
   MONTH_CALC_FILE="${DSWRF_OUT}/net_HRRR.${MONTH_SELECTOR}.nc"
-  ${CDO_COMMAND} ${NET_MATH} ${MERGE_FILE} ${MONTH_CALC_FILE}
+  ${CDO_COMMAND} -aexpr,"${NET_MATH}" ${MERGE_FILE} ${MONTH_CALC_FILE}
 
   echo "  Split by day MST"
   ${CDO_COMMAND} splitday ${MONTH_CALC_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
@@ -71,7 +87,7 @@ function net_hrrr_for_month() {
     echo "  ** Error processing ${MONTH_SELECTOR} **"
   else
     rm ${MONTH_FILE}
-    rm ${SMRF_MONTH}
+    rm ${SMRF_MERGE}
     rm ${MERGE_FILE}
   fi
 }
