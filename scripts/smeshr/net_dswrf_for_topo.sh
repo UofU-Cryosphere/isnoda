@@ -5,8 +5,8 @@
 #
 # Iterates over one water year.
 # Example call:
-#   ./net_HRRR_for_ERW.sh <YYYY> <DSWRF_in> <albedo_in> <DSWRF_out>
-#   ./net_HRRR_for_ERW.sh 2021 /path/to/DSWRF /path/to/SMRF /path/to/destination
+#   ./net_HRRR_for_topo.sh <YYYY> <DSWRF_in> <albedo_in> <DSWRF_out>
+#   ./net_HRRR_for_topo.sh 2021 /path/to/DSWRF /path/to/SMRF /path/to/destination
 
 export OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 export OMP_WAIT_POLICY=PASSIVE

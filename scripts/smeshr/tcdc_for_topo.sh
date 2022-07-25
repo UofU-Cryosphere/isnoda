@@ -9,9 +9,9 @@
 # - Months argument are relative to the start month of october
 #
 # Arguments:
-#   ./tcdc_for_ERW.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX> <WATER_YEAR> <MONTHS> <SNOBAL_OUT>
+#   ./tcdc_for_topo.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX> <WATER_YEAR> <MONTHS> <SNOBAL_OUT>
 # Sample call:
-#   ./tcdc_for_ERW.sh /path/to/topo \
+#   ./tcdc_for_topo.sh /path/to/topo \
 #                     "hrrr.YYYYMM*" \
 #                     "hrrr.t*.f06.grib2" \
 #                     /write/to/here/file_prefix \
