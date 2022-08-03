@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Iterate over time range and calculate ERW topographic shading
+# Wrapper to iterate over SMRF outputs and execute `CDO_smrf.sh`
 #
 # Arguments:
 #   ./SMRF_merge_solar.sh <TOPO> SMRF_DAY_OUTPUT
