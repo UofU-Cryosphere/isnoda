@@ -5,8 +5,8 @@
 #
 # Iterates over one water year.
 # Example call:
-#   ./net_HRRR_for_ERW.sh <YYYY> <DSWRF_in> <albedo_in> <DSWRF_out>
-#   ./net_HRRR_for_ERW.sh 2021 /path/to/DSWRF /path/to/SMRF /path/to/destination
+#   ./net_HRRR_for_topo_SMRF.sh <YYYY> <MM> <DSWRF_in> <albedo_in> <DSWRF_out>
+#   ./net_HRRR_for_topo_SMRF.sh 2021 "0 1 2" /path/to/DSWRF /path/to/SMRF /path/to/destination
 
 export OMP_NUM_THREADS=6
 export OMP_WAIT_POLICY=PASSIVE
@@ -19,9 +19,9 @@ else
 fi
 export WATER_START_MONTH=10
 
-export DSWRF_IN=${2}
-export SMRF_IN=${3}
-export DSWRF_OUT=${4}
+export DSWRF_IN=${3}
+export SMRF_IN=${4}
+export DSWRF_OUT=${5}
 
 # Merge by month to get one file per day starting at midnight MST.
 # The 6-hour forecast requires to add the last day of the previous month
@@ -93,4 +93,4 @@ net_solar=(1-albedo)*illumination_angle*DSWRF;\
 }
 
 export -f net_hrrr_for_month
-parallel --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: {0..11}
+parallel --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: ${2}
