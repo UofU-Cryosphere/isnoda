@@ -6,14 +6,13 @@
 # Arguments:
 # ${1}: /path/to/MODIS/inputs
 # ${2}: water year
-# ${3}: GeoJSON with model boundary cutline
+# ${3}: /path/to/extracted/MODIS/albedo
 
 # command from isnoda snobedo package
 variable_from_modis --source-dir ${1} \
                     --water-year ${2} \
                     --variable albedo_observed_muZ
 
-export CUTLINE=${3}
 export ERW_NC="_ERW.nc"
 export ERW_ONE_DAY_SUFFIX="_24.nc"
 
@@ -22,9 +21,9 @@ modis_erw() {
   ERW_TMP=${1/\.tif/_tmp.nc}
 
   gdalwarp -overwrite -multi\
-  -co FORMAT=NC4 -ot Float32 -dstnodata -1\
-  -t_srs EPSG:32613 -tr 50 50 -cblend 1\
-  -crop_to_cutline -cutline ${CUTLINE}\
+  -co FORMAT=NC4C -co WRITE_BOTTOMUP=NO -ot Float32 \
+  -t_srs EPSG:32613 -tr 50 50 -dstnodata -1\
+  -te 315900.0 4280850.0 348700.0 4322700.0 \
   ${1} ${ERW_TMP}
 
   if [ $? != 0 ]; then
@@ -35,7 +34,7 @@ modis_erw() {
   date=$(date -d $(echo $1 | cut -d '_' -f2) +%Y-%m-%d)
   # Set time and variable name in NetCDF
   cdo -O -z zip_4 -chname,Band1,albedo \
-                  -setdate,"${date}" -settime,"23:00:00" \
+                  -setdate,"${date}" \
                   ${ERW_TMP} ${1/\.tif/${ERW_NC}}
 
   if [ $? != 0 ]; then
@@ -47,7 +46,7 @@ modis_erw() {
   rm ${1}
 }
 export -f modis_erw
-parallel --jobs ${SLURM_NTASKS} modis_erw ::: ${1}
+parallel -u --jobs ${SLURM_NTASKS} modis_erw ::: ${3}
 
 albedo_day() {
   HOUR_FILE="shift_${1}"
@@ -58,8 +57,8 @@ albedo_day() {
     return 1
   fi
 
-  for hour in {1..22}; do
-    cdo -O -z zip_4 -shifttime,-${hour}hour $1 ${HOUR_FILE}_${hour}.nc
+  for hour in {1..23}; do
+    cdo -O -z zip_4 -shifttime,${hour}hour $1 ${HOUR_FILE}_${hour}.nc
   done
 
   cdo -O -z zip_4 mergetime $1 ${HOUR_FILE}*.nc ${1/\.nc/${ERW_ONE_DAY_SUFFIX}}
@@ -74,4 +73,4 @@ albedo_day() {
 }
 
 export -f albedo_day
-parallel --jobs ${SLURM_NTASKS} albedo_day ::: *${ERW_NC}
+parallel -u --jobs ${SLURM_NTASKS} albedo_day ::: *${ERW_NC}
