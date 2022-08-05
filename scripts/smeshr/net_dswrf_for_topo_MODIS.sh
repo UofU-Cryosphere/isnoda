@@ -92,4 +92,4 @@ function net_hrrr_for_month() {
 }
 
 export -f net_hrrr_for_month
-parallel -u --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: ${2}
+parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: ${2}

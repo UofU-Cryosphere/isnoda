@@ -46,7 +46,7 @@ modis_erw() {
   rm ${1}
 }
 export -f modis_erw
-parallel -u --jobs ${SLURM_NTASKS} modis_erw ::: ${3}
+parallel --tag --line-buffer --jobs ${SLURM_NTASKS} modis_erw ::: ${3}
 
 albedo_day() {
   HOUR_FILE="shift_${1}"
@@ -73,4 +73,4 @@ albedo_day() {
 }
 
 export -f albedo_day
-parallel -u --jobs ${SLURM_NTASKS} albedo_day ::: *${ERW_NC}
+parallel --tag --line-buffer --jobs ${SLURM_NTASKS} albedo_day ::: *${ERW_NC}

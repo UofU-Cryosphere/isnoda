@@ -17,4 +17,4 @@ solar_for_day() {
 }
 
 export -f solar_for_day
-parallel --jobs ${PROCESSES} solar_for_day ::: ${1}
+parallel --tag --line-buffer --jobs ${PROCESSES} solar_for_day ::: ${1}

@@ -27,7 +27,7 @@ export FORECAST_HOUR=${1}
 export WGRIB_MATCH="APCP:surface:$((FORECAST_HOUR - 1))-${FORECAST_HOUR}"
 
 extract_apcp_fc06() {
-  parallel --jobs ${OMP_NUM_THREADS} wgrib2 {} -match $WGRIB_MATCH \
+  parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} wgrib2 {} -match $WGRIB_MATCH \
            -grib {.}.apcp.grib2 ::: $1
 }
 
@@ -65,7 +65,7 @@ adjust_time() {
 
 export -f adjust_time
 while [ ! -z "$2" ]; do
-  parallel --jobs ${OMP_NUM_THREADS} adjust_time ::: ${2}/*wrfsfcf0${FORECAST_HOUR}.grib2
+  parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} adjust_time ::: ${2}/*wrfsfcf0${FORECAST_HOUR}.grib2
   shift
 done
 

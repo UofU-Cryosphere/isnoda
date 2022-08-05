@@ -29,11 +29,11 @@ compact_smrf() {
 }
 
 export -f compact_smrf
-parallel --jobs ${OMP_NUM_THREADS} compact_smrf ::: ${SOURCE_FOLDER}
+parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} compact_smrf ::: ${SOURCE_FOLDER}
 
 # Add compression to remaining files, not processed by the above
 # `smrf_compactor` call. Utilizes the `parallel` command and tools from `cdo`.
-parallel --jobs ${OMP_NUM_THREADS} \
+parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} \
   nccopy -s -u -d4 {} {.}_c.nc ::: ${SOURCE_FOLDER}/{em,snow}.nc
 rename _c.nc .nc ${SOURCE_FOLDER}/{em,snow}_c.nc
 

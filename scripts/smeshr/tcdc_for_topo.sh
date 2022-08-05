@@ -44,7 +44,7 @@ get_day() {
 }
 
 export -f get_day
-parallel --jobs ${OMP_NUM_THREADS} get_day ::: ${HRRR_GLOB}
+parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} get_day ::: ${HRRR_GLOB}
 
 ## Part 2 - Organize by MST
 
@@ -106,5 +106,5 @@ function tcdc_for_month() {
 }
 
 export -f tcdc_for_month
-parallel --jobs ${OMP_NUM_THREADS} tcdc_for_month ::: ${6}
+parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} tcdc_for_month ::: ${6}
 

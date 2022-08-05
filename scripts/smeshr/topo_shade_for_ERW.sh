@@ -30,4 +30,4 @@ until [[ ${start} > ${4} ]]; do
 done
 
 export -f shade_for_day
-parallel --jobs ${PROCESSES} shade_for_day ::: "${DATES[@]}"
+parallel --tag --line-buffer --jobs ${PROCESSES} shade_for_day ::: "${DATES[@]}"

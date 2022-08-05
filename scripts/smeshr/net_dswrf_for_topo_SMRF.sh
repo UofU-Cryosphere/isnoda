@@ -93,4 +93,4 @@ net_solar=(1-albedo)*illumination_angle*DSWRF;\
 }
 
 export -f net_hrrr_for_month
-parallel --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: ${2}
+parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: ${2}

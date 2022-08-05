@@ -31,4 +31,4 @@ combine_day() {
 }
 
 export -f combine_day
-parallel --jobs ${OMP_NUM_THREADS} combine_day ::: ${2}
+parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} combine_day ::: ${2}
