@@ -22,20 +22,19 @@ export WATER_START_MONTH=10
 export DSWRF_IN=${3}
 export SMRF_IN=${4}
 export DSWRF_OUT=${5}
+export ERW_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
 
-# Merge by month to get one file per day starting at midnight MST.
-# The 6-hour forecast requires to add the last day of the previous month
-function net_hrrr_for_month() {
-  CDO_COMMAND='cdo -z zip4 -O'
-  HRRR_SELECT="-select,name=illumination_angle,DSWRF"
-  SMRF_SELECT="-select,name=albedo_vis,albedo_ir"
-  NET_MATH="\
+export CDO_COMMAND='cdo -z zip4 -O'
+export HRRR_SELECT="-select,name=illumination_angle,DSWRF"
+export SMRF_SELECT="-select,name=albedo_vis,albedo_ir"
+export NET_MATH="\
 albedo=(0.67*albedo_vis)+(0.33*albedo_ir);\
 net_solar=(1-albedo)*illumination_angle*DSWRF;\
 "
 
-  ERW_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
-
+# Merge by month to get one file per day starting at midnight MST.
+# The 6-hour forecast requires to add the last day of the previous month
+function net_hrrr_for_month() {
   pushd "${DSWRF_OUT}" || exit
 
   CURRENT_MONTH=$(date -d "${WATER_START_MONTH}/01/${WATER_YEAR} + ${1} month")
