@@ -31,7 +31,19 @@ SNOTEL_DIR = DATA_DIR.joinpath( 'Snotel')
 FIGURES_DIR = DATA_DIR.joinpath('figures')
 
 # Plot styles
-BOKEH_FONT=dict(fontsize={'title': 14, 'labels': 12, 'xticks': 12, 'yticks': 12, 'legend': 12})
+BOKEH_FONT = dict(
+    fontsize={
+        'title': 14, 
+        'labels': 12, 
+        'xticks': 12, 
+        'yticks': 12, 
+        'legend': 12
+    }
+)
+HV_PLOT_OPTS = dict(
+    width=1200, 
+    height=600,
+)
 
 # Xarray options
 # Used in comparison to SNOTEL site locations
