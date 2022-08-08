@@ -12,6 +12,6 @@
 for DAY in $1; do
   pushd $DAY || exit 1
   DAY=$(echo $DAY | cut -d '/' -f11,12 | sed 's/\//./g' | sed 's/run//g' );
-  ln -s $2.$DAY.nc $3
+  ln -fs $2.$DAY.nc $3
   popd
 done
