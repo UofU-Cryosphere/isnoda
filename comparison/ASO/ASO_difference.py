@@ -20,7 +20,7 @@ plt.rcParams.update(
 )
 
 # Values above 25m are considered outlier
-OUTLIER = 25
+OUTLIER = 12
 
 
 def violin_plot(ax, data, color):
@@ -43,6 +43,7 @@ def area_plot(file, title='', save=False):
 
     data = differences.band_values()
     data[data > OUTLIER] = np.ma.masked
+    data[data < -OUTLIER] = np.ma.masked
     data[np.isnan(data)] = np.ma.masked
 
     fig, (ax1, ax2) = plt.subplots(
