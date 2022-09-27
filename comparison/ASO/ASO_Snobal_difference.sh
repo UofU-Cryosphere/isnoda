@@ -29,7 +29,7 @@ echo $WATER_YEAR
 SNOBAL_50M=${DIFFERENCE_DIR}/Snobal_thickness_${DAY}_50m.tif
 
 gdal_translate --optfile $GDAL_OPTS \
-  NETCDF:"${SNOBAL_HOME}/erw_isnobal/wy${WATER_YEAR}/erw/run${DAY}/snow.nc":thickness \
+  NETCDF:"${SNOBAL_HOME}/erw_isnobal/GMD/wy${WATER_YEAR}/erw/run${DAY}/snow.nc":thickness \
   ${SNOBAL_50M}
 
 if [ $? != 0 ]; then exit -1; fi
@@ -54,6 +54,6 @@ rm ${DIFF_FILE} 2> /dev/null
 
 gdal_calc.py --co="TILED=YES" --co="COMPRESS=LZW" --co="NUM_THREADS=ALL_CPUS"  \
   --calc="A-B" \
-  -A ${ASO_50M_SG} \
-  -B ${SNOBAL_50M} \
+  -A ${SNOBAL_50M} \
+  -B ${ASO_50M_SG} \
   --outfile ${DIFF_FILE}
