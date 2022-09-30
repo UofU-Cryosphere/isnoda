@@ -33,16 +33,27 @@ FIGURES_DIR = DATA_DIR.joinpath('figures')
 # Plot styles
 BOKEH_FONT = dict(
     fontsize={
-        'title': 14, 
-        'labels': 12, 
-        'xticks': 12, 
-        'yticks': 12, 
-        'legend': 12
+        'title': 24,
+        'labels': 24,
+        'xlabel': 24,
+        'ylabel': 24,
+        'xticks': 20,
+        'yticks': 20,
+        'legend': 24,
     }
 )
 HV_PLOT_OPTS = dict(
-    width=1200, 
+    width=1200,
     height=600,
+)
+LINE_STYLE = dict(
+    line_width=3
+)
+LEGEND_OPTS = dict(
+    legend_position='top_left',
+    legend_opts={ 'glyph_width':35 },
+    legend_spacing=10,
+    legend_padding=30,
 )
 
 # Xarray options
