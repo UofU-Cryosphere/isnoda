@@ -24,6 +24,7 @@ DATA_DIR = SHARED_STORE.joinpath('jmeyer')
 
 HRRR_DIR = SHARED_STORE.joinpath('HRRR_water_years')
 SNOBAL_DIR = SHARED_STORE.joinpath('erw_isnobal')
+MODIS_DIR = SHARED_STORE.joinpath('MODIS_albedo')
 
 ASO_DIR = DATA_DIR.joinpath('ASO-data')
 CBRFC_DIR = DATA_DIR.joinpath('CBRFC')
