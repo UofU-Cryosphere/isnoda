@@ -28,21 +28,38 @@ export CDO_call="cdo -O -z zip_4 -s"
 
 # Extracts the ERW domain from the Western US MODIS albedo GeoTiffs
 modis_erw() {
-  ERW_TMP_VRT=${1/\.tif/_tmp.vrt}
+  ERW_TMP_CUBIC=${1/\.tif/_cubic_tmp.vrt}
+  ERW_TMP_NN=${1/\.tif/_nn_tmp.vrt}
+  ERW_TMP=${1/\.tif/_tmp.tif}
   ERW_TMP_NC=${1/\.tif/_tmp.nc}
 
-  gdalwarp -q -overwrite -multi\
-    -r cubic \
-    -t_srs EPSG:32613 -tr 50 50 -dstnodata 65535 \
-    -te 315900.0 4280850.0 348700.0 4322700.0 \
-    ${1} ${ERW_TMP_VRT}
+  ERW_DOMAIN="\
+-t_srs EPSG:32613 -tr 50 50 -dstnodata 65535
+-te 315900.0 4280850.0 348700.0 4322700.0
+"
+  FILTER_MATH="A*(A<=numpy.max(B)) + numpy.max(B)*(A>numpy.max(B))" 
 
-  # There are negative resampling values when going
-  # straight from MODIS GeoTiff to ERW NetCDF. Breaking
-  # up in two steps via VRT
+  # Use cubic resampling to smooth the image
+  gdalwarp -q -overwrite -multi \
+    -r cubic ${ERW_DOMAIN} \
+    ${1} ${ERW_TMP_CUBIC}
+
+  # Generate a nearest neighbor to get the max basin value as filter
+  gdalwarp -q -overwrite -multi \
+    ${ERW_DOMAIN} \
+    ${1} ${ERW_TMP_NN}
+
+  # Combine products, filter any values from cubic resampling higher
+  # than the max of nearest neighbor and set to that value
+  gdal_calc.py --overwrite --quiet --co COMPRESS=LZW \
+    -A ${ERW_TMP_CUBIC} -B ${ERW_TMP_NN} \
+    --calc=${FILTER_MATH} \
+    --outfile=${ERW_TMP}
+
+  # Convert to NetCDF
   gdalwarp -overwrite -multi -q \
     -co FORMAT=NC4C -co WRITE_BOTTOMUP=NO \
-    ${ERW_TMP_VRT} ${ERW_TMP_NC}
+    ${ERW_TMP} ${ERW_TMP_NC}
 
   if [ $? != 0 ]; then
     printf "Error extracting domain from: \n   ${1}\n"
@@ -52,7 +69,7 @@ modis_erw() {
   date=$(date -d $(basename $1 | cut -d '_' -f2) +%Y-%m-%d)
   # Set time and variable name in NetCDF
   ${CDO_call} \
-    -expr,"Band1=((Band1 > 10000)) ? 10000 : Band1" \
+    -chname,Band1,albedo \
     -setdate,"${date}" \
     ${ERW_TMP_NC} ${1/\.tif/${ERW_NC}}
 
@@ -61,7 +78,11 @@ modis_erw() {
     return 1
   fi
 
-  rm ${ERW_TMP_VRT}
+  printf "*\n"
+
+  rm ${ERW_TMP_CUBIC}
+  rm ${ERW_TMP_NN}
+  rm ${ERW_TMP}
   rm ${ERW_TMP_NC}
 }
 export -f modis_erw
@@ -77,13 +98,14 @@ albedo_day() {
     return 1
   fi
 
+  # Duplicate the single day value for every hour
   for hour in {1..23}; do
     ${CDO_call} -shifttime,${hour}hour \
       ${1} ${HOUR_FILE}_${hour}.nc
   done
 
-  ${CDO_call} mergetime -chname,Band1,albedo $1 \
-    ${HOUR_FILE}*.nc ${1/\.nc/${ERW_ONE_DAY_SUFFIX}}
+  # Make on file with values for every full hour
+  ${CDO_call} mergetime ${HOUR_FILE}*.nc ${1/\.nc/${ERW_ONE_DAY_SUFFIX}}
 
   if [ $? != 0 ]; then
     printf "Error: Could not merge hours for:\n  ${1}\n"
