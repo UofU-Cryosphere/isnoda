@@ -53,7 +53,7 @@ modis_erw() {
   # than the max of nearest neighbor and set to that value
   gdal_calc.py --overwrite --quiet --co COMPRESS=LZW \
     -A ${ERW_TMP_CUBIC} -B ${ERW_TMP_NN} \
-    --calc=${FILTER_MATH} \
+    --calc="${FILTER_MATH}" \
     --outfile=${ERW_TMP}
 
   # Convert to NetCDF
@@ -104,8 +104,8 @@ albedo_day() {
       ${1} ${HOUR_FILE}_${hour}.nc
   done
 
-  # Make on file with values for every full hour
-  ${CDO_call} mergetime ${HOUR_FILE}*.nc ${1/\.nc/${ERW_ONE_DAY_SUFFIX}}
+  # Make on file with values for every full hour and given file
+  ${CDO_call} mergetime ${1} ${HOUR_FILE}*.nc ${1/\.nc/${ERW_ONE_DAY_SUFFIX}}
 
   if [ $? != 0 ]; then
     printf "Error: Could not merge hours for:\n  ${1}\n"
