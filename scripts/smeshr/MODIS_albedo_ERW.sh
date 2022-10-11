@@ -24,7 +24,8 @@ fi
 export ERW_NC="_ERW.nc"
 export ERW_ONE_DAY_SUFFIX="_24.nc"
 
-export CDO_call="cdo -O -z zip_4 -s"
+export CDO_call="cdo -O -z zip_4 -f nc4 -s"
+export PARALLEL_call="parallel --tagstring {#} --tag --line-buffer --jobs ${SLURM_NTASKS}"
 
 # Extracts the ERW domain from the Western US MODIS albedo GeoTiffs
 modis_erw() {
@@ -79,7 +80,7 @@ modis_erw() {
     return 1
   fi
 
-  printf "*\n"
+  printf "DONE: ${date}\n"
 
   rm ${ERW_TMP_CUBIC}
   rm ${ERW_TMP_NN}
@@ -87,7 +88,8 @@ modis_erw() {
   rm ${ERW_TMP_NC}
 }
 export -f modis_erw
-parallel --tag --line-buffer --jobs ${SLURM_NTASKS} modis_erw ::: ${1}/wy${2}/*.tif
+echo "Extracting MODIS albedo"
+${PARALLEL_call} modis_erw ::: ${1}/wy${2}/*.tif
 
 # Creates a NetCDF using the extracted ERW domain values and
 # populates every hour of one day with those.
@@ -120,5 +122,6 @@ albedo_day() {
 }
 
 export -f albedo_day
-parallel --tag --line-buffer --jobs ${SLURM_NTASKS} albedo_day ::: ${1}/wy${2}/*${ERW_NC}
+echo "Creating NetCDFs"
+${PARALLEL_call} albedo_day ::: ${1}/wy${2}/*${ERW_NC}
 
