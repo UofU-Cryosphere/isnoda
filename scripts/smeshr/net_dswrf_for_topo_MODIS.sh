@@ -66,7 +66,7 @@ function net_hrrr_for_month() {
 
   echo "  Merge DSWRF and Albedo"
   MERGE_FILE="${DSWRF_OUT}/HRRR_MODIS.${MONTH_SELECTOR}.nc"
-  $CDO_COMMAND merge -selmonth,${MONTH} ${MONTH_FILE} -selmonth,${MONTH} ${MODIS_MERGE} ${MERGE_FILE}
+  $CDO_COMMAND merge -selmonth,${MONTH} ${MODIS_MERGE} -selmonth,${MONTH} ${MONTH_FILE} ${MERGE_FILE}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error merging MODIS and DSWRF **"
@@ -95,4 +95,5 @@ function net_hrrr_for_month() {
 }
 
 export -f net_hrrr_for_month
-parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: ${2}
+parallel --tagstring month-{} --line-buffer --jobs ${OMP_NUM_THREADS} net_hrrr_for_month ::: ${2}
+
