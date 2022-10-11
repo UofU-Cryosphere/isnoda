@@ -71,6 +71,7 @@ modis_erw() {
   ${CDO_call} \
     -chname,Band1,albedo \
     -setdate,"${date}" \
+    -settunits,1hour \
     ${ERW_TMP_NC} ${1/\.tif/${ERW_NC}}
 
   if [ $? != 0 ]; then
