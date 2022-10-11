@@ -2,7 +2,10 @@
 # Script to prepare net_solar.nc from HRRR data in expected format by iSnobal
 # Uses albedo from MODIS.
 #
-# Passed month should be based of a water year; October -> 0; September -> 11
+# Script argument notes:
+# * Passed month should be based of a water year; October -> 0; September -> 11
+# * Paths need to be absolute for the parallel command to be able to find files
+#
 # Example call:
 #   ./net_HRRR_for_topo_MODIS.sh <YYYY> <MM> <DSWRF_in> <MODIS_in> <DSWRF_out>
 #   ./net_HRRR_for_topo_MODIS.sh 2021 "0 1 2" /path/to/DSWRF /path/to/MODIS /path/to/destination
@@ -23,7 +26,7 @@ export MODIS_IN=${4}
 export DSWRF_OUT=${5}
 export ERW_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
 
-export CDO_COMMAND='cdo -z zip4 -O'
+export CDO_COMMAND='cdo -z zip4 -O -s'
 export HRRR_SELECT="-select,name=illumination_angle,DSWRF"
 export NET_MATH="net_solar=(1-albedo*0.0001)*illumination_angle*DSWRF;"
 
