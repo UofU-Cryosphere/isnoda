@@ -1,10 +1,6 @@
 {
-    "description": "<p>Release of code version used with Geoscientific Model Development submission.</p>", 
-    "license": "other-open", 
-    "title": "UofU-Cryosphere/isnoda: GMD submission", 
-    "version": "20220512", 
     "upload_type": "software", 
-    "publication_date": "2022-05-12", 
+    "publication_type": "article",
     "creators": [
         {
             "affiliation": "University of Utah", 
@@ -16,18 +12,5 @@
             "name": "Dillon Ragar",
             "orcid": "0000-0002-9714-1330"
         }
-    ], 
-    "access_right": "open", 
-    "related_identifiers": [
-        {
-            "scheme": "url", 
-            "identifier": "https://github.com/UofU-Cryosphere/isnoda/tree/20220512", 
-            "relation": "isSupplementTo"
-        }, 
-        {
-            "scheme": "doi", 
-            "identifier": "10.5281/zenodo.6543994", 
-            "relation": "isVersionOf"
-        }
-    ]
+    ] 
 }
