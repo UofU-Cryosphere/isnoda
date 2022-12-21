@@ -1,10 +1,14 @@
 ## OS X binaries
 ### Wgrib2
-* Install wgrib2 using Macports
-  * Takes a looooong time and compiles everything from source
+Command line binary to read GRIB-2 files.
+([More Info](https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/))
+
+* Install wgrib2 using [Macports](https://www.macports.org/)
+  * Takes a looooong time and compiles everything from source.  
+    __NOTE__: The `wgrib2` binary is not needed for the point model version of iSnobal.
 
 ### IPW
-* Install gcc and OpenMP using Homebrew
+* Install the gcc compiler (version 7) and OpenMP using [Homebrew](https://brew.sh/)
     ```shell script
     brew install gcc@7 libomp
     ```
@@ -13,20 +17,8 @@
    ```shell script
     export CC='/usr/local/bin/gcc-7 -fopenmp'
     ```
-  * Follow the steps described [in the official docs](https://github.com/USDA-ARS-NWRC/ipw/blob/master/Install)
-  In a nutshell, it drills down to these sequence of commands:
-  ````shell script
-    cd <path to IPW directory>
-    # Will throw an error with the `make` command if not set
-    export IPW=`pwd`
-    # Needed when running the commands later
-    mkdir tmp
-    export WORKDIR=${IPW}/tmp
-    # Build ...
-    ./configure
-    make
-    make install
-  ````
+  * Follow the steps described [in the official docs](https://github.com/USDA-ARS-NWRC/ipw/blob/master/Install).  
+    The essential steps are also available this [install script](../conda/install_ipw.sh)
   
  __NOTE__:
  * Don't get tempted to use parallel make command (`-j`). The files have to be compiled in sequence.
