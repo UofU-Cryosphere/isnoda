@@ -7,7 +7,6 @@
 #  - SMRF
 #  - PySnobal
 #  - Weather Forecast Retrieval
-#  - IPW
 #
 # Other packages are installed via the latest available version as pip package.
 
@@ -64,17 +63,3 @@ for package in "${packages[@]}"
 do
   pip install --no-deps ${package}
 done
-
-# IPW
-# Remove comments below if point model should be installed
-
-#git clone --depth 1 https://github.com/USDA-ARS-NWRC/ipw.git
-#pushd ipw
-#
-#./configure
-#export IPW=`pwd`
-#export WORKDIR=${IPW}/tmp
-#make
-#make install
-#
-#popd
