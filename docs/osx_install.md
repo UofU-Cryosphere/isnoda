@@ -25,5 +25,17 @@ Command line binary to read GRIB-2 files.
  * Using gcc-9 and OpenMP 5 is currently not supported.
 
 ## Conda
-Use attached `environment.yml` and link the activation and deactivation scripts.
-Also add the `bin` folder from Macports to the `$PATH` to have wgrib2 available.
+* For the spatially distributed version (iSnobal)
+Use the provided [environment.yml](../conda/environment.yml) to setup the 
+environment. For development, also link the [activation](../conda/isnoda-activate.sh)
+and [deactivation](../conda/isnoda-deactivate.sh) scripts (see below).
+Lastly, ensure that the  `bin` folder from Macports is in the `$PATH` environment
+variable to have wgrib2 available.
+
+* For the point model version (Snobal/IPW)
+Use the provided [ipw_build.yml](../conda/ipw_build.yml) to setup the environment.
+Also link the [activation](../conda/ipw-activate.sh)
+and [deactivation](../conda/ipw-deactivate.sh) scripts (see below).
+
+### Where to link activation/deactivation scripts?
+[Anaconda Docs](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#saving-environment-variables)
