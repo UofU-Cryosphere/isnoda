@@ -1,6 +1,7 @@
 name: ipw_build
 channels:
   - conda-forge
+  - gouarin
   - defaults
 dependencies:
   - libgcc=7
