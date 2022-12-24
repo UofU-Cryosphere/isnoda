@@ -1,0 +1,8 @@
+name: ipw_build
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - gcc_linux-64=8.5
+  - make
+  - openmp=5.0.0
