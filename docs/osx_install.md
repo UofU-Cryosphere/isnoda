@@ -32,10 +32,5 @@ and [deactivation](../conda/isnoda-deactivate.sh) scripts (see below).
 Lastly, ensure that the  `bin` folder from Macports is in the `$PATH` environment
 variable to have wgrib2 available.
 
-* For the point model version (Snobal/IPW)
-Use the provided [ipw_build.yml](../conda/ipw_build.yml) to setup the environment.
-Also link the [activation](../conda/ipw-activate.sh)
-and [deactivation](../conda/ipw-deactivate.sh) scripts (see below).
-
 ### Where to link activation/deactivation scripts?
 [Anaconda Docs](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#saving-environment-variables)
