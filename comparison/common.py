@@ -48,7 +48,7 @@ HV_PLOT_OPTS = dict(
     height=600,
 )
 LINE_STYLE = dict(
-    line_width=3
+    line_width=2
 )
 LEGEND_OPTS = dict(
     legend_position='top_left',
