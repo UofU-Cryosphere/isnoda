@@ -19,8 +19,9 @@ Backup of configuration files.
 
 ## Docs
 
-Specific instructions for Mac OS and the high performance compute environment
-at the University of Utah (CHPC).
+Install instructions for:
+* [IPW](https://github.com/USDA-ARS-NWRC/ipw) on Mac OS and Linux environments.  
+* [basin setup](https://github.com/USDA-ARS-NWRC/basin_setup) from source on Linux.
 
 ## Notebooks
 

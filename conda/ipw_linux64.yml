@@ -3,6 +3,6 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - libgcc=7
-  - openmp
-  - gcc-7   # conda install -c gouarin gcc-7
+  - gcc_linux-64=8.5
+  - make
+  - openmp=5.0.0
