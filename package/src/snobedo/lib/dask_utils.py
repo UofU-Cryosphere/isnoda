@@ -14,7 +14,7 @@ def start_cluster(cores=6, memory=None):
             cores=cores,
             processes=cores,
             n_workers=1,
-            project="notchpeak-shared-short",
+            account="notchpeak-shared-short",
             queue="notchpeak-shared-short",
             memory=f"{memory or cores}G",
             walltime="2:00:00",
