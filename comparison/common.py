@@ -24,6 +24,7 @@ DATA_DIR = SHARED_STORE.joinpath('jmeyer')
 
 HRRR_DIR = SHARED_STORE.joinpath('HRRR_water_years')
 SNOBAL_DIR = SHARED_STORE.joinpath('erw_isnobal')
+MODIS_DIR = SHARED_STORE.joinpath('MODIS_albedo')
 
 ASO_DIR = DATA_DIR.joinpath('ASO-data')
 CBRFC_DIR = DATA_DIR.joinpath('CBRFC')
@@ -31,7 +32,30 @@ SNOTEL_DIR = DATA_DIR.joinpath( 'Snotel')
 FIGURES_DIR = DATA_DIR.joinpath('figures')
 
 # Plot styles
-BOKEH_FONT=dict(fontsize={'title': 14, 'labels': 12, 'xticks': 12, 'yticks': 12, 'legend': 12})
+BOKEH_FONT = dict(
+    fontsize={
+        'title': 24,
+        'labels': 24,
+        'xlabel': 24,
+        'ylabel': 24,
+        'xticks': 20,
+        'yticks': 20,
+        'legend': 24,
+    }
+)
+HV_PLOT_OPTS = dict(
+    width=1200,
+    height=600,
+)
+LINE_STYLE = dict(
+    line_width=2
+)
+LEGEND_OPTS = dict(
+    legend_position='top_left',
+    legend_opts={ 'glyph_width':35 },
+    legend_spacing=10,
+    legend_padding=30,
+)
 
 # Xarray options
 # Used in comparison to SNOTEL site locations

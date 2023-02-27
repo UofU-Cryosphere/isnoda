@@ -29,7 +29,7 @@ echo $WATER_YEAR
 SNOBAL_50M=${DIFFERENCE_DIR}/Snobal_thickness_${DAY}_50m.tif
 
 gdal_translate --optfile $GDAL_OPTS \
-  NETCDF:"${SNOBAL_HOME}/erw_isnobal/GMD/wy${WATER_YEAR}/erw/run${DAY}/snow.nc":thickness \
+  NETCDF:"${SNOBAL_HOME}/erw_isnobal/wy${WATER_YEAR}/erw/run${DAY}/snow.nc":thickness \
   ${SNOBAL_50M}
 
 if [ $? != 0 ]; then exit -1; fi

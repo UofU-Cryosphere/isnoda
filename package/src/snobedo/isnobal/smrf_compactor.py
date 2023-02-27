@@ -8,9 +8,7 @@ from pathlib import Path
 DAY_FOLDER_PREFIX = 'run'
 OUTPUT_FILES = [
     'air_temp.nc',
-    'cloud_factor.nc',
     'percent_snow.nc',
-    'precip.nc',
     'precip_temp.nc',
     'precip.nc',
     'snow_density.nc',
@@ -37,7 +35,7 @@ CDO_SELECT = '-selname,{var}'
 
 def argument_parser():
     parser = argparse.ArgumentParser(
-        description='Compress and combine SMRF output for given water year.'
+        description='Compress and combine SMRF output files.'
                     'This will combine individual output files into one'
     )
 
@@ -45,8 +43,7 @@ def argument_parser():
         '--source-dir', '-sd',
         required=True,
         type=Path,
-        help='Directory containing each individual day output folders. '
-             'The day folders have the pattern of: runYYYYMMDD'
+        help='Directory containing an individual SMRF day output.'
     )
     parser.add_argument(
         '--delete-originals',
@@ -142,22 +139,19 @@ def main():
             f'Given source folder does not exist: {arguments.source_dir}'
         )
 
-    day_folders = arguments.source_dir.glob(DAY_FOLDER_PREFIX + '*')
-
-    for day in day_folders:
-        day_files = combine_files(day, arguments.energy_balance)
-        if day_files is None:
-            sys.exit(1)
-        elif len(day_files):
-            if not arguments.delete_originals:
-                destination = (day / COMBINED_FOLDER)
-                destination.mkdir(exist_ok=True)
-                print(f'  Moving files to: {destination.as_posix()}')
-                for file in day_files:
-                    shutil.move(file, destination)
-            else:
-                for file in day_files:
-                    print(f'  Delete file: {file}')
-                    os.remove(file)
-        elif len(day_files) == 0:
-            continue
+    day_files = combine_files(arguments.source_dir, arguments.energy_balance)
+    if day_files is None:
+        sys.exit(1)
+    elif len(day_files):
+        if not arguments.delete_originals:
+            destination = (arguments.source_dir / COMBINED_FOLDER)
+            destination.mkdir(exist_ok=True)
+            print(f'  Moving files to: {destination.as_posix()}')
+            for file in day_files:
+                shutil.move(file, destination)
+        else:
+            for file in day_files:
+                print(f'  Delete file: {file}')
+                os.remove(file)
+    else:
+        print(f'  No files combined')
