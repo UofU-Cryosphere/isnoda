@@ -111,9 +111,10 @@ class RasterFile(object):
         band_number = kwargs.get('band_number', self.band_number)
 
         band = self.file.GetRasterBand(band_number)
+        no_data = band.GetNoDataValue()
         values = np.ma.masked_values(
             gdal_array.BandReadAsArray(band),
-            band.GetNoDataValue(),
+            no_data if no_data is not None else np.nan,
             copy=False
         )
 
