@@ -8,7 +8,7 @@ dependencies:
   - cftime=1.5.2
   - coloredlogs
   - cython
-  - dateparser=0.7.4
+  - dateparser=0.7.2
   - gcc=8.5.0
   - make
   - nco
