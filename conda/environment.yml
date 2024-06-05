@@ -9,7 +9,6 @@ dependencies:
   - coloredlogs
   - cython
   - dateparser=0.7.2
-  - gcc=8.5.0
   - make
   - nco
   - netCDF4
