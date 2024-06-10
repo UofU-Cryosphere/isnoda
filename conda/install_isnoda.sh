@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# Script to install all required components from the USDA ARS NWRC
-# GitHub repositories.
+# Script to install all required components from GitHub repositories.
 #
 # These components are installed with the latest from the master branch:
-#  - AWSM
-#  - SMRF
-#  - PySnobal
-#  - Weather Forecast Retrieval
+#  - AWSM (Universit of Utah)
+#  - SMRF (Universit of Utah)
+#  - PySnobal (ARs)
+#  - Weather Forecast Retrieval (Universit of Utah)
 #
 # Other packages are installed via the latest available version as pip package.
+# 
+# Install location is given via the first parameter or defaults to $HOME/isnoda
 
 set -e
 
@@ -28,9 +29,6 @@ declare -a repositories=(
   "https://github.com/USDA-ARS-NWRC/pysnobal.git"
   "https://github.com/UofU-Cryosphere/weather_forecast_retrieval.git"
 )
-
-# Make sure to use the conda installed GCC
-export CC=$(which gcc)
 
 for repository in "${repositories[@]}"
 do
