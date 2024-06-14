@@ -50,3 +50,4 @@ This work was developed as part of two publications:
   
 * Journal of Hydrology  
   Zenodo [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11245701.svg)](https://doi.org/10.5281/zenodo.11245701)   
+  Meyer, J., Hedrick, A., and McKenzie Skiles, S.: A new approach to net solar radiation in a spatially distributed snow energy balance model to improve snowmelt timing, Journal of Hydrology, 131490, https://doi.org/10.1016/j.jhydrol.2024.131490, 2024.  
