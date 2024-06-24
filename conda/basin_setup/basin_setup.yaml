@@ -1,21 +1,18 @@
 name: basin_setup
 channels:
   - conda-forge
+  - defaults
 dependencies:
-  - taudem
-  - colorama=0.3.9
-  - coloredlogs=10.0
-  - geopandas<0.10
-  - netcdf4>=1.4.1
-  - numpy<1.20
-  - pandas>=1.0
+  - colorama
+  - coloredlogs
+  - geopandas
+  - netcdf4
+  - numpy<1.25
+  - pandas
   - pip
-  - pyshp=1.2.12
-  - python=3.7
-  - rioxarray>=0.3.1
-  - xarray>=0.16.2
+  - python
+  - rioxarray
+  - xarray
   - pip:
-      - inicheck>=0.9,<0.10.0
-      - spatialnc>=0.3.0,<0.4.0
-      - cftime<1.1.0
-
+      - inicheck
+      - spatialnc
