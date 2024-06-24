@@ -63,6 +63,13 @@ for MONTH in {0..11}; do
     continue
   fi
 
+  # Unused  katana output files by iSnobal
+  find ${KATANA_OUTPUT_DIR} -name *.prj -type f -delete
+  find ${KATANA_OUTPUT_DIR} -name *_cld.asc -type f -delete
+  ## Unused temporary grib files created by katana
+  find ${KATANA_OUTPUT_DIR} -name *.grib2 -type f -delete
+  find ${KATANA_OUTPUT_DIR} -name hrrr.* -type d -empty -delete
+
   if [ $ARCHIVE_OUTPUT -eq 1 ]; then
     echo "  Archiving"
     ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
