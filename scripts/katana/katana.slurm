@@ -15,9 +15,6 @@
 #SBATCH --output=slurm-%j.out-%N
 #SBATCH --error=slurm-%j.err-%N
 
-# For pbzip2
-source load_conda_env gmt
-
 export OMP_NUM_THREADS=${SLURM_NTASKS}
 
 START_YEAR=2019
@@ -30,6 +27,11 @@ BASIN_SETUP=/path/to/basin_setup/
 
 KATANA_DIR=/path/to/katana/config_and_image/
 KATANA_OUTPUT_DIR=/path/to/katana/output/
+
+# Set the below to 1 and update path if backups should be created as part
+# of this job.
+# This also requires an environment that has the pbzip2 command installed.
+ARCHIVE_OUTPUT=0
 KATANA_ARCHIVE_DIR=/path/to/katana/output_backup/
 ## -------------------------------------------- ##
 KATANA_INI=${KATANA_DIR}/katana.ini
@@ -61,14 +63,23 @@ for MONTH in {0..11}; do
     continue
   fi
 
-  echo "  Archiving"
-  ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
+  # Unused  katana output files by iSnobal
+  find ${KATANA_OUTPUT_DIR} -name *.prj -type f -delete
+  find ${KATANA_OUTPUT_DIR} -name *_cld.asc -type f -delete
+  ## Unused temporary grib files created by katana
+  find ${KATANA_OUTPUT_DIR} -name *.grib2 -type f -delete
+  find ${KATANA_OUTPUT_DIR} -name hrrr.* -type d -empty -delete
 
-  cd ${KATANA_OUTPUT_DIR}
+  if [ $ARCHIVE_OUTPUT -eq 1 ]; then
+    echo "  Archiving"
+    ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
 
-  find data${YEAR}${MONTH}[0-3][0-9] -name *hrrr* -delete
-  find data${YEAR}${MONTH}[0-3][0-9] -name *.prj -delete
+    cd ${KATANA_OUTPUT_DIR}
 
-  tar -I pbzip2 -cf ${KATANA_ARCHIVE_DIR_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
-  cp katana.log katana_${YEAR}${MONTH}.log
+    find data${YEAR}${MONTH}[0-3][0-9] -name *hrrr* -delete
+    find data${YEAR}${MONTH}[0-3][0-9] -name *.prj -delete
+
+    tar -I pbzip2 -cf ${KATANA_ARCHIVE_DIR_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
+    cp katana.log katana_${YEAR}${MONTH}.log
+  fi
 done
