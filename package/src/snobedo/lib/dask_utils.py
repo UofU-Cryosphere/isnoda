@@ -38,6 +38,16 @@ def client_ip_and_port(client):
     print(client.dashboard_link.split('/')[2])
 
 
+def slurm_script(client):
+    """
+    Print the slurm script that would be submitted to start the cluster
+
+    :param client: Instance of dask.distributed.Client
+    :return: str: slurm script
+    """
+    print(client.jobscript())
+
+
 @contextmanager
 def run_with_client(cores, memory):
     client = start_cluster(cores, memory)
