@@ -26,20 +26,15 @@ echo "        with SLURM_JOB_ID:  $SLURM_JOB_ID"
 echo "        with SLURM_JOB_PARTITION:  $SLURM_JOB_PARTITION"
 echo "        with SLURM_JOB_NODELIST:  $SLURM_JOB_NODELIST"
 
-# Enable CPU Hyper-threading
-export OMP_NUM_THREADS=${SLURM_NTASKS}
-
 module use $HOME/MyModules
 module load miniconda3/latest
 conda activate work
 
-#rundir=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/test/erw_isnobal/wy2023/erw
-rundir=$1
-for f in ${rundir}/run202107*/
-do 
-    echo output_pngs.py ${f}
-    output_pngs.py ${f}
-done
+# basindir contains all the daily model runs
+# basindir=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/test/erw_isnobal/wy2023/erw
+basindir=$1
+
+parallel "echo output_pngs.py {}; output_pngs.py {}" ::: ${basindir}/run*/
 
 # Move log files to log dir
 mv slurm-${SLURM_JOB_ID}* $LOGDIR
