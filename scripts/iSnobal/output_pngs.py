@@ -6,6 +6,8 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import pathlib
+import glob
+import imageio
 
 def parse_args():
     """
@@ -18,7 +20,7 @@ def parse_args():
     parser.add_argument('workdir', type=str, default="./", help='working directory')
     return parser.parse_args()
 
-def fn_list(thisDir, fn_pattern, verbose=False):
+def fn_list(thisDir: str, fn_pattern: str, verbose=False) -> list:
     """
     Match and sort filenames based on a regex pattern in specified directory.
 
@@ -30,7 +32,6 @@ def fn_list(thisDir, fn_pattern, verbose=False):
     Returns:
         list: List of filenames matched and sorted.
     """
-    import glob
     fns=[]
     for f in glob.glob(thisDir + "/" + fn_pattern):
         fns.append(f)
@@ -38,7 +39,7 @@ def fn_list(thisDir, fn_pattern, verbose=False):
     if verbose: print(fns)
     return fns
 
-def generate_png(nc_list, workdir, dt, bbox=False):
+def generate_png(nc_list: list, workdir: str, dt: bool, bbox=False):
     """
     Generate PNG files from a list of NetCDF files, resampling to two hour means.
 
@@ -72,7 +73,7 @@ def generate_png(nc_list, workdir, dt, bbox=False):
                 plt.savefig(fname=f'{workdir}/{dt}_{keyvar}.png', dpi=300, bbox_inches='tight')
             plt.close()
             
-def generate_gif(workdir, outgif_fn='test_outputs.gif'):
+def generate_gif(workdir: str, outgif_fn='test_outputs.gif'):
     """
     Generate a GIF from a list of PNG files in a directory.
 
@@ -83,7 +84,6 @@ def generate_gif(workdir, outgif_fn='test_outputs.gif'):
     Returns:
         None
     """
-    import imageio
     images = []
     for png in fn_list(workdir, '*png'):
         images.append(imageio.v2.imread(png))
