@@ -17,7 +17,7 @@ installed. See the [installation instructions](../../package/README.md) for
 getting this step complete.
 
 ### Conda
-The provided (environment.yaml)[/environment.yaml] in this directory
+The provided [environment.yaml](/environment.yaml) in this directory
 can be used to setup a execution environment. It also includes the above
 listed packages and the libraries needed for the `snobedo` package.
 

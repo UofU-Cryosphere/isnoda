@@ -3,6 +3,7 @@ channels:
 - conda-forge
 dependencies:
 - cdo
+- cython
 - dask
 - dask-jobqueue
 - gdal
@@ -12,4 +13,4 @@ dependencies:
 - utm
 - wgrib2
 - pip:
-    topocalc
+  - topocalc
