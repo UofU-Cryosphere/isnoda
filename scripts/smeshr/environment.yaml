@@ -6,11 +6,12 @@ dependencies:
 - cython
 - dask
 - dask-jobqueue
-- gdal
+- gdal=3.5
 - h5py
 - parallel
 - pip
 - utm
 - wgrib2
+- netCDF4
 - pip:
   - topocalc
