@@ -11,10 +11,10 @@
 # Arguments:
 #   ./tcdc_for_topo.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX> <WATER_YEAR> <MONTHS> <SNOBAL_OUT>
 # Sample call:
-#   ./tcdc_for_topo.sh /path/to/topo \
+#   ./tcdc_for_topo.sh /full/path/to/topo.nc \
 #                     "hrrr.YYYYMM*" \
-#                     "hrrr.t*.f06.grib2" \
-#                     /write/to/here/file_prefix \
+#                     "hrrr.t*f06.grib2" \
+#                     /path/to/write/out/tcdc/outputs/with/file_prefix \
 #                     2021 \
 #                     "1 2 3" \
 #                     /input/read/from/isnobal
@@ -38,8 +38,11 @@ get_day() {
 
   TMPF=$DAY.grib2
 
+  echo "cat ${HRRR_PATTERN} | wgrib2 - -match "TCDC:entire atmosphere" -inv /dev/null -grib $TMPF"
   cat ${HRRR_PATTERN} | wgrib2 - -match "TCDC:entire atmosphere" -inv /dev/null -grib $TMPF
 
+
+  echo "hrrr_param_for_topo --topo ${TOPO_FILE} --hrrr_in ${TMPF} --nc_out ${NC_OUT_PREFIX}${DAY}.tcdc.nc"
   hrrr_param_for_topo --topo "${TOPO_FILE}" \
                       --hrrr_in $TMPF \
                       --nc_out "${NC_OUT_PREFIX}${DAY}.tcdc.nc" \
