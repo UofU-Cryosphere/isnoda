@@ -5,7 +5,7 @@
 # * Creates daily output files organized in MST time zone
 #
 # NOTES:
-# - First argument needs to bin quotes to prevent shell expansion
+# - First argument needs to be in quotes to prevent shell expansion
 # - Months argument are relative to the start month of october
 #
 # Arguments:
