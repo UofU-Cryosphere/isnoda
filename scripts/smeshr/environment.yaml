@@ -10,8 +10,11 @@ dependencies:
 - h5py
 - parallel
 - pip
+- python<3.11
 - utm
 - wgrib2
 - netCDF4
+- numpy<2
 - pip:
   - topocalc
+
