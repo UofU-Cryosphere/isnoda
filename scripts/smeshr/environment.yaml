@@ -2,7 +2,7 @@ name: smeshr
 channels:
 - conda-forge
 dependencies:
-- cdo
+- cdo=2.2
 - cython
 - dask
 - dask-jobqueue
