@@ -47,7 +47,7 @@ function net_hrrr_for_month() {
 
   echo "  Merge HRRR month"
   MONTH_FILE="${DSWRF_OUT}/dswrf.${MONTH_SELECTOR}.nc"
-  ${CDO_COMMAND} mergetime ${HRRR_SELECT} ${DSWRF_IN}/*${LAST_DAY}* ${DSWRF_IN}/*${MONTH_SELECTOR}* ${MONTH_FILE}
+  ${CDO_COMMAND} ${HRRR_SELECT} [ -mergetime ${DSWRF_IN}/*${LAST_DAY}* ${DSWRF_IN}/*${MONTH_SELECTOR}* ] ${MONTH_FILE}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error merging HRRR month **"
