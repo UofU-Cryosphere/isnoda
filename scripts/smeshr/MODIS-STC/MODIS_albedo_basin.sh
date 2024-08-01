@@ -102,7 +102,7 @@ modis_basin() {
 }
 export -f modis_basin
 echo "Extracting MODIS albedo"
-${PARALLEL_call} modis_basin ::: ${1}/wy${2}/*.tif $BASIN_DOMAIN
+${PARALLEL_call} modis_basin {} {} ::: ${1}/wy${2}/*.tif ${BASIN_DOMAIN}
 
 # Creates a NetCDF using the extracted model domain values and
 # populates every hour of one day with those.
