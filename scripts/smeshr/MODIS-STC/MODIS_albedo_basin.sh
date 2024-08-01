@@ -25,10 +25,13 @@ extract_modis() {
   fi
 }
 
-#BASIN name
+# Basin name and processing parameters
 BASIN='yampa'
-#BASIN_EXTENT='315900.0 4280850.0 348700.0 4322700.0' #East River
-# BASIN_EXTENT='156776.4 4530442.0 365276.4 4426242.0' #yampa
+BASIN_EXTENT='156776.4 4530442.0 365276.4 4426242.0' #yampa
+RES=100
+EPSG='EPSG:32613'
+BASIN_DOMAIN=" -t_srs $EPSG -tr $RES $RES -dstnodata 65535 -te $BASIN_EXTENT"
+echo "BASIN_DOMAIN: $BASIN_DOMAIN"
 SLURM_NTASKS=4
 
 export BASIN_NC="_${BASIN}.nc"
@@ -43,11 +46,8 @@ modis_basin() {
   BASIN_TMP_NN=${1/\.tif/_nn_tmp.vrt}
   BASIN_TMP=${1/\.tif/_tmp.tif}
   BASIN_TMP_NC=${1/\.tif/_tmp.nc}
+  BASIN_DOMAIN=${2}
 
-  BASIN_DOMAIN="\
--t_srs EPSG:32613 -tr 100 100 -dstnodata 65535
--te 156776.4 4530442.0 365276.4 4426242.0
-"
   FILTER_MATH="A*(A<=numpy.max(B)) + numpy.max(B)*(A>numpy.max(B))" 
   echo "gdalwarp -q -overwrite -multi \
     -r cubic ${BASIN_DOMAIN} \
@@ -102,7 +102,7 @@ modis_basin() {
 }
 export -f modis_basin
 echo "Extracting MODIS albedo"
-${PARALLEL_call} modis_basin ::: ${1}/wy${2}/*.tif
+${PARALLEL_call} modis_basin ::: ${1}/wy${2}/*.tif $BASIN_DOMAIN
 
 # Creates a NetCDF using the extracted model domain values and
 # populates every hour of one day with those.
