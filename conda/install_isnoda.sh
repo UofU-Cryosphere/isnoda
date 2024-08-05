@@ -2,10 +2,10 @@
 # Script to install all required components from GitHub repositories.
 #
 # These components are installed with the latest from the master branch:
-#  - AWSM (Universit of Utah)
-#  - SMRF (Universit of Utah)
-#  - PySnobal (ARs)
-#  - Weather Forecast Retrieval (Universit of Utah)
+#  - AWSM (University of Utah)
+#  - SMRF (University of Utah)
+#  - PySnobal (ARS)
+#  - Weather Forecast Retrieval (University of Utah)
 #
 # Other packages are installed via the latest available version as pip package.
 # 
@@ -13,7 +13,7 @@
 
 set -e
 
-ISNODA_HOME=${1:-$HOME/isnoda}
+ISNODA_HOME=${1:-$HOME/iSnobal}
 mkdir -p ${ISNODA_HOME}
 
 cd $ISNODA_HOME
