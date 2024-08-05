@@ -27,7 +27,7 @@ extract_modis() {
 
 # Basin name and processing parameters
 BASIN='yampa'
-BASIN_EXTENT='156776.4 4426242.0 365276.4 4530442.0' #yampa
+BASIN_EXTENT='156726.4 4426192.0 365326.4 4530492.0' #yampa
 RES=100
 EPSG='EPSG:32613'
 BASIN_DOMAIN=" -t_srs $EPSG -tr $RES $RES -dstnodata 65535 -te $BASIN_EXTENT"
@@ -48,7 +48,7 @@ modis_basin() {
   BASIN_TMP_NC=${1/\.tif/_tmp.nc}
   BASIN_DOMAIN="${@:2}"
 
-  echo "BASIN_DOMAIN: ${BASIN_DOMAIN}"
+  # echo "BASIN_DOMAIN: ${BASIN_DOMAIN}"
   FILTER_MATH="A*(A<=numpy.max(B)) + numpy.max(B)*(A>numpy.max(B))" 
   echo "gdalwarp -q -overwrite -multi \
     -r cubic ${BASIN_DOMAIN} \
@@ -138,4 +138,3 @@ albedo_day() {
 export -f albedo_day
 echo "Creating NetCDFs"
 ${PARALLEL_call} albedo_day ::: ${1}/wy${2}/*${BASIN_NC}
-
