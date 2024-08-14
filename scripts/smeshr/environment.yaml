@@ -11,10 +11,10 @@ dependencies:
 - parallel
 - pip
 - python<3.11
+- skyfield
 - utm
 - wgrib2
 - netCDF4
 - numpy<2
 - pip:
   - topocalc
-
