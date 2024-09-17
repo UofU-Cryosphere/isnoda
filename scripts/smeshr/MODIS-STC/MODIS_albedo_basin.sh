@@ -26,8 +26,10 @@ extract_modis() {
 }
 
 # Basin name and processing parameters
-BASIN='yampa'
-BASIN_EXTENT='156726.4 4426192.0 365326.4 4530492.0' #yampa
+#export BASIN='yampa'
+#BASIN_EXTENT='156726.4 4426192.0 365326.4 4530492.0' #yampa
+export BASIN='littleanimas_jmh'
+BASIN_EXTENT='251200 4170400 256400 4177500'
 RES=100
 EPSG='EPSG:32613'
 BASIN_DOMAIN=" -t_srs $EPSG -tr $RES $RES -dstnodata 65535 -te $BASIN_EXTENT"
@@ -47,60 +49,72 @@ modis_basin() {
   BASIN_TMP=${1/\.tif/_tmp.tif}
   BASIN_TMP_NC=${1/\.tif/_tmp.nc}
   BASIN_DOMAIN="${@:2}"
+  # add catch for existing 24.nc files (final output), remove later as needed
+  if [[ -f "${1%.*}_${BASIN}${BASIN_ONE_DAY_SUFFIX}" ]]; then
+    return
+  else
+    echo "${1%.*}_${BASIN}${BASIN_ONE_DAY_SUFFIX}" DNE
+    # echo "BASIN_DOMAIN: ${BASIN_DOMAIN}"
+    FILTER_MATH="A*(A<=numpy.max(B)) + numpy.max(B)*(A>numpy.max(B))" 
+    echo "gdalwarp -q -overwrite -multi \
+      -r cubic ${BASIN_DOMAIN} \
+      ${1} ${BASIN_TMP_CUBIC}"
 
-  # echo "BASIN_DOMAIN: ${BASIN_DOMAIN}"
-  FILTER_MATH="A*(A<=numpy.max(B)) + numpy.max(B)*(A>numpy.max(B))" 
-  echo "gdalwarp -q -overwrite -multi \
-    -r cubic ${BASIN_DOMAIN} \
-    ${1} ${BASIN_TMP_CUBIC}"
+    # Use cubic resampling to smooth the image
+    gdalwarp -q -overwrite -multi \
+      -r cubic ${BASIN_DOMAIN} \
+      ${1} ${BASIN_TMP_CUBIC}
 
-  # Use cubic resampling to smooth the image
-  gdalwarp -q -overwrite -multi \
-    -r cubic ${BASIN_DOMAIN} \
-    ${1} ${BASIN_TMP_CUBIC}
+    # Generate a nearest neighbor to get the max basin value as filter
+    gdalwarp -q -overwrite -multi \
+      ${BASIN_DOMAIN} \
+      ${1} ${BASIN_TMP_NN}
 
-  # Generate a nearest neighbor to get the max basin value as filter
-  gdalwarp -q -overwrite -multi \
-    ${BASIN_DOMAIN} \
-    ${1} ${BASIN_TMP_NN}
+    # Combine products, filter any values from cubic resampling higher
+    # than the max of nearest neighbor and set to that value
+    gdal_calc.py --overwrite --quiet --co COMPRESS=LZW \
+      -A ${BASIN_TMP_CUBIC} -B ${BASIN_TMP_NN} \
+      --calc="${FILTER_MATH}" \
+      --outfile=${BASIN_TMP}
 
-  # Combine products, filter any values from cubic resampling higher
-  # than the max of nearest neighbor and set to that value
-  gdal_calc.py --overwrite --quiet --co COMPRESS=LZW \
-    -A ${BASIN_TMP_CUBIC} -B ${BASIN_TMP_NN} \
-    --calc="${FILTER_MATH}" \
-    --outfile=${BASIN_TMP}
+    # Add threshold enforcement of the values lower than the
+    # minimum of the nearest neighbor resampling and set to that min
+    gdal_calc.py --overwrite --quiet --co COMPRESS=LZW \
+      -A ${BASIN_TMP_CUBIC} -B ${BASIN_TMP_NN} \
+      --calc="A*(A>=numpy.min(B)) + numpy.min(B)*(A<numpy.min(B))" \
+      --outfile=${BASIN_TMP}
 
-  # Convert to NetCDF
-  gdalwarp -overwrite -multi -q \
-    -co FORMAT=NC4C -co WRITE_BOTTOMUP=NO \
-    ${BASIN_TMP} ${BASIN_TMP_NC}
+    # Convert to NetCDF
+    gdalwarp -overwrite -multi -q \
+      -co FORMAT=NC4C -co WRITE_BOTTOMUP=NO \
+      ${BASIN_TMP} ${BASIN_TMP_NC}
 
-  if [ $? != 0 ]; then
-    printf "Error extracting domain from: \n   ${1}\n"
-    return 1
+    if [ $? != 0 ]; then
+      printf "Error extracting domain from: \n   ${1}\n"
+      return 1
+    fi
+
+    date=$(date -d $(basename $1 | cut -d '_' -f3) +%Y-%m-%d)
+    # Set time and variable name in NetCDF
+    ${CDO_call} \
+      -chname,Band1,albedo \
+      -setdate,"${date}" \
+      -settunits,1hour \
+      ${BASIN_TMP_NC} ${1/\.tif/${BASIN_NC}}
+
+    if [ $? != 0 ]; then
+      echo "Error setting NetCDF variable name and time"
+      return 1
+    fi
+
+    printf "DONE: ${date}\n"
+
+    rm ${BASIN_TMP_CUBIC}
+    rm ${BASIN_TMP_NN}
+    rm ${BASIN_TMP}
+    rm ${BASIN_TMP_NC}
   fi
-
-  date=$(date -d $(basename $1 | cut -d '_' -f3) +%Y-%m-%d)
-  # Set time and variable name in NetCDF
-  ${CDO_call} \
-    -chname,Band1,albedo \
-    -setdate,"${date}" \
-    -settunits,1hour \
-    ${BASIN_TMP_NC} ${1/\.tif/${BASIN_NC}}
-
-  if [ $? != 0 ]; then
-    echo "Error setting NetCDF variable name and time"
-    return 1
-  fi
-
-  printf "DONE: ${date}\n"
-
-  rm ${BASIN_TMP_CUBIC}
-  rm ${BASIN_TMP_NN}
-  rm ${BASIN_TMP}
-  rm ${BASIN_TMP_NC}
-}
+  }
 export -f modis_basin
 echo "Extracting MODIS albedo"
 ${PARALLEL_call} modis_basin {} ${BASIN_DOMAIN} ::: ${1}/wy${2}/*.tif 
