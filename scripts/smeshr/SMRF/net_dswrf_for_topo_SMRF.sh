@@ -22,7 +22,7 @@ export WATER_START_MONTH=10
 export DSWRF_IN=${3}
 export SMRF_IN=${4}
 export DSWRF_OUT=${5}
-export ERW_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
+export BASIN_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
 
 export CDO_COMMAND='cdo -z zip4 -O'
 export HRRR_SELECT="-select,name=illumination_angle,DSWRF"
@@ -49,7 +49,8 @@ function net_hrrr_for_month() {
 
   echo "  Merge HRRR month"
   MONTH_FILE="${DSWRF_OUT}/dswrf.${MONTH_SELECTOR}.nc"
-  ${CDO_COMMAND} mergetime ${HRRR_SELECT} ${DSWRF_IN}.${LAST_DAY}* ${DSWRF_IN}.${MONTH_SELECTOR}* ${MONTH_FILE}
+  ${CDO_COMMAND} ${HRRR_SELECT} [ -mergetime ${DSWRF_IN}/*${LAST_DAY}* ${DSWRF_IN}/*${MONTH_SELECTOR}* ] ${MONTH_FILE}
+
 
   if [[ $? != 0 ]]; then
     echo "  ** Error merging HRRR month **"
@@ -80,7 +81,7 @@ function net_hrrr_for_month() {
   ${CDO_COMMAND} -aexpr,"${NET_MATH}" ${MERGE_FILE} ${MONTH_CALC_FILE}
 
   echo "  Split by day MST"
-  ${CDO_COMMAND} splitday ${MONTH_CALC_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
+  ${CDO_COMMAND} splitday ${MONTH_CALC_FILE} ${BASIN_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error processing ${MONTH_SELECTOR} **"
