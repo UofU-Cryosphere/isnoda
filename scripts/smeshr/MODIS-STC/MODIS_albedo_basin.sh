@@ -26,13 +26,11 @@ extract_modis() {
 }
 
 # Basin name and processing parameters
-#export BASIN='yampa'
-#BASIN_EXTENT='156726.4 4426192.0 365326.4 4530492.0' #yampa
 export BASIN='littleanimas_jmh'
 BASIN_EXTENT='251200 4170400 256400 4177500'
 RES=100
 EPSG='EPSG:32613'
-BASIN_DOMAIN=" -t_srs $EPSG -tr $RES $RES -dstnodata 65535 -te $BASIN_EXTENT"
+export BASIN_DOMAIN=" -t_srs $EPSG -tr $RES $RES -dstnodata 65535 -te $BASIN_EXTENT"
 
 SLURM_NTASKS=4
 
@@ -46,6 +44,7 @@ export PARALLEL_call="parallel --tagstring {#} --tag --line-buffer --jobs ${SLUR
 modis_basin() {
   BASIN_TMP_CUBIC=${1/\.tif/_cubic_tmp.vrt}
   BASIN_TMP_NN=${1/\.tif/_nn_tmp.vrt}
+  BASIN_TMP_MAX=${1/\.tif/_tmp_max.vrt}
   BASIN_TMP=${1/\.tif/_tmp.tif}
   BASIN_TMP_NC=${1/\.tif/_tmp.nc}
   BASIN_DOMAIN="${@:2}"
@@ -75,12 +74,12 @@ modis_basin() {
     gdal_calc.py --overwrite --quiet --co COMPRESS=LZW \
       -A ${BASIN_TMP_CUBIC} -B ${BASIN_TMP_NN} \
       --calc="${FILTER_MATH}" \
-      --outfile=${BASIN_TMP}
+      --outfile=${BASIN_TMP_MAX}
 
     # Add threshold enforcement of the values lower than the
     # minimum of the nearest neighbor resampling and set to that min
     gdal_calc.py --overwrite --quiet --co COMPRESS=LZW \
-      -A ${BASIN_TMP_CUBIC} -B ${BASIN_TMP_NN} \
+      -A ${BASIN_TMP_MAX} -B ${BASIN_TMP_NN} \
       --calc="A*(A>=numpy.min(B)) + numpy.min(B)*(A<numpy.min(B))" \
       --outfile=${BASIN_TMP}
 
@@ -112,12 +111,13 @@ modis_basin() {
     rm ${BASIN_TMP_CUBIC}
     rm ${BASIN_TMP_NN}
     rm ${BASIN_TMP}
+    rm ${BASIN_TMP_MAX}
     rm ${BASIN_TMP_NC}
   fi
   }
 export -f modis_basin
 echo "Extracting MODIS albedo"
-${PARALLEL_call} modis_basin {} ${BASIN_DOMAIN} ::: ${1}/wy${2}/*.tif 
+${PARALLEL_call} modis_basin {} ::: ${1}/wy${2}/*.tif 
 
 # Creates a NetCDF using the extracted model domain values and
 # populates every hour of one day with those.
