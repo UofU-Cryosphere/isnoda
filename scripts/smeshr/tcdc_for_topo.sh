@@ -24,7 +24,7 @@
 export OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 export OMP_WAIT_POLICY=PASSIVE
 
-## Part 1 - Extract from HRRR Grib, crop and interpolate to ERW
+## Part 1 - Extract from HRRR Grib, crop and interpolate to basin
 
 export TOPO_FILE=${1}
 HRRR_GLOB=${2}
@@ -79,8 +79,8 @@ function tcdc_for_month() {
 
   # Need to add the 'hrrr' back in as it stems from the HRRR folder pattern
   TCDC_IN="${TCDC_IN}hrrr"
-  ERW_MONTH="${TCDC_OUT}/ERW_TCDC"
-  ERW_DAY_MST="${TCDC_OUT}/tcdc.MST"
+  BASIN_MONTH="${TCDC_OUT}/BASIN_TCDC"
+  BASIN_DAY_MST="${TCDC_OUT}/tcdc.MST"
 
   pushd "${TCDC_OUT}" || exit
 
@@ -95,7 +95,7 @@ function tcdc_for_month() {
   echo "Processing: ${MONTH_SELECTOR}"
 
   echo "  Merge month"
-  MONTH_FILE="${ERW_MONTH}.${MONTH_SELECTOR}.nc"
+  MONTH_FILE="${BASIN_MONTH}.${MONTH_SELECTOR}.nc"
   ${CDO_COMMAND} mergetime -selmonth,${MONTH} ${TCDC_IN}.${LAST_DAY}* ${TCDC_IN}.${MONTH_SELECTOR}* ${MONTH_FILE}
 
   if [[ $? != 0 ]]; then
@@ -104,7 +104,7 @@ function tcdc_for_month() {
   fi
 
   echo "  Split by day MST and convert to fraction"
-  ${CDO_COMMAND} splitday -selmonth,${MONTH} -expr,"${CDO_MATH}" ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
+  ${CDO_COMMAND} splitday -selmonth,${MONTH} -expr,"${CDO_MATH}" ${MONTH_FILE} ${BASIN_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error splitting ${MONTH_SELECTOR} **"
