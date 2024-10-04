@@ -31,7 +31,6 @@ BASIN_EXTENT='391137.9 4356434 433937.9 4392434'
 RES=100
 EPSG='EPSG:32613'
 export BASIN_DOMAIN=" -t_srs $EPSG -tr $RES $RES -dstnodata 65535 -te $BASIN_EXTENT"
-echo "BASIN_DOMAIN: ${BASIN_DOMAIN}"
 SLURM_NTASKS=4
 
 export BASIN_NC="_${BASIN}.nc"
@@ -44,7 +43,7 @@ export PARALLEL_call="parallel --tagstring {#} --tag --line-buffer --jobs ${SLUR
 modis_basin() {
   BASIN_TMP_CUBIC=${1/\.tif/_cubic_tmp.vrt}
   BASIN_TMP_NN=${1/\.tif/_nn_tmp.vrt}
-  BASIN_TMP_MAX=${1/\.tif/_tmp_max.tif}
+  BASIN_TMP_MAX=${1/\.tif/_tmp_max.vrt}
   BASIN_TMP=${1/\.tif/_tmp.tif}
   BASIN_TMP_NC=${1/\.tif/_tmp.nc}
   
@@ -53,7 +52,6 @@ modis_basin() {
     return
   else
     echo "${1%.*}_${BASIN}${BASIN_ONE_DAY_SUFFIX}" DNE
-    echo "BASIN_DOMAIN: ${BASIN_DOMAIN}"
     FILTER_MATH="A*(A<=numpy.max(B)) + numpy.max(B)*(A>numpy.max(B))" 
     echo "gdalwarp -q -overwrite -multi \
       -r cubic ${BASIN_DOMAIN} \
