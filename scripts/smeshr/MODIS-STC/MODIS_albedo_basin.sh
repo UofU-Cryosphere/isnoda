@@ -43,7 +43,7 @@ export PARALLEL_call="parallel --tagstring {#} --tag --line-buffer --jobs ${SLUR
 modis_basin() {
   BASIN_TMP_CUBIC=${1/\.tif/_cubic_tmp.vrt}
   BASIN_TMP_NN=${1/\.tif/_nn_tmp.vrt}
-  BASIN_TMP_MAX=${1/\.tif/_tmp_max.vrt}
+  BASIN_TMP_MAX=${1/\.tif/_tmp_max.tif}
   BASIN_TMP=${1/\.tif/_tmp.tif}
   BASIN_TMP_NC=${1/\.tif/_tmp.nc}
   
