@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Script Name: prepare_HRRR_SC_inputs.sh
 # Author: J. Michelle Hu | University of Utah
