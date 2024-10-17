@@ -21,6 +21,10 @@ echo ; echo "Running $0 $1 $2" ; echo "    $3" ; echo "    from $(pwd)"
 # Script running flags
 verbose=true
 realrun=true
+process_cloudcover=false
+process_radiation=false
+process_albedo=true
+process_netsolar=true
 
 echo ; echo verbose is $verbose, realrun is $realrun ; echo
 
@@ -76,182 +80,195 @@ cp -pv $generic_albedo_script $albedo_script
 #======== Process HRRR cloud cover ========
 #==========================================
 # Prepare directory structure for outputs
-cd ${HRRR_DIR}
-
-if $realrun ; then
-    if [ ! -d ${TCDC} ] ; then
-        mkdir -pv ${TCDC}
-        mkdir -pv ${TCDC_out}
+if $process_cloudcover ; then
+    if $realrun ; then
+        if [ ! -d ${TCDC} ] ; then
+            mkdir -pv ${TCDC}
+            mkdir -pv ${TCDC_out}
+        fi
     fi
-fi
-if $verbose ; then
-    echo "mkdir -pv ${TCDC}"
-    echo "mkdir -pv ${TCDC_out}"
-    echo 
-fi
+    if $verbose ; then
+        echo "mkdir -pv ${TCDC}"
+        echo "mkdir -pv ${TCDC_out}"
+        echo 
+    fi
 
-# Extract TCDC from HRRR files
-# Run September preceding your WY
-if $verbose ; then
-    echo "${tcdc_script}"
-    echo "    ${TOPO}"
-    echo "    hrrr.${YEAR}09*"
-    echo "    hrrr.t*f06.grib2"
-    echo "    ${TCDC}"
-    echo "    ${WY}"
-    echo "    11"
-    echo "    ${TCDC_out}"
-fi
-if $realrun ; then
-    ${tcdc_script} ${TOPO} "hrrr.${YEAR}09*" "hrrr.t*f06.grib2" ${TCDC} ${WY} "-1" ${TCDC_out}
-fi
+    # Extract TCDC from HRRR files
+    # Run September preceding your WY
+    if $verbose ; then
+        echo "${tcdc_script}"
+        echo "    ${TOPO}"
+        echo "    hrrr.${YEAR}09*"
+        echo "    hrrr.t*f06.grib2"
+        echo "    ${TCDC}"
+        echo "    ${WY}"
+        echo "    11"
+        echo "    ${TCDC_out}"
+    fi
+    if $realrun ; then
+        ${tcdc_script} ${TOPO} "hrrr.${YEAR}09*" "hrrr.t*f06.grib2" ${TCDC} ${WY} "-1" ${TCDC_out}
+    fi
 
-# Run October through December for your WY
-if $verbose ; then
-    echo "${tcdc_script}"
-    echo "    ${TOPO}"
-    echo "    hrrr.${YEAR}1*"
-    echo "    hrrr.t*f06.grib2"
-    echo "    ${TCDC}"
-    echo "    ${WY}"
-    echo "    0 1 2"
-    echo "    ${TCDC_out}"
-fi
-if $realrun ; then
-    ${tcdc_script} ${TOPO} "hrrr.${YEAR}1*" "hrrr.t*f06.grib2" ${TCDC} ${WY} "0 1 2" ${TCDC_out}
-fi
-# Run January through September for your WY
-if $verbose ; then
-    echo "${tcdc_script}"
-    echo "    ${TOPO}"
-    echo "    hrrr.${WY}*"
-    echo "    hrrr.t*f06.grib2"
-    echo "    ${TCDC}"
-    echo "    ${WY}"
-    echo "    3 4 5 6 7 8 9 10 11"
-    echo "    ${TCDC_out}"
-fi
-if $realrun ; then
-    ${tcdc_script} ${TOPO} "hrrr.${WY}0*" "hrrr.t*f06.grib2" ${TCDC} ${WY} "3 4 5 6 7 8 9 10 11" ${TCDC_out}
-fi
+    # Run October through December for your WY
+    if $verbose ; then
+        echo "${tcdc_script}"
+        echo "    ${TOPO}"
+        echo "    hrrr.${YEAR}1*"
+        echo "    hrrr.t*f06.grib2"
+        echo "    ${TCDC}"
+        echo "    ${WY}"
+        echo "    0 1 2"
+        echo "    ${TCDC_out}"
+    fi
+    if $realrun ; then
+        ${tcdc_script} ${TOPO} "hrrr.${YEAR}1*" "hrrr.t*f06.grib2" ${TCDC} ${WY} "0 1 2" ${TCDC_out}
+    fi
+    # Run January through September for your WY
+    if $verbose ; then
+        echo "${tcdc_script}"
+        echo "    ${TOPO}"
+        echo "    hrrr.${WY}*"
+        echo "    hrrr.t*f06.grib2"
+        echo "    ${TCDC}"
+        echo "    ${WY}"
+        echo "    3 4 5 6 7 8 9 10 11"
+        echo "    ${TCDC_out}"
+    fi
+    if $realrun ; then
+        ${tcdc_script} ${TOPO} "hrrr.${WY}0*" "hrrr.t*f06.grib2" ${TCDC} ${WY} "3 4 5 6 7 8 9 10 11" ${TCDC_out}
+    fi
 
-echo ; echo " ============== Finished processing HRRR cloud cover ============== " ; echo 
+    echo ; echo " ============== Finished processing HRRR cloud cover ============== " ; echo 
+else
+    echo ; echo " ============== Skipping HRRR cloud cover processing ============== " ; echo 
+fi
 
 #==========================================
 #========== Process SW radiation ==========
 #==========================================
-# Create directory for SW outputs
-if $verbose ; then
-    echo "mkdir -pv ${SMESHR_DIR}${BASIN}/DSWRF/" ; echo
-fi
-if $realrun ; then
-    if [ ! -d ${SMESHR_DIR}${BASIN}/DSWRF/ ] ; then
-        mkdir -pv ${SMESHR_DIR}${BASIN}/DSWRF/
-    fi
-fi
-
-# Extract SW from HRRR outputs 
-# Run for the WY, looping month by month beginning with the last day of the preceding September
-dt=${YEAR}09
-end_dt=${WY}09
-
-while [ "$dt" -le "$end_dt" ]
-do
+if $process_radiation ; then
+    # Create directory for SW outputs
     if $verbose ; then
-        echo -ne "Processing $dt\r"
-        sleep 0.01
+        echo "mkdir -pv ${SMESHR_DIR}${BASIN}/DSWRF/" ; echo
     fi
-    echo ${dt}
     if $realrun ; then
-        # check for preceding september and process last day only
-        if [ ${dt} == ${YEAR}09 ] ; then
-            ${dswrf_script} ${TOPO} "hrrr.${dt}30" "hrrr.t*f06.grib2" ${DSWRF_DIR}
-        else
-            ${dswrf_script} ${TOPO} "hrrr.${dt}*" "hrrr.t*f06.grib2" ${DSWRF_DIR}
+        if [ ! -d ${SMESHR_DIR}${BASIN}/DSWRF/ ] ; then
+            mkdir -pv ${SMESHR_DIR}${BASIN}/DSWRF/
         fi
     fi
-    dt=$(date -d "${dt}01 +1 month" +%Y%m)
-done
 
-echo ; echo ; echo " ============== Finished processing HRRR SW radiation ============== " ; echo
+    # Extract SW from HRRR outputs 
+    # Run for the WY, looping month by month beginning with the last day of the preceding September
+    dt=${YEAR}09
+    end_dt=${WY}09
+
+    while [ "$dt" -le "$end_dt" ]
+    do
+        if $verbose ; then
+            echo -ne "Processing $dt\r"
+            sleep 0.01
+        fi
+        echo ${dt}
+        if $realrun ; then
+            # check for preceding september and process last day only
+            if [ ${dt} == ${YEAR}09 ] ; then
+                ${dswrf_script} ${TOPO} "hrrr.${dt}30" "hrrr.t*f06.grib2" ${DSWRF_DIR}
+            else
+                ${dswrf_script} ${TOPO} "hrrr.${dt}*" "hrrr.t*f06.grib2" ${DSWRF_DIR}
+            fi
+        fi
+        dt=$(date -d "${dt}01 +1 month" +%Y%m)
+    done
+
+    echo ; echo ; echo " ============== Finished processing HRRR SW radiation ============== " ; echo
+else
+    echo ; echo ; echo " ============== Skipping HRRR SW radiation processing ============== " ; echo
+fi
 
 #==========================================
 #========== Process MODIS albedo ==========
 #==========================================
-# Edit MODIS_albedo_basin.sh
-function update_verbose()
-{
-    echo "          Formerly: $1"
-    echo "          Now: $2"
-    sed -i "s|${1}|${2}|g" $3 
-    echo
-}
+if $process_albedo ; then
+    # Edit MODIS_albedo_basin.sh
+    function update_verbose()
+    {
+        echo "          Formerly: $1"
+        echo "          Now: $2"
+        sed -i "s|${1}|${2}|g" $3 
+        echo
+    }
 
-# Extract extents of basin from topo.nc
-# Get x bounds
-minx=$(cdo sinfon ${TOPO} | grep x | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f2)
-maxx=$(cdo sinfon ${TOPO} | grep x | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f4)
+    # Extract extents of basin from topo.nc
+    # Get x bounds
+    minx=$(cdo sinfon ${TOPO} | grep x | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f2)
+    maxx=$(cdo sinfon ${TOPO} | grep x | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f4)
 
-# Get y bounds. Note that this order is reversed in cdo sinfon output
-miny=$(cdo sinfon ${TOPO} | grep y | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f4)
-maxy=$(cdo sinfon ${TOPO} | grep y | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f2)
+    # Get y bounds. Note that this order is reversed in cdo sinfon output
+    miny=$(cdo sinfon ${TOPO} | grep y | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f4)
+    maxy=$(cdo sinfon ${TOPO} | grep y | tail -n 1 | cut -d ':' -f2 | cut -d ' ' -f2)
 
-# Adjust extents based on half the resolution size (RES) and basic calculator (bc)
-# Decrease minx and miny
-minx=$(echo "${minx} - ${RES}/2" | bc)
-miny=$(echo "${miny} - ${RES}/2" | bc)
-# Increase maxx and maxy
-maxx=$(echo "${maxx} + ${RES}/2" | bc)
-maxy=$(echo "${maxy} + ${RES}/2" | bc)
+    # Adjust extents based on half the resolution size (RES) and basic calculator (bc)
+    # Decrease minx and miny
+    minx=$(echo "${minx} - ${RES}/2" | bc)
+    miny=$(echo "${miny} - ${RES}/2" | bc)
+    # Increase maxx and maxy
+    maxx=$(echo "${maxx} + ${RES}/2" | bc)
+    maxy=$(echo "${maxy} + ${RES}/2" | bc)
 
-# Put together new extents 
-extents="${minx} ${miny} ${maxx} ${maxy}"
+    # Put together new extents 
+    extents="${minx} ${miny} ${maxx} ${maxy}"
 
-# Update variables in MODIS_albedo_basin.sh
-# Update BASIN
-current=$(grep BASIN= ${albedo_script})
-# shellcheck disable=SC2089
-new="export BASIN='${BASIN}'"
-if $realrun ; then update_verbose "$current" "$new" $albedo_script ; fi
+    # Update variables in MODIS_albedo_basin.sh
+    # Update BASIN
+    current=$(grep BASIN= ${albedo_script})
+    # shellcheck disable=SC2089
+    new="export BASIN='${BASIN}'"
+    if $realrun ; then update_verbose "$current" "$new" $albedo_script ; fi
 
-# Update BASIN_EXTENT
-current=$(grep BASIN_EXTENT= ${albedo_script})
-# shellcheck disable=SC2089
-new="BASIN_EXTENT='${extents}'"
-if $realrun ; then update_verbose "$current" "$new" $albedo_script ; fi
+    # Update BASIN_EXTENT
+    current=$(grep BASIN_EXTENT= ${albedo_script})
+    # shellcheck disable=SC2089
+    new="BASIN_EXTENT='${extents}'"
+    if $realrun ; then update_verbose "$current" "$new" $albedo_script ; fi
 
-# Run the albedo processing script
-if $verbose ; then echo ${albedo_script} ${ALBEDO_DIR} ${WY} ; fi
-if $realrun ; then ${albedo_script} ${ALBEDO_DIR} ${WY} ; fi
+    # Run the albedo processing script
+    if $verbose ; then echo ${albedo_script} ${ALBEDO_DIR} ${WY} ; fi
+    if $realrun ; then ${albedo_script} ${ALBEDO_DIR} ${WY} ; fi
 
-echo ; echo " ============== Finished processing MODIS albedo ============== " ; echo
-
+    echo ; echo " ============== Finished processing MODIS albedo ============== " ; echo
+else
+    echo ; echo " ============== Skipping MODIS albedo processing ============== " ; echo
+fi
 #==========================================
 #========== Prepare net_solar.nc ==========
 #==========================================
 # Prepare net_solar.nc from MODIS albedo and HRRR SW
-# Create directory for net solar output files
-if $verbose ; then echo mkdir -v ${NET_SOLAR_DIR} ; echo ; fi
-if $realrun ; then 
-    if [ ! -d ${NET_SOLAR_DIR} ] ; then
-        mkdir -v ${NET_SOLAR_DIR}
+if $process_netsolar ; then
+    # Create directory for net solar output files
+    if $verbose ; then echo mkdir -v ${NET_SOLAR_DIR} ; echo ; fi
+    if $realrun ; then 
+        if [ ! -d ${NET_SOLAR_DIR} ] ; then
+            mkdir -v ${NET_SOLAR_DIR}
+        fi
     fi
-fi
 
-if $verbose ; then 
-    echo "${net_solar_script} "
-    echo "    ${WY} "
-    echo '    "0 1 2 3 4 5 6 7 8 9 10 11" '
-    echo "    ${DSWRF_DIR} "
-    echo "    ${ALBEDO_DIR}wy${WY} "
-    echo "    ${NET_SOLAR_DIR}"
-fi
+    if $verbose ; then 
+        echo "${net_solar_script} "
+        echo "    ${WY} "
+        echo '    "0 1 2 3 4 5 6 7 8 9 10 11" '
+        echo "    ${DSWRF_DIR} "
+        echo "    ${ALBEDO_DIR}wy${WY} "
+        echo "    ${NET_SOLAR_DIR}"
+    fi
 
-if $realrun ; then 
-    ${net_solar_script} ${WY} "0 1 2 3 4 5 6 7 8 9 10 11" ${DSWRF_DIR} ${ALBEDO_DIR}wy${WY} ${NET_SOLAR_DIR}
-fi
+    if $realrun ; then 
+        ${net_solar_script} ${WY} "0 1 2 3 4 5 6 7 8 9 10 11" ${DSWRF_DIR} ${ALBEDO_DIR}wy${WY} ${NET_SOLAR_DIR}
+    fi
 
-echo ; echo " ============== Finished processing net_solar.nc ============== " ; echo
+    echo ; echo " ============== Finished processing net_solar.nc ============== " ; echo
+else
+    echo ; echo " ============== Skipping net_solar.nc processing ============== " ; echo
+fi
 
 #===========================================
 #======= Link outputs to iSnobal dir =======
