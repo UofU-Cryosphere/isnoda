@@ -31,10 +31,10 @@ echo ; echo verbose is $verbose, realrun is $realrun ; echo
 BASIN=$1
 WY=$2
 YEAR=$(echo "${WY} - 1" | bc)
-# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/animas_setup/output_100m/topo.nc
 # TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/blue_river_setup/output_100m/topo.nc
-# Updated for upper yampa only. Previous version found in __yampa_setup
+# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/animas_setup/output_100m/topo.nc
 # TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/yampa_setup/output_100m/topo.nc
+# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/erw_setup/output_100m/topo.nc
 TOPO=$3
 RES=100 #default value
 
@@ -43,13 +43,13 @@ HRRR_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/HRRR_CBR/
 SMESHR_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/SMESHR/
 
 # Basin-specific output directories
-TCDC=${SMESHR_DIR}${BASIN}/TCDC/
-TCDC_out=${SMESHR_DIR}${BASIN}/TCDC_out/
-DSWRF_DIR=${SMESHR_DIR}${BASIN}/DSWRF/
-# ALBEDO_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/MODIS_albedo/
-ALBEDO_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/MODIS_albedo_v2023.0e_JMH_reprocessed/
-NET_SOLAR_DIR=${SMESHR_DIR}${BASIN}/net_HRRR_MODIS
-MODEL_DIR=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/model_runs/
+BASIN_SMESHR_DIR=${SMESHR_DIR}${BASIN}
+TCDC=${BASIN_SMESHR_DIR}/TCDC/
+TCDC_out=${BASIN_SMESHR_DIR}/TCDC_out/
+DSWRF_DIR=${BASIN_SMESHR_DIR}/DSWRF/
+ALBEDO_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/MODIS_albedo/
+NET_SOLAR_DIR=${BASIN_SMESHR_DIR}/net_HRRR_MODIS
+MODEL_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/model_runs/
 
 # isnoda scripts and repo directory
 ISNODA_DIR=/uufs/chpc.utah.edu/common/home/u6058223/git_dirs/isnoda/
@@ -244,7 +244,7 @@ echo ; echo " ============== Finished processing net_solar.nc ============== " ;
 #======= Link outputs to iSnobal dir =======
 #===========================================
 # Generate the directory structure 
-OUTDIR=${MODEL_DIR}${BASIN}_100m_isnobal_solar_albedo/wy${WY}/${BASIN}_basin_100m/
+OUTDIR=${MODEL_DIR}${BASIN}_100m_isnobal/wy${WY}/${BASIN}_basin_100m_solar_albedo/
 if $verbose ; then echo mkdir -pv ${OUTDIR} ; echo ; fi
 if $realrun ; then 
     if [ ! -d ${OUTDIR} ] ; then
