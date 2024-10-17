@@ -24,7 +24,7 @@ export WATER_START_MONTH=10
 export DSWRF_IN=${3}
 export MODIS_IN=${4}
 export DSWRF_OUT=${5}
-export ERW_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
+export DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
 
 export CDO_COMMAND='cdo -z zip4 -O -s'
 export HRRR_SELECT="-select,name=illumination_angle,DSWRF"
@@ -83,7 +83,7 @@ function net_hrrr_for_month() {
   fi
 
   echo "  Split by day MST"
-  ${CDO_COMMAND} splitday ${MONTH_CALC_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
+  ${CDO_COMMAND} splitday ${MONTH_CALC_FILE} ${DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error processing ${MONTH_SELECTOR} **"
