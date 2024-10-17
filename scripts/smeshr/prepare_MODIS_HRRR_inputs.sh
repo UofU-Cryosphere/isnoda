@@ -55,9 +55,22 @@ MODEL_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/model_runs/
 ISNODA_DIR=/uufs/chpc.utah.edu/common/home/u6058223/git_dirs/isnoda/
 tcdc_script=${ISNODA_DIR}scripts/smeshr/tcdc_for_topo.sh
 dswrf_script=${ISNODA_DIR}scripts/smeshr/dswrf_for_topo.sh 
-albedo_script=${ISNODA_DIR}scripts/smeshr/MODIS-STC/MODIS_albedo_basin.sh
+generic_albedo_script=${ISNODA_DIR}scripts/smeshr/MODIS-STC/MODIS_albedo_basin.sh
 net_solar_script=${ISNODA_DIR}scripts/smeshr/MODIS-STC/net_dswrf_for_topo_MODIS.sh
 linker_script=${ISNODA_DIR}scripts/smeshr/HRRR_linker.sh
+
+cd ${HRRR_DIR}
+
+# Make the basin directory
+if $realrun ; then
+    if [ ! -d ${BASIN_SMESHR_DIR} ] ; then
+        mkdir -pv ${BASIN_SMESHR_DIR}
+    fi
+fi
+
+# Copy generic albedo script to basin-specific script to run and keep in SMESHR dir
+albedo_script=${BASIN_SMESHR_DIR}/MODIS_albedo_basin_${BASIN}.sh
+cp -pv $generic_albedo_script $albedo_script
 
 #==========================================
 #======== Process HRRR cloud cover ========
@@ -254,7 +267,7 @@ fi
 
 # Loop through the WY and generate run* directories
 # print statements every 30 days
-for d in $(seq 0 365)
+for d in $(seq 0 364)
 do 
     # Add a spinner
     echo -ne "Processing day $d\r"
