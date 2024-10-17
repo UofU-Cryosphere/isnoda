@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Script Name: prepare_MODIS_HRRR_inputs.sh
 # Author: J. Michelle Hu | University of Utah
@@ -7,8 +7,15 @@
 # Requires smeshr conda env
 # Usage: ./prepare_MODIS_HRRR_inputs.sh <BASIN_NAME> <WY> <TOPO>
 # Example: prepare_MODIS_HRRR_inputs.sh animas 2022 /full/path/to/topo.nc
+# echo "time prepare_MODIS_HRRR_inputs.sh $BASIN $WY $TOPO 2>&1 | tee prep_${BASIN}_$(date +%Y%m%d_%H%M).log"
 
-set -e
+if [[ -n "$CONDA_DEFAULT_ENV" && "$CONDA_DEFAULT_ENV" == "smeshr" ]]; then
+  echo "Conda environment 'smeshr' is active."
+else
+  echo "Conda environment 'smeshr' is not active, exiting script"
+  exit 1
+fi
+
 echo ; echo "Running $0 $1 $2" ; echo "    $3" ; echo "    from $(pwd)"
 
 # Script running flags
