@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Extract DSWRF from given HRRR files for given topo extent
 #
-# NOTE: First argument needs to bin quotes to prevent shell expansion
+# NOTE: First argument needs to be in quotes to prevent shell expansion
 #
 # Arguments:
 #   ./dswrf_for_topo.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX>

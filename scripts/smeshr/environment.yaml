@@ -1,0 +1,20 @@
+name: smeshr
+channels:
+- conda-forge
+dependencies:
+- cdo=2.2
+- cython
+- dask
+- dask-jobqueue
+- gdal=3.5
+- h5py
+- parallel
+- pip
+- python<3.11
+- skyfield
+- utm
+- wgrib2
+- netCDF4
+- numpy<2
+- pip:
+  - topocalc

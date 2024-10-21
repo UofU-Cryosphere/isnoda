@@ -9,17 +9,19 @@
 # ${1}: /path/to/MODIS/inputs
 # ${2}: water year
 
-# command from UofU snow-rs package
-# https://github.com/UofU-Cryosphere/snow-rs
-# Converts the MODIS matlab to GeoTiff files
-variable_from_modis --source-dir ${1} \
-                    --water-year ${2} \
-                    --variable albedo_observed_muZ
+extract_modis() {
+  # command from UofU snow-rs package
+  # https://github.com/UofU-Cryosphere/snow-rs
+  # Converts the MODIS matlab to GeoTiff files
+  variable_from_modis --source-dir ${1} \
+                      --water-year ${2} \
+                      --variable albedo_observed_muZ
 
-if [ $? != 0 ]; then
-  echo "Error extracting variable from MODIS inputs"
-  exit 1
-fi
+  if [ $? != 0 ]; then
+    echo "Error extracting variable from MODIS inputs"
+    exit 1
+  fi
+}
 
 export ERW_NC="_ERW.nc"
 export ERW_ONE_DAY_SUFFIX="_24.nc"
@@ -35,7 +37,7 @@ modis_erw() {
   ERW_TMP_NC=${1/\.tif/_tmp.nc}
 
   ERW_DOMAIN="\
--t_srs EPSG:32613 -tr 50 50 -dstnodata 65535
+-t_srs EPSG:32613 -tr 100 100 -dstnodata 65535
 -te 315900.0 4280850.0 348700.0 4322700.0
 "
   FILTER_MATH="A*(A<=numpy.max(B)) + numpy.max(B)*(A>numpy.max(B))" 
@@ -67,7 +69,7 @@ modis_erw() {
     return 1
   fi
 
-  date=$(date -d $(basename $1 | cut -d '_' -f2) +%Y-%m-%d)
+  date=$(date -d $(basename $1 | cut -d '_' -f1) +%Y-%m-%d)
   # Set time and variable name in NetCDF
   ${CDO_call} \
     -chname,Band1,albedo \
