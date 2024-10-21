@@ -38,11 +38,8 @@ get_day() {
 
   TMPF=$DAY.grib2
 
-  echo "cat ${HRRR_PATTERN} | wgrib2 - -match "TCDC:entire atmosphere" -inv /dev/null -grib $TMPF"
   cat ${HRRR_PATTERN} | wgrib2 - -match "TCDC:entire atmosphere" -inv /dev/null -grib $TMPF
 
-
-  echo "hrrr_param_for_topo --topo ${TOPO_FILE} --hrrr_in ${TMPF} --nc_out ${NC_OUT_PREFIX}${DAY}.tcdc.nc"
   hrrr_param_for_topo --topo "${TOPO_FILE}" \
                       --hrrr_in $TMPF \
                       --nc_out "${NC_OUT_PREFIX}${DAY}.tcdc.nc" \
