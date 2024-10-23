@@ -4,7 +4,7 @@
 # Arguments:
 #   ./topo_shade_for_ERW.sh <TOPO> <OUTPUT_PATH_WITH_PREFIX> <start_date> <end_date>
 # Sample call:
-#   ./topo_shade_for_ERW.sh /path/to/topo "/write/to/here/file_prefix"
+#   ./topo_shade_for_ERW.sh /path/to/topo "/write/to/here/file_prefix" 2021-10-01 2021-10-31
 #
 
 export PROCESSES=${SLURM_NTASKS:-4}

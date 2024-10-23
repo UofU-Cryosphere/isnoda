@@ -11,7 +11,8 @@
 
 for DAY in $1; do
   pushd $DAY || exit 1
-  DAY=$(echo $DAY | cut -d '/' -f11,12 | sed 's/\//./g' | sed 's/run//g' );
-  ln -fs $2.$DAY.nc $3
+  # get date in YYYYMMDD format
+  DAY=$(echo $(basename $DAY) | sed 's/\//./g' | sed 's/run//g' );
+  ln -fsv ${2}/*.MST.$DAY.nc $3
   popd
 done

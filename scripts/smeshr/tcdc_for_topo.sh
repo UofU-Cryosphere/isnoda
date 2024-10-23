@@ -5,16 +5,16 @@
 # * Creates daily output files organized in MST time zone
 #
 # NOTES:
-# - First argument needs to bin quotes to prevent shell expansion
+# - First argument needs to be in quotes to prevent shell expansion
 # - Months argument are relative to the start month of october
 #
 # Arguments:
 #   ./tcdc_for_topo.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX> <WATER_YEAR> <MONTHS> <SNOBAL_OUT>
 # Sample call:
-#   ./tcdc_for_topo.sh /path/to/topo \
+#   ./tcdc_for_topo.sh /full/path/to/topo.nc \
 #                     "hrrr.YYYYMM*" \
-#                     "hrrr.t*.f06.grib2" \
-#                     /write/to/here/file_prefix \
+#                     "hrrr.t*f06.grib2" \
+#                     /path/to/write/out/tcdc/outputs/with/file_prefix \
 #                     2021 \
 #                     "1 2 3" \
 #                     /input/read/from/isnobal
@@ -24,7 +24,7 @@
 export OMP_NUM_THREADS=${SLURM_NTASKS:-4}
 export OMP_WAIT_POLICY=PASSIVE
 
-## Part 1 - Extract from HRRR Grib, crop and interpolate to ERW
+## Part 1 - Extract from HRRR Grib, crop and interpolate to basin
 
 export TOPO_FILE=${1}
 HRRR_GLOB=${2}
@@ -76,8 +76,8 @@ function tcdc_for_month() {
 
   # Need to add the 'hrrr' back in as it stems from the HRRR folder pattern
   TCDC_IN="${TCDC_IN}hrrr"
-  ERW_MONTH="${TCDC_OUT}/ERW_TCDC"
-  ERW_DAY_MST="${TCDC_OUT}/tcdc.MST"
+  BASIN_MONTH="${TCDC_OUT}/BASIN_TCDC"
+  BASIN_DAY_MST="${TCDC_OUT}/tcdc.MST"
 
   pushd "${TCDC_OUT}" || exit
 
@@ -92,7 +92,7 @@ function tcdc_for_month() {
   echo "Processing: ${MONTH_SELECTOR}"
 
   echo "  Merge month"
-  MONTH_FILE="${ERW_MONTH}.${MONTH_SELECTOR}.nc"
+  MONTH_FILE="${BASIN_MONTH}.${MONTH_SELECTOR}.nc"
   ${CDO_COMMAND} mergetime -selmonth,${MONTH} ${TCDC_IN}.${LAST_DAY}* ${TCDC_IN}.${MONTH_SELECTOR}* ${MONTH_FILE}
 
   if [[ $? != 0 ]]; then
@@ -101,7 +101,7 @@ function tcdc_for_month() {
   fi
 
   echo "  Split by day MST and convert to fraction"
-  ${CDO_COMMAND} splitday -selmonth,${MONTH} -expr,"${CDO_MATH}" ${MONTH_FILE} ${ERW_DAY_MST}.${MONTH_SELECTOR}
+  ${CDO_COMMAND} splitday -selmonth,${MONTH} -expr,"${CDO_MATH}" ${MONTH_FILE} ${BASIN_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
     echo "  ** Error splitting ${MONTH_SELECTOR} **"
