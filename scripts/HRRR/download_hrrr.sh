@@ -102,6 +102,8 @@ download_hrrr() {
   check_file_existence
   if [[ $? -eq 0 ]]; then
     return
+  elif [[ -e ${FILE_NAME} ]]; then
+    rm ${FILE_NAME}
   fi
 
   check_file_in_archive ${ARCHIVE}
@@ -142,6 +144,7 @@ download_hrrr() {
   fi
 
   TMP_FILE="${FILE_NAME}_tmp"
+  [[ -e ${TMP_FILE} ]] && rm $TMP_FILE
   mkfifo $TMP_FILE
 
   printf '\n'
