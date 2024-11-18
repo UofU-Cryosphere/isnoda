@@ -22,6 +22,11 @@ export HRRR_FC_HOURS=(1 6)
 export HRRR_DAY_HOURS=$(seq 0 23)
 
 export GRIB_AREA="-112.322:-105.628 35.556:43.452"
+# Job control - the defaults require to have 32 CPUs for the job
+## Number of jobs to donwload in parallel
+PARALLEL_JOBS=4
+## Number of Grib threads
+export GRIB_THREADS="-ncpu 8"
 
 export UofU_ARCHIVE='UofU'
 export AWS_ARCHIVE='AWS'
@@ -149,8 +154,8 @@ download_hrrr() {
 
   printf '\n'
   wget -q --no-check-certificate ${ARCHIVE_URL} -O $TMP_FILE | \
-  wgrib2 $TMP_FILE -v0 -set_grib_type same -small_grib ${GRIB_AREA} - | \
-  wgrib2 - -v0 -match "$HRRR_VARS" -grib $FILE_NAME >&1
+  wgrib2 $TMP_FILE -v0 ${GRIB_THREADS} -set_grib_type same -small_grib ${GRIB_AREA} - | \
+  wgrib2 - -v0 ${GRIB_THREADS} -match "$HRRR_VARS" -grib $FILE_NAME >&1
 
   rm $TMP_FILE
 
@@ -192,7 +197,7 @@ for DATE in "${DATES[@]}"; do
   mkdir -p $FOLDER
   pushd $FOLDER > /dev/null
 
-  parallel --tag --line-buffer --jobs ${SLURM_NTASKS} download_hrrr ::: ${HRRR_DAY_HOURS} ::: "${HRRR_FC_HOURS[@]}"
+  parallel --tag --line-buffer --jobs ${PARALLEL_JOBS} download_hrrr ::: ${HRRR_DAY_HOURS} ::: "${HRRR_FC_HOURS[@]}"
 
   popd > /dev/null
 done
