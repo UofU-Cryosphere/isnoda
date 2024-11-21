@@ -104,11 +104,14 @@ download_hrrr() {
 
   printf "  File: ${FILE_NAME}"
 
+  # Clean up any old temporary pipes from previous runs
+  find . -type p -name *_tmp -delete
+  # Remove any previous downloads of empty grib files
+  find . -type f -name *.grib2 -size 0 -delete
+
   check_file_existence
   if [[ $? -eq 0 ]]; then
     return
-  elif [[ -e ${FILE_NAME} ]]; then
-    rm ${FILE_NAME}
   fi
 
   check_file_in_archive ${ARCHIVE}
@@ -149,7 +152,6 @@ download_hrrr() {
   fi
 
   TMP_FILE="${FILE_NAME}_tmp"
-  [[ -e ${TMP_FILE} ]] && rm $TMP_FILE
   mkfifo $TMP_FILE
 
   printf '\n'
