@@ -36,9 +36,4 @@ for NEXT in {0..2}; do
     >&2 echo "ERROR processing ${CURRENT_YEAR}${CURRENT_MONTH}"
     exit
   fi
-
-  >&1 echo "  Archiving"
-
-  ARCHIVE="hrrr-${CURRENT_YEAR}${CURRENT_MONTH}.tar.bz2"
-  tar -I pbzip2 -cf ${ARCHIVE} hrrr.${CURRENT_YEAR}${CURRENT_MONTH}[0-3][0-9]
 done
