@@ -16,6 +16,7 @@
 # List days after a download, where there are not 48 files for a day:
 # find -L . -name *.grib2 -type f | cut -d/ -f2 | uniq -c | grep -v '48 ' | tr -s ' ' | cut -d '.' -f 2
 #
+set -e
 
 export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
 export HRRR_FC_HOURS=(1 6)
@@ -105,9 +106,9 @@ download_hrrr() {
   printf "  File: ${FILE_NAME}"
 
   # Clean up any old temporary pipes from previous runs
-  find . -type p -name *_tmp -delete
+  find . -type p -name "*_tmp" -delete
   # Remove any previous downloads of empty grib files
-  find . -type f -name *.grib2 -size 0 -delete
+  find . -type f -name "*.grib2" -size 0 -delete
 
   check_file_existence
   if [[ $? -eq 0 ]]; then
