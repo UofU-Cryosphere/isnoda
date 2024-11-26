@@ -106,9 +106,9 @@ download_hrrr() {
   printf "  File: ${FILE_NAME}"
 
   # Clean up any old temporary pipes from previous runs
-  find . -type p -name "*_tmp" -delete
+  find . -type p -name "${FILE_NAME}_tmp" -delete
   # Remove any previous downloads of empty grib files
-  find . -type f -name "*.grib2" -size 0 -delete
+  find . -type f -name ${FILE_NAME} -size 0 -delete
 
   check_file_existence
   if [[ $? -eq 0 ]]; then
