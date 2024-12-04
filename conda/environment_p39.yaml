@@ -1,0 +1,25 @@
+name: isnoda
+channels:
+- conda-forge
+dependencies:
+- beautifulsoup4
+- cfgrib
+- cftime=1.5.2
+- coloredlogs
+- cython
+- dateparser=0.7.2
+- make
+- netCDF4
+- numpy<1.23
+- pandas<1.4
+- parallel
+- pip
+- pykrige>1.5
+- python=3.9
+- pytz
+- regex<2021
+- scipy<1.12
+- siphon
+- utm==0.5
+- xarray<2023
+
