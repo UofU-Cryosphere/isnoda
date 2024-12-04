@@ -1,7 +1,6 @@
 name: isnoda
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - beautifulsoup4
   - cfgrib
