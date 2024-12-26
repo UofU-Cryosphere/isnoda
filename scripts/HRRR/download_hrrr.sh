@@ -24,15 +24,17 @@ export HRRR_DAY_HOURS=$(seq 0 23)
 
 export GRIB_AREA="-112.322:-105.628 35.556:43.452"
 # Job control - the defaults require to have 32 CPUs for the job
-## Number of jobs to donwload in parallel
+## Number of jobs to download in parallel
 PARALLEL_JOBS=4
 ## Number of Grib threads
 export GRIB_THREADS="-ncpu 8"
 
+# When adding a new archive, also add the variable to function:
+#  check_alternate_archive
 export UofU_ARCHIVE='UofU'
 export AWS_ARCHIVE='AWS'
 export Google_ARCHIVE='Google'
-export ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE)
+export Azure_ARCHIVE='Azure'
 
 set_archive_url() {
   if [[ ! -v ALT_DATE ]]; then
@@ -47,6 +49,8 @@ set_archive_url() {
       export ARCHIVE_URL="https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.${HRRR_DAY}/conus/${FILE_NAME}"
   elif [ $1 == ${Google_ARCHIVE} ]; then
       export ARCHIVE_URL="https://storage.googleapis.com/high-resolution-rapid-refresh/hrrr.${HRRR_DAY}/conus/${FILE_NAME}"
+  elif [ $1 == ${Azure_ARCHIVE} ]; then
+      export ARCHIVE_URL="https://noaahrrr.blob.core.windows.net/hrrr/hrrr.${HRRR_DAY}/conus/${FILE_NAME}"
   fi
 }
 export -f set_archive_url
@@ -56,8 +60,8 @@ check_file_in_archive() {
   STATUS_CODE=$(curl -s -o /dev/null -I -w "%{http_code}" ${ARCHIVE_URL})
 
   if [ "${STATUS_CODE}" == "404" ]; then
-    >&2 printf " - missing on $1\n"
-    return 1
+    >&2 printf "   missing\n"
+    return 3
   fi
 
   >&2 printf "\n"
@@ -67,12 +71,15 @@ check_file_in_archive() {
 export -f check_file_in_archive
 
 check_alternate_archive() {
+    ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE $Azure_ARCHIVE)
+
+    >&2 printf "  Checking alternate archive: \n"
     for ALT_ARCHIVE in "${ARCHIVES[@]}"; do
       if [[ "${ALT_ARCHIVE}" == "${ARCHIVE}" ]]; then
         continue
       fi
 
-      >&2 printf "    Checking alternate archive:"
+      >&2 printf "   - ${ALT_ARCHIVE}"
       check_file_in_archive ${ALT_ARCHIVE}
       if [ $? -eq 0 ]; then
         return 0
@@ -81,20 +88,17 @@ check_alternate_archive() {
 
     unset ALT_DATE
     touch "${FILE_NAME}.missing"
-    return 1
+    return 3
 }
 export -f check_alternate_archive
 
 check_file_existence(){
-  # Check for existing file and that it is not zero in size
+  # Check for existing file on disk and that it is not zero in size
   if [[ -s "${FILE_NAME}" ]]; then
-    >&1 printf " exists \n"
-    return 0
-  elif [[ -e "${FILE_NAME}.missing" ]]; then
-    >&1 printf " missing in archives \n"
-    return 0
+    >&1 printf "  exists \n"
+    exit 0
   fi
-  return 1
+  return 3
 }
 export -f check_file_existence
 
@@ -103,26 +107,25 @@ download_hrrr() {
   FC_HOUR=$2
   FILE_NAME="hrrr.t$(printf "%02d" $DAY_HOUR)z.wrfsfcf0${FC_HOUR}.grib2"
 
-  printf "  File: ${FILE_NAME}"
+  printf "File: ${FILE_NAME} \n"
 
   # Clean up any old temporary pipes from previous runs
   find . -type p -name "${FILE_NAME}_tmp" -delete
   # Remove any previous downloads of empty grib files
   find . -type f -name ${FILE_NAME} -size 0 -delete
+  # Remove any previously missing files in archives and try again
+  find . -type f -name "${FILE_NAME}.missing" -size 0 -delete
 
   check_file_existence
-  if [[ $? -eq 0 ]]; then
-    return
-  fi
 
   check_file_in_archive ${ARCHIVE}
 
-  if [ $? -eq 1 ]; then
+  if [[ $? -eq 3 ]]; then
     check_alternate_archive
   fi
 
-  if [ $? -eq 1 ]; then
-    >&2 printf "  ** File not available **\n"
+  if [[ $? -eq 3 ]]; then
+    >&2 printf "  ** Forecast hour ${FC_HOUR} not available **\n"
 
     # Try a previous hour of the day when getting the F06 forecast
     if [[ ${FC_HOUR} -eq 6 ]]; then
@@ -133,19 +136,18 @@ download_hrrr() {
       >&2 printf "  ** Checking previous hour: hrrr.${ALT_DATE}/${FILE_NAME}"
 
       check_file_existence
-      if [[ $? -eq 0 ]]; then
-        unset ALT_DATE
-        return
-      fi
-      check_file_in_archive $ARCHIVE
 
-      if [[ $? -eq 1 ]]; then
+      check_file_in_archive ${ARCHIVE}
+
+      if [[ $? -eq 3 ]]; then
         check_alternate_archive
 
-        if [[ $? -eq 1 ]]; then
-          >&2 printf "  ** File not present in previous hour\n"
+        if [[ $? -eq 3 ]]; then
+          >&2 printf "  not available in previous hour\n"
           return
         fi
+      else
+        >&2 printf "   found previous hour\n"
       fi
     else
       return
