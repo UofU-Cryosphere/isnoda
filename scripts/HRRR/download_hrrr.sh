@@ -71,7 +71,7 @@ check_file_in_archive() {
 export -f check_file_in_archive
 
 check_alternate_archive() {
-    ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE)
+    ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE $Azure_ARCHIVE)
 
     >&2 printf "  Checking alternate archive: \n"
     for ALT_ARCHIVE in "${ARCHIVES[@]}"; do
