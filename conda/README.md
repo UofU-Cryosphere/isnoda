@@ -22,7 +22,7 @@ The following steps create a new environment to execute the iSnobal model.
   ./install_isnoda.sh
 ```
 The script takes a user-defined install location as the first argument. The
-default location is: `$HOME/isnoda` if none is provided.
+default location is: `$HOME/iSnobal` if none is provided.
 
 ## Other environments
 ### Basin Setup
