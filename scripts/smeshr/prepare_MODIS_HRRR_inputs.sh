@@ -7,7 +7,7 @@
 # Requires smeshr conda env
 # Usage: ./prepare_MODIS_HRRR_inputs.sh <BASIN_NAME> <WY> <TOPO>
 # Example: prepare_MODIS_HRRR_inputs.sh animas 2022 /full/path/to/topo.nc
-# echo "time prepare_MODIS_HRRR_inputs.sh $BASIN $WY $TOPO 2>&1 | tee prep_${BASIN}_$(date +%Y%m%d_%H%M).log"
+# echo "time prepare_MODIS_HRRR_inputs.sh $BASIN $WY $TOPO 2>&1 | tee prep_${BASIN}_wy${WY}_$(date +%Y%m%d_%H%M).log"
 
 if [[ -n "$CONDA_DEFAULT_ENV" && "$CONDA_DEFAULT_ENV" == "smeshr" ]]; then
   echo "Conda environment 'smeshr' is active."
@@ -35,10 +35,10 @@ echo ; echo verbose is $verbose, realrun is $realrun ; echo
 BASIN=$1
 WY=$2
 YEAR=$(echo "${WY} - 1" | bc)
-# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/blue_river_setup/output_100m/topo.nc
-# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/animas_setup/output_100m/topo.nc
-# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/yampa_setup/output_100m/topo.nc
-# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group1/jmhu/isnobal_scripts/erw_setup/output_100m/topo.nc
+# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group3/jmhu/isnobal_scripts/blue_setup/output_100m/topo.nc
+# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group3/jmhu/isnobal_scripts/animas_setup/output_100m/topo.nc
+# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group3/jmhu/isnobal_scripts/yampa_setup/output_100m/topo.nc
+# TOPO=/uufs/chpc.utah.edu/common/home/skiles-group3/jmhu/isnobal_scripts/erw_setup/output_100m/topo.nc
 TOPO=$3
 RES=100 #default value
 
@@ -172,6 +172,7 @@ if $process_radiation ; then
         if $realrun ; then
             # check for preceding september and process last day only
             if [ ${dt} == ${YEAR}09 ] ; then
+                echo "${dswrf_script} ${TOPO} "hrrr.${dt}30" "hrrr.t*f06.grib2" ${DSWRF_DIR}"
                 ${dswrf_script} ${TOPO} "hrrr.${dt}30" "hrrr.t*f06.grib2" ${DSWRF_DIR}
             else
                 ${dswrf_script} ${TOPO} "hrrr.${dt}*" "hrrr.t*f06.grib2" ${DSWRF_DIR}
