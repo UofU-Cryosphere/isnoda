@@ -24,6 +24,7 @@ export WATER_START_MONTH=10
 export DSWRF_IN=${3}
 export MODIS_IN=${4}
 export DSWRF_OUT=${5}
+export BASIN=$(dirname ${DSWRF_OUT##*SMESHR/})
 export DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
 
 export CDO_COMMAND='cdo -z zip4 -O -s'
@@ -47,6 +48,7 @@ function net_hrrr_for_month() {
 
   echo "  Merge HRRR month"
   MONTH_FILE="${DSWRF_OUT}/dswrf.${MONTH_SELECTOR}.nc"
+  echo "${CDO_COMMAND} ${HRRR_SELECT} [ -mergetime ${DSWRF_IN}/*${LAST_DAY}* ${DSWRF_IN}/*${MONTH_SELECTOR}* ] ${MONTH_FILE}"
   ${CDO_COMMAND} ${HRRR_SELECT} [ -mergetime ${DSWRF_IN}/*${LAST_DAY}* ${DSWRF_IN}/*${MONTH_SELECTOR}* ] ${MONTH_FILE}
 
   if [[ $? != 0 ]]; then
@@ -55,8 +57,9 @@ function net_hrrr_for_month() {
   fi
 
   echo "  Fetch Albedo"
-  MODIS_MONTH="${MODIS_IN}/*${MONTH_SELECTOR}*.nc"
+  MODIS_MONTH="${MODIS_IN}/*${MONTH_SELECTOR}*${BASIN}_24.nc"
   MODIS_MERGE="${DSWRF_OUT}/MODIS.${MONTH_SELECTOR}.nc"
+  echo "${CDO_COMMAND} mergetime ${MODIS_MONTH} ${MODIS_MERGE}"
   ${CDO_COMMAND} mergetime ${MODIS_MONTH} ${MODIS_MERGE}
 
   if [[ $? != 0 ]]; then
@@ -66,6 +69,7 @@ function net_hrrr_for_month() {
 
   echo "  Merge DSWRF and Albedo"
   MERGE_FILE="${DSWRF_OUT}/HRRR_MODIS.${MONTH_SELECTOR}.nc"
+  echo "$CDO_COMMAND merge -selmonth,${MONTH} ${MODIS_MERGE} -selmonth,${MONTH} ${MONTH_FILE} ${MERGE_FILE}"
   $CDO_COMMAND merge -selmonth,${MONTH} ${MODIS_MERGE} -selmonth,${MONTH} ${MONTH_FILE} ${MERGE_FILE}
 
   if [[ $? != 0 ]]; then
@@ -75,6 +79,7 @@ function net_hrrr_for_month() {
 
   echo "  Calculate Net Solar HRRR MODIS"
   MONTH_CALC_FILE="${DSWRF_OUT}/net_HRRR.${MONTH_SELECTOR}.nc"
+  echo "${CDO_COMMAND} -aexpr,"${NET_MATH}" ${MERGE_FILE} ${MONTH_CALC_FILE}"
   ${CDO_COMMAND} -aexpr,"${NET_MATH}" ${MERGE_FILE} ${MONTH_CALC_FILE}
 
   if [[ $? != 0 ]]; then
