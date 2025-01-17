@@ -1,7 +1,6 @@
 name: basin_setup
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - colorama
   - coloredlogs
