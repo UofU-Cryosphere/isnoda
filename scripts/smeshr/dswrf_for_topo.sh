@@ -23,7 +23,6 @@ combine_day() {
   pushd $DAY > /dev/null
 
   TMPF=$DAY.grib2
-
   cat ${HRRR_PATTERN} | wgrib2 - -match "DSWRF:surface" -inv /dev/null -grib $TMPF
 
   hrrr_param_for_topo --topo "${TOPO_FILE}" \
