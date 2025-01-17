@@ -43,17 +43,18 @@ for MONTH in {0..11}; do
 
   echo "Processing: ${YEAR}-${MONTH}"
 
-  # Update the config to the month processed
-  sed -i -e "s/^start_date: .* UTC/start_date: ${YEAR}-${MONTH}-01 00:00:00 UTC/g" ${KATANA_INI}
-  sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" ${KATANA_INI}
+  # Make copy to edit and have as backup
+  MONTH_INI="${KATANA_OUTPUT_DIR}katana_${YEAR}${MONTH}.ini"
+  cp ${KATANA_INI} ${MONTH_INI}
 
-  # Backup the used configuration of the processed month
-  cp ${KATANA_INI} ${KATANA_OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
+  # Update the config to the month processed
+  sed -i -e "s/^start_date: .* UTC/start_date: ${YEAR}-${MONTH}-01 00:00:00 UTC/g" ${MONTH_INI}
+  sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" ${MONTH_INI}
 
   # Map local file paths to container paths
   export SINGULARITY_BIND="${BASIN_SETUP}:/data/topo,${INPUT_DIR}:/data/input,${KATANA_OUTPUT_DIR}:/data/output"
   # Run
-  singularity exec ${KATANA_IMAGE} run_katana ${KATANA_INI} 1>&2
+  singularity exec ${KATANA_IMAGE} run_katana ${MONTH_INI} 1>&2
 
   if [ $? -ne 0 ]; then
     >&2 echo "ERROR processing ${YEAR}${MONTH}"
