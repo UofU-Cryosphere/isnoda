@@ -3,7 +3,6 @@ iSnobal installation in a local conda environment that allows for editing of:
 * [AWSM](https://github.com/USDA-ARS-NWRC/awsm)
 * [SMRF](https://github.com/USDA-ARS-NWRC/smrf)
 * [PySnobal](https://github.com/USDA-ARS-NWRC/pysnobal)
-* [Weather forecast retrieval](https://github.com/USDA-ARS-NWRC/weather_forecast_retrieval) 
 
 ## Conda
 Contains `environment.yml` file and de/activation scripts to setup required
