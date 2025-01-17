@@ -21,16 +21,28 @@ echo ; echo "Running $0 $1 $2" ; echo "    $3" ; echo "    from $(pwd)"
 # Script running flags
 verbose=true
 realrun=true
-process_cloudcover=false
-process_radiation=false
+process_cloudcover=true
+process_radiation=true
 process_albedo=true
 process_netsolar=true
 
-echo ; echo verbose is $verbose, realrun is $realrun ; echo
+if [ "$ENTRY_POINT" = 1 ] ; then
+    process_cloudcover=false
+elif [ "$ENTRY_POINT" = 2 ] ; then
+    process_cloudcover=false
+    process_radiation=false
+elif [ "$ENTRY_POINT" = 3 ] ; then
+    process_cloudcover=false
+    process_radiation=false
+    process_albedo=false
+fi
 
-#==========================================================  
+echo ; echo verbose is $verbose, realrun is $realrun ; echo
+echo $process_cloudcover $process_radiation $process_albedo $process_netsolar
+
+#==========================================================
 #========  Establish variables and directory names ========
-#==========================================================  
+#==========================================================
 # Basin-specific variables
 BASIN=$1
 WY=$2
@@ -58,12 +70,12 @@ MODEL_DIR=/uufs/chpc.utah.edu/common/home/skiles-group3/model_runs/
 # isnoda scripts and repo directory
 ISNODA_DIR=/uufs/chpc.utah.edu/common/home/u6058223/git_dirs/isnoda/
 tcdc_script=${ISNODA_DIR}scripts/smeshr/tcdc_for_topo.sh
-dswrf_script=${ISNODA_DIR}scripts/smeshr/dswrf_for_topo.sh 
+dswrf_script=${ISNODA_DIR}scripts/smeshr/dswrf_for_topo.sh
 generic_albedo_script=${ISNODA_DIR}scripts/smeshr/MODIS-STC/MODIS_albedo_basin.sh
 net_solar_script=${ISNODA_DIR}scripts/smeshr/MODIS-STC/net_dswrf_for_topo_MODIS.sh
 linker_script=${ISNODA_DIR}scripts/smeshr/HRRR_linker.sh
 
-cd ${HRRR_DIR}
+cd ${HRRR_DIR} || exit 1
 
 # Make the basin directory
 if $realrun ; then
@@ -90,7 +102,7 @@ if $process_cloudcover ; then
     if $verbose ; then
         echo "mkdir -pv ${TCDC}"
         echo "mkdir -pv ${TCDC_out}"
-        echo 
+        echo
     fi
 
     # Extract TCDC from HRRR files
@@ -138,9 +150,9 @@ if $process_cloudcover ; then
         ${tcdc_script} ${TOPO} "hrrr.${WY}0*" "hrrr.t*f06.grib2" ${TCDC} ${WY} "3 4 5 6 7 8 9 10 11" ${TCDC_out}
     fi
 
-    echo ; echo " ============== Finished processing HRRR cloud cover ============== " ; echo 
+    echo ; echo " ============== Finished processing HRRR cloud cover ============== " ; echo
 else
-    echo ; echo " ============== Skipping HRRR cloud cover processing ============== " ; echo 
+    echo ; echo " ============== Skipping HRRR cloud cover processing ============== " ; echo
 fi
 
 #==========================================
@@ -157,7 +169,7 @@ if $process_radiation ; then
         fi
     fi
 
-    # Extract SW from HRRR outputs 
+    # Extract SW from HRRR outputs
     # Run for the WY, looping month by month beginning with the last day of the preceding September
     dt=${YEAR}09
     end_dt=${WY}09
@@ -195,7 +207,7 @@ if $process_albedo ; then
     {
         echo "          Formerly: $1"
         echo "          Now: $2"
-        sed -i "s|${1}|${2}|g" $3 
+        sed -i "s|${1}|${2}|g" $3
         echo
     }
 
@@ -216,7 +228,7 @@ if $process_albedo ; then
     maxx=$(echo "${maxx} + ${RES}/2" | bc)
     maxy=$(echo "${maxy} + ${RES}/2" | bc)
 
-    # Put together new extents 
+    # Put together new extents
     extents="${minx} ${miny} ${maxx} ${maxy}"
 
     # Update variables in MODIS_albedo_basin.sh
@@ -247,13 +259,13 @@ fi
 if $process_netsolar ; then
     # Create directory for net solar output files
     if $verbose ; then echo mkdir -v ${NET_SOLAR_DIR} ; echo ; fi
-    if $realrun ; then 
+    if $realrun ; then
         if [ ! -d ${NET_SOLAR_DIR} ] ; then
             mkdir -v ${NET_SOLAR_DIR}
         fi
     fi
 
-    if $verbose ; then 
+    if $verbose ; then
         echo "${net_solar_script} "
         echo "    ${WY} "
         echo '    "0 1 2 3 4 5 6 7 8 9 10 11" '
@@ -262,7 +274,7 @@ if $process_netsolar ; then
         echo "    ${NET_SOLAR_DIR}"
     fi
 
-    if $realrun ; then 
+    if $realrun ; then
         ${net_solar_script} ${WY} "0 1 2 3 4 5 6 7 8 9 10 11" ${DSWRF_DIR} ${ALBEDO_DIR}wy${WY} ${NET_SOLAR_DIR}
     fi
 
@@ -274,10 +286,10 @@ fi
 #===========================================
 #======= Link outputs to iSnobal dir =======
 #===========================================
-# Generate the directory structure 
+# Generate the directory structure
 OUTDIR=${MODEL_DIR}${BASIN}_100m_isnobal/wy${WY}/${BASIN}_basin_100m_solar_albedo/
 if $verbose ; then echo mkdir -pv ${OUTDIR} ; echo ; fi
-if $realrun ; then 
+if $realrun ; then
     if [ ! -d ${OUTDIR} ] ; then
         mkdir -pv ${OUTDIR}
     fi
@@ -286,7 +298,7 @@ fi
 # Loop through the WY and generate run* directories
 # print statements every 30 days
 for d in $(seq 0 364)
-do 
+do
     # Add a spinner
     echo -ne "Processing day $d\r"
     sleep 0.001
@@ -295,18 +307,18 @@ do
             echo "    mkdir run$(date -d "${YEAR}-10-01 +$d days" +%Y%m%d)"
         fi
     fi
-    if $realrun ; then 
-        mkdir ${OUTDIR}run$(date -d "${YEAR}-10-01 +$d days" +%Y%m%d) ; 
+    if $realrun ; then
+        mkdir ${OUTDIR}run$(date -d "${YEAR}-10-01 +$d days" +%Y%m%d) ;
     fi
 done
 echo ; echo
 
 # Link net_solar outputs to these run* dirs using HRRR_linker.sh
 # test verbose flag only if realrun=false to avoid excess output
-if $realrun ; then 
+if $realrun ; then
     ${linker_script} "${OUTDIR}run*" "${NET_SOLAR_DIR}" "net_solar.nc"
 else
-    if $verbose ; then 
+    if $verbose ; then
         echo ${linker_script}
         echo "    ${OUTDIR}run*"
         echo "    ${NET_SOLAR_DIR}"
@@ -315,10 +327,10 @@ else
 fi
 
 # Link the cloud cover outputs as well
-if $verbose ; then 
+if $verbose ; then
     echo ${linker_script}
     echo "    ${OUTDIR}run*"
     echo "    ${TCDC_out}"
-    echo "    cloud_factor.nc" 
+    echo "    cloud_factor.nc"
 fi
 if $realrun ; then ${linker_script} "${OUTDIR}run*" "${TCDC_out}" "cloud_factor.nc" ; fi
