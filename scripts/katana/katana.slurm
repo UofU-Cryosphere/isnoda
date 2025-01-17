@@ -59,6 +59,7 @@ for MONTH in {0..11}; do
     >&2 echo "ERROR processing ${YEAR}${MONTH}"
     continue
   fi
+done
 
   # Unused  katana output files by iSnobal
   find ${KATANA_OUTPUT_DIR} -name *.prj -type f -delete
@@ -66,4 +67,3 @@ for MONTH in {0..11}; do
   ## Unused temporary grib files created by katana
   find ${KATANA_OUTPUT_DIR} -name *.grib2 -type f -delete
   find ${KATANA_OUTPUT_DIR} -name hrrr.* -type d -empty -delete
-done
