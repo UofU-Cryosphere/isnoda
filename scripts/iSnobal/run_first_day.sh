@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-#
-# Run for given day. Date format: 2017-10-01 00:00
+# Run iSnobal for the first day of the simulation
+# Usage: run_first_day.sh <config_file> <start_date>
+# Example: run_first_day.sh /path/to/awsm.ini 2017-10-01
 
-source load_conda_env isnoda
+awsm_ini=$1
+start=$2
 
 # Initial run, no previous days
-awsm_daily_airflow -c ${HOME}/project-data/iSnobal/ERW/ERW_subset_awsm_$(date -d "${1} + 1 year" +%Y).ini \
-  --no_previous \
-  --start_date $1
+awsm_daily_airflow -c "${awsm_ini}" \
+  --start_date "${start}" \
+  --no_previous
