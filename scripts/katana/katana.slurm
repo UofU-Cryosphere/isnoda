@@ -15,26 +15,22 @@
 #SBATCH --output=slurm-%j.out-%N
 #SBATCH --error=slurm-%j.err-%N
 
+# Load the singularity module
+ml singularity
+
 export OMP_NUM_THREADS=${SLURM_NTASKS}
 
 START_YEAR=2019
 START_MONTH=10
 
 ## Update these variables with the actual paths ##
-INPUT_DIR=${HOME}/skiles-group1/HRRR_CBR/
-
 BASIN_SETUP=/path/to/basin_setup/
-
-KATANA_DIR=/path/to/katana/config_and_image/
+INPUT_DIR=/path/to/HRRR
 KATANA_OUTPUT_DIR=/path/to/katana/output/
 
-# Set the below to 1 and update path if backups should be created as part
-# of this job.
-# This also requires an environment that has the pbzip2 command installed.
-ARCHIVE_OUTPUT=0
-KATANA_ARCHIVE_DIR=/path/to/katana/output_backup/
+KATANA_INI=/path/to/katana.ini
+KATANA_IMAGE=/path/to/katana.sif
 ## -------------------------------------------- ##
-KATANA_INI=${KATANA_DIR}/katana.ini
 
 for MONTH in {0..11}; do
   START=($(date -d "${START_MONTH}/01/${START_YEAR} + ${MONTH} month" "+%m %Y"))
@@ -47,21 +43,24 @@ for MONTH in {0..11}; do
 
   echo "Processing: ${YEAR}-${MONTH}"
 
+  # Make copy to edit and have as backup
+  MONTH_INI="${KATANA_OUTPUT_DIR}katana_${YEAR}${MONTH}.ini"
+  cp ${KATANA_INI} ${MONTH_INI}
+
   # Update the config to the month processed
-  sed -i -e "s/^start_date: .* UTC/start_date: ${YEAR}-${MONTH}-01 00:00:00 UTC/g" ${KATANA_INI}
-  sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" ${KATANA_INI}
+  sed -i -e "s/^start_date: .* UTC/start_date: ${YEAR}-${MONTH}-01 00:00:00 UTC/g" ${MONTH_INI}
+  sed -i -e "s/^end_date: .* UTC/end_date: ${YEAR_END}-${MONTH_END}-01 00:00:00 UTC/g" ${MONTH_INI}
 
-  # Backup the used configuration of the processed month
-  cp ${KATANA_INI} ${KATANA_OUTPUT_DIR}katana_${YEAR}${MONTH}.ini
-
-  ${KATANA_DIR}/katana_singularity.sh ${BASIN_SETUP} \
-    ${INPUT_DIR} \
-    ${KATANA_OUTPUT_DIR} 1>&2
+  # Map local file paths to container paths
+  export SINGULARITY_BIND="${BASIN_SETUP}:/data/topo,${INPUT_DIR}:/data/input,${KATANA_OUTPUT_DIR}:/data/output"
+  # Run
+  singularity exec ${KATANA_IMAGE} run_katana ${MONTH_INI} 1>&2
 
   if [ $? -ne 0 ]; then
     >&2 echo "ERROR processing ${YEAR}${MONTH}"
     continue
   fi
+done
 
   # Unused  katana output files by iSnobal
   find ${KATANA_OUTPUT_DIR} -name *.prj -type f -delete
@@ -69,17 +68,3 @@ for MONTH in {0..11}; do
   ## Unused temporary grib files created by katana
   find ${KATANA_OUTPUT_DIR} -name *.grib2 -type f -delete
   find ${KATANA_OUTPUT_DIR} -name hrrr.* -type d -empty -delete
-
-  if [ $ARCHIVE_OUTPUT -eq 1 ]; then
-    echo "  Archiving"
-    ARCHIVE=katana-${YEAR}${MONTH}.tar.bz2
-
-    cd ${KATANA_OUTPUT_DIR}
-
-    find data${YEAR}${MONTH}[0-3][0-9] -name *hrrr* -delete
-    find data${YEAR}${MONTH}[0-3][0-9] -name *.prj -delete
-
-    tar -I pbzip2 -cf ${KATANA_ARCHIVE_DIR_DIR}${ARCHIVE} data${YEAR}${MONTH}[0-3][0-9]
-    cp katana.log katana_${YEAR}${MONTH}.log
-  fi
-done
