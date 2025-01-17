@@ -48,7 +48,7 @@ elif [ ! -e ${DSWRF_DIR}/hrrr.${LAST_DAY}.dswrf.nc ]; then
     echo "*************************************************************"
     export ENTRY_POINT=1
     exit 1
-elif [ ! -e ${ALBEDO_DIR}/wy${WY}/westernUS_Terra_${LAST_DAY}_*albedo_${BASIN}_24.nc ]; then
+elif [ ! -n "$(ls ${ALBEDO_DIR}/wy${WY}/westernUS_Terra_${LAST_DAY}_*albedo_${BASIN}_24.nc)" ]; then
     echo "*************************************************************"
     echo "Last day of WY missing: ${ALBEDO_DIR}/wy${WY}/westernUS_Terra_${LAST_DAY}_*albedo_${BASIN}_24.nc"
     echo " for MODIS albedo outputs <ALBEDO_DIR> for ${BASIN} ${WY}"
@@ -72,7 +72,7 @@ elif [ ! -e ${NET_SOLAR_DIR}/net_dswrf.MST.${LAST_DAY}.nc ]; then
 else
     BASIN_CAP=$(echo $BASIN | tr '[:lower:]' '[:upper:]')
     echo ; echo "All SMESHR outputs (and HRRR-MODIS modified inputs) found for" ; echo
-    echo "                 == ${BASIN_CAP} WY ${WY} ==" ; echo 
+    echo "                 == ${BASIN_CAP} WY ${WY} ==" ; echo
     ls ${TCDC_out}/tcdc.MST.${LAST_DAY}.nc
     ls ${DSWRF_DIR}/hrrr.${LAST_DAY}.dswrf.nc
     ls ${ALBEDO_DIR}/wy${WY}/westernUS_Terra_${LAST_DAY}_*albedo_${BASIN}_24.nc
