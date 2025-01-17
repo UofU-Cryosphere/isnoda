@@ -28,7 +28,7 @@ combine_day() {
 
   hrrr_param_for_topo --topo "${TOPO_FILE}" \
                       --hrrr_in $TMPF \
-                      --nc_out "${NC_OUT_PREFIX}_${DAY}.dswrf.nc" \
+                      --nc_out "${NC_OUT_PREFIX}${DAY}.dswrf.nc" \
                       --add-shading
 
   rm $TMPF
