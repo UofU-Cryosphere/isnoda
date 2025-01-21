@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # Script to install all required components from GitHub repositories.
+# Requires to have a fully setup and activated conda environment.
 #
-# These components are installed with the latest from the master branch:
+# The below components are installed with the latest from the master branch:
 #  - AWSM (University of Utah)
 #  - SMRF (University of Utah)
 #  - PySnobal (ARS)
-#  - Weather Forecast Retrieval (University of Utah)
+#  - TopoCalc (ARS)
 #
 # Other packages are installed via the latest available version as pip package.
 # 
-# Install location is given via the first parameter or defaults to $HOME/isnoda
+# Install location is given via the first parameter or defaults to $HOME/iSnobal
 
 set -e
 
@@ -20,14 +21,14 @@ cd $ISNODA_HOME
 
 ######
 # GitHub repositories
-# Will install from source
+# Will install from source and editable
 ######
 
 declare -a repositories=(
   "https://github.com/UofU-Cryosphere/awsm.git"
   "https://github.com/UofU-Cryosphere/smrf.git"
   "https://github.com/USDA-ARS-NWRC/pysnobal.git"
-  "https://github.com/UofU-Cryosphere/weather_forecast_retrieval.git"
+  "https://github.com/USDA-ARS-NWRC/topocalc.git"
 )
 
 for repository in "${repositories[@]}"
@@ -48,16 +49,15 @@ do
 done
 
 #######
-# ISNOBAL components not available via conda package
+# iSnobal components not available via conda package
 #######
 
 declare -a packages=(
   "inicheck"
   "spatialnc"
-  "topocalc"
 )
 
 for package in "${packages[@]}"
 do
-  pip install --no-deps ${package}
+  pip install ${package}
 done
