@@ -16,13 +16,16 @@
 # List days after a download, where there are not 48 files for a day:
 # find -L . -name *.grib2 -type f | cut -d/ -f2 | uniq -c | grep -v '48 ' | tr -s ' ' | cut -d '.' -f 2
 #
-set -e
-
 
 export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|DLWRF:surface|HGT:surface'
-cd /uufs/chpc.utah.edu/common/home/skiles-group3/HRRR_CBR
-ml wgrib2 
  
+if [ -z "${LMOD_VERSION}" ]; then
+  source /uufs/chpc.utah.edu/sys/etc/profile.d/module.sh
+fi
+
+cd /uufs/chpc.utah.edu/common/home/skiles-group3/HRRR_CBR || exit
+ml wgrib2
+
 export HRRR_FC_HOURS=(1 6)
 export HRRR_DAY_HOURS=$(seq 0 23)
 
@@ -63,7 +66,6 @@ export -f set_archive_url
 check_file_in_archive() {
   set_archive_url $1
   STATUS_CODE=$(curl -s -o /dev/null -I -w "%{http_code}" ${ARCHIVE_URL})
-
   if [ "${STATUS_CODE}" == "404" ]; then
     >&2 printf "   missing\n"
     return 3
@@ -121,7 +123,7 @@ export -f get_grib_range
 download_hrrr() {
   DAY_HOUR=$1
   FC_HOUR=$2
-  FILE_NAME="hrrr.t$(printf "%02d" $DAY_HOUR)z.wrfsfcf0${FC_HOUR}.grib2"
+  FILE_NAME="hrrr.t$(printf '%02d' $DAY_HOUR)z.wrfsfcf0${FC_HOUR}.grib2"
 
   printf "File: ${FILE_NAME} \n"
 
