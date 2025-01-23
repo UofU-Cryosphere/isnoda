@@ -7,7 +7,6 @@
 
 SOURCE_FILE=$1
 CREATED_FILE=$2
-SOURCE_HOUR=7
 CREATED_HOUR=6
 
 # Grab non-precip fields
