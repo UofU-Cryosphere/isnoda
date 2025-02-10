@@ -54,7 +54,7 @@ def slurm_script(client):
 @contextmanager
 def run_with_client(cores, memory):
     client = start_cluster(cores, memory)
-    print(client.dashboard_link)
+    print(client_ip_and_port(client))
     try:
         yield client
     finally:
