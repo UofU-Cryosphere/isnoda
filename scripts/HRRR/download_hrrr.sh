@@ -103,6 +103,17 @@ check_file_existence(){
 }
 export -f check_file_existence
 
+get_grib_range(){
+  INDEX_FILE="${1}.idx"
+  RANGE_GREP="grep -A 1 -B 1 "
+
+  INDEX_FILE=$(curl -s "${ARCHIVE_URL}.idx")
+
+  export MIN_RANGE=$(echo "${INDEX_FILE}" | ${RANGE_GREP} -E "${HRRR_VARS}" | cut -d ":" -f 2 | head -n 1)
+  export MAX_RANGE=$(echo "${INDEX_FILE}" | ${RANGE_GREP} -E "${HRRR_VARS}" | cut -d ":" -f 2 | tail -n 1)
+}
+export -f get_grib_range
+
 download_hrrr() {
   DAY_HOUR=$1
   FC_HOUR=$2
@@ -158,10 +169,13 @@ download_hrrr() {
   TMP_FILE="${FILE_NAME}_tmp"
   mkfifo $TMP_FILE
 
+  # Reduce download size of GRIB file by requesting a specific range
+  get_grib_range ${FILE_NAME}
+
   printf '\n'
-  wget -q --no-check-certificate ${ARCHIVE_URL} -O $TMP_FILE | \
+  curl -s --range ${MIN_RANGE}-${MAX_RANGE} ${ARCHIVE_URL} -o $TMP_FILE | \
   wgrib2 $TMP_FILE -v0 ${GRIB_THREADS} -set_grib_type same -small_grib ${GRIB_AREA} - | \
-  wgrib2 - -v0 ${GRIB_THREADS} -match "$HRRR_VARS" -grib $FILE_NAME >&1
+  wgrib2 - -v0 ${GRIB_THREADS} -match "${HRRR_VARS}" -grib $FILE_NAME >&1
 
   rm $TMP_FILE
 
