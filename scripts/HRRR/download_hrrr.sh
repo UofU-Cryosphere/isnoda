@@ -22,7 +22,8 @@ export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface
 export HRRR_FC_HOURS=(1 6)
 export HRRR_DAY_HOURS=$(seq 0 23)
 
-export GRIB_AREA="-112.322:-105.628 35.556:43.452"
+# Western United States from Denver West
+export GRIB_AREA="-122.00:-105.00 32.00:49.00"
 # Job control - the defaults require to have 32 CPUs for the job
 ## Number of jobs to download in parallel
 PARALLEL_JOBS=4
