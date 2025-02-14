@@ -156,13 +156,13 @@ download_hrrr() {
 
         if [[ $? -eq 3 ]]; then
           >&2 printf "  not available in previous hour\n"
-          return
+          exit 0
         fi
       else
         >&2 printf "   found previous hour\n"
       fi
     else
-      return
+      exit 0
     fi
   fi
 
