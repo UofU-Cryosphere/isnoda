@@ -26,9 +26,9 @@ export HRRR_DAY_HOURS=$(seq 0 23)
 export GRIB_AREA="-122.00:-105.00 32.00:49.00"
 # Job control - the defaults require to have 32 CPUs for the job
 ## Number of jobs to download in parallel
-PARALLEL_JOBS=4
+PARALLEL_JOBS=16
 ## Number of Grib threads
-export GRIB_THREADS="-ncpu 8"
+export GRIB_THREADS="-ncpu 2"
 
 # When adding a new archive, also add the variable to function:
 #  check_alternate_archive
