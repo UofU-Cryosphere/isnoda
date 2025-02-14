@@ -18,16 +18,17 @@
 #
 set -e
 
-export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|HGT:surface'
+export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|DLWRF:surface|HGT:surface'
 export HRRR_FC_HOURS=(1 6)
 export HRRR_DAY_HOURS=$(seq 0 23)
 
-export GRIB_AREA="-112.322:-105.628 35.556:43.452"
+# Western United States from Denver West
+export GRIB_AREA="-122.00:-105.00 32.00:49.00"
 # Job control - the defaults require to have 32 CPUs for the job
 ## Number of jobs to download in parallel
-PARALLEL_JOBS=4
+PARALLEL_JOBS=16
 ## Number of Grib threads
-export GRIB_THREADS="-ncpu 8"
+export GRIB_THREADS="-ncpu 2"
 
 # When adding a new archive, also add the variable to function:
 #  check_alternate_archive
@@ -102,6 +103,17 @@ check_file_existence(){
 }
 export -f check_file_existence
 
+get_grib_range(){
+  INDEX_FILE="${1}.idx"
+  RANGE_GREP="grep -A 1 -B 1 "
+
+  INDEX_FILE=$(curl -s "${ARCHIVE_URL}.idx")
+
+  export MIN_RANGE=$(echo "${INDEX_FILE}" | ${RANGE_GREP} -E "${HRRR_VARS}" | cut -d ":" -f 2 | head -n 1)
+  export MAX_RANGE=$(echo "${INDEX_FILE}" | ${RANGE_GREP} -E "${HRRR_VARS}" | cut -d ":" -f 2 | tail -n 1)
+}
+export -f get_grib_range
+
 download_hrrr() {
   DAY_HOUR=$1
   FC_HOUR=$2
@@ -144,23 +156,26 @@ download_hrrr() {
 
         if [[ $? -eq 3 ]]; then
           >&2 printf "  not available in previous hour\n"
-          return
+          exit 0
         fi
       else
         >&2 printf "   found previous hour\n"
       fi
     else
-      return
+      exit 0
     fi
   fi
 
   TMP_FILE="${FILE_NAME}_tmp"
   mkfifo $TMP_FILE
 
+  # Reduce download size of GRIB file by requesting a specific range
+  get_grib_range ${FILE_NAME}
+
   printf '\n'
-  wget -q --no-check-certificate ${ARCHIVE_URL} -O $TMP_FILE | \
+  curl -s --range ${MIN_RANGE}-${MAX_RANGE} ${ARCHIVE_URL} -o $TMP_FILE | \
   wgrib2 $TMP_FILE -v0 ${GRIB_THREADS} -set_grib_type same -small_grib ${GRIB_AREA} - | \
-  wgrib2 - -v0 ${GRIB_THREADS} -match "$HRRR_VARS" -grib $FILE_NAME >&1
+  wgrib2 - -v0 ${GRIB_THREADS} -match "${HRRR_VARS}" -grib $FILE_NAME >&1
 
   rm $TMP_FILE
 
