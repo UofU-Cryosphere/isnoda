@@ -16,6 +16,5 @@ else
 fi
 
 # Initial run, no previous days
-awsm_daily_airflow -c "${awsm_ini}" \
-  --start_date "${start}" \
-  --no_previous
+awsm -c ${awsm_ini} --start_date ${start} -np
+
