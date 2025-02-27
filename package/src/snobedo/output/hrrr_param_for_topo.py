@@ -36,6 +36,15 @@ def argument_parser():
         action=argparse.BooleanOptionalAction,
         help='Add calculated topographic shading to netCDF output as variable.'
     )
+    parser.add_argument(
+        '--resample', '-r',
+        required=False,
+        type=str,
+        choices=["nearest", "bilinear", "cubic", "cubic_spline", "lanczos", "average", "mode"],
+        help='Optional: Choose the resampling algorithm for warping HRRR data. \n'
+             'Options: nearest, bilinear, cubic, cubic_spline, lanczos, average, mode. \n'
+             'If not specified, the default GDAL resampling method is used.'
+    )
 
     return parser
 
@@ -53,7 +62,8 @@ def main():
     if arguments.hrrr_in:
         hrrr_in = arguments.hrrr_in.as_posix()
 
-    hrrr_param = HrrrParameter(arguments.topo.as_posix(), hrrr_in)
+    # Pass the optional resampling method (defaults to None if not specified)
+    hrrr_param = HrrrParameter(arguments.topo.as_posix(), hrrr_in, resample_method=arguments.resample)
     hrrr_param.save(arguments.nc_out)
 
     if arguments.add_shading:

@@ -10,9 +10,10 @@ class HrrrParameter:
     VSISTDIN = '/vsistdin/'
     MEM_TIFF = '/vsimem/grib_%i.tif'
 
-    def __init__(self, topo_file_path, grib_file_path=None):
+    def __init__(self, topo_file_path, grib_file_path=None, resample_method=None): #
         self._topo_file = topo_file_path
         self._mem_tif = self.MEM_TIFF % random.getrandbits(32)
+        self.resample_method = resample_method #
         self.grib_file = grib_file_path
         self._time_range = []
 
@@ -68,12 +69,27 @@ class HrrrParameter:
         spatial_info = osr.SpatialReference()
         spatial_info.SetFromUserInput(topo.GetProjection())
 
+        # Mapping from string input to GDAL resampling algorithms
+        resampling_methods = {
+            "nearest": gdal.GRA_NearestNeighbour,
+            "bilinear": gdal.GRA_Bilinear,
+            "cubic": gdal.GRA_Cubic,
+            "cubic_spline": gdal.GRA_CubicSpline,
+            "lanczos": gdal.GRA_Lanczos,
+            "average": gdal.GRA_Average,
+            "mode": gdal.GRA_Mode,
+        }
+
+        # Use user-specified resampling method if provided, else keep default behavior
+        resample_alg = resampling_methods.get(self.resample_method.lower()) if self.resample_method else None
+
         options = gdal.WarpOptions(
             dstSRS=self.gdal_osr_authority(spatial_info),
             outputBoundsSRS=self.gdal_osr_authority(spatial_info),
             outputBounds=self.gdal_output_bounds(topo),
             xRes=topo.GetGeoTransform()[1],
             yRes=topo.GetGeoTransform()[1],
+            resampleAlg=resample_alg, # Use selected resampling method
             multithread=True,
         )
 
