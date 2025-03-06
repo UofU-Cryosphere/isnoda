@@ -3,16 +3,18 @@
 # University of Utah
 # Feb 2025
 # Script to compress the snow.nc and em.nc output files from iSnobal runs
+# TODO: add option to specify variables to compress
 
 set -e
 
 function display_help() {
-   echo "Usage: $(basename $0) <dirpath>"
+   echo "Usage: $(basename $0) <dirpath> <dir_pattern>"
    echo "Description: This script compresses the snow.nc and em.nc output files from iSnobal runs."
    echo "Arguments:"
    echo "  dir: Path to directory containing daily run folders. Defaults to current directory."
+   echo "  dir_pattern: Regex pattern to match for run directories. Defaults to 'run'"
    echo
-   echo "Example: $(basename $0) model_runs/animas_100m_isnobal/wy2021/animas_basin_100m/"
+   echo "Example: $(basename $0) model_runs/animas_100m_isnobal/wy2021/animas_basin_100m run20201"
 }
 if [[ $1 == "--help" || $1 == "-h" ]]; then
    display_help
@@ -23,15 +25,18 @@ ml cdo
 
 # if no input detected, use current directory
 if [ -z "$1" ]; then
-	thisdir=./
+	thisdir="./"
+	runpattern="run"
 else
 	thisdir=$1
+	runpattern=$2
 fi
+
 for outvar in snow em
 do
-	parallel --plus --jobs 4 "echo cdo -P 4 -z zip_4 merge {} {/.nc/_c.nc} ; cdo -P 4 -z zip_4 merge {} {/.nc/_c.nc}" ::: "$thisdir"/run*/${outvar}.nc
+	parallel --plus --jobs 4 "echo cdo -P 4 -z zip_4 merge {} {/.nc/_c.nc} ; cdo -P 4 -z zip_4 merge {} {/.nc/_c.nc}" ::: "${thisdir}"/*${runpattern}*/${outvar}.nc
 	# Rename the compressed files to the original filename
-	for f in "$thisdir"/run*/"${outvar}"_c.nc
+	for f in $thisdir/*${runpattern}*/${outvar}_c.nc
 	do
 		echo mv "$f" "${f%_*}".nc
 		mv "$f" "${f%_*}".nc
