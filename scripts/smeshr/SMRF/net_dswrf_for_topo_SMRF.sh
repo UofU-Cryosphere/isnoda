@@ -22,7 +22,7 @@ export WATER_START_MONTH=10
 export DSWRF_IN=${3}
 export SMRF_IN=${4}
 export DSWRF_OUT=${5}
-export BASIN_DAY_MST="${DSWRF_OUT}/net_dswrf.MST"
+export BASIN_DAY_MST="${DSWRF_OUT}/net_dswrf.UTC"
 
 export CDO_COMMAND='cdo -z zip4 -O'
 export HRRR_SELECT="-select,name=illumination_angle,DSWRF"
@@ -32,7 +32,7 @@ albedo=(0.67*albedo_vis)+(0.33*albedo_ir);\
 net_solar=(1-albedo)*illumination_angle*DSWRF;\
 "
 
-# Merge by month to get one file per day starting at midnight MST.
+# Merge by month to get one file per day starting at midnight UTC.
 # The 6-hour forecast requires to add the last day of the previous month
 function net_hrrr_for_month() {
   pushd "${DSWRF_OUT}" || exit
@@ -80,7 +80,7 @@ function net_hrrr_for_month() {
   MONTH_CALC_FILE="${DSWRF_OUT}/net_HRRR.${MONTH_SELECTOR}.nc"
   ${CDO_COMMAND} -aexpr,"${NET_MATH}" ${MERGE_FILE} ${MONTH_CALC_FILE}
 
-  echo "  Split by day MST"
+  echo "  Split by day UTC"
   ${CDO_COMMAND} splitday ${MONTH_CALC_FILE} ${BASIN_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then

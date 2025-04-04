@@ -28,7 +28,7 @@ export DLWRF_IN=${3}
 export TAIR_IN=${4}
 export TOPO=${5}
 export DLWRF_OUT=${6}
-export DAY_MST="${DLWRF_OUT}/adjusted_dlwrf.MST"
+export DAY_MST="${DLWRF_OUT}/adjusted_dlwrf.UTC"
 
 export CDO_COMMAND='cdo -z zip4 -O -s'
 export HRRR_SELECT="-select,name=DLWRF"
@@ -43,7 +43,7 @@ FREEZE=273.16
 
 export NET_MATH="thermal=(DLWRF*sky_view_factor) + (1.0 - sky_view_factor)*$EMISS_SNOW*$STEF_BOLTZ*(air_temp+$FREEZE)^4;"
 
-# Merge by month to get one file per day starting at midnight MST.
+# Merge by month to get one file per day starting at midnight UTC.
 # The 6-hour forecast requires to add the last day of the previous month
 function net_hrrr_for_month() {
   pushd "${DLWRF_OUT}" || exit
@@ -108,7 +108,7 @@ function net_hrrr_for_month() {
     exit 1
   fi
 
-  echo "  Split by day MST"
+  echo "  Split by day UTC"
   ${CDO_COMMAND} splitday ${ADJUSTED_SELECT} ${MONTH_CALC_FILE} ${DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then
