@@ -6,7 +6,7 @@
 # Arguments:
 #   ./dswrf_for_topo.sh <TOPO> <FOLDER_PATTERN> <HRRR_FILE_PATTERN> <OUTPUT_PATH_WITH_PREFIX>
 # Sample call:
-#   ./dswrf_for_topo.sh /path/to/topo "hrrr.YYYYMM*" "hrrr.t*.f06.grib2" "/write/to/here/file_prefix"
+#   ./dswrf_for_topo.sh /path/to/topo "hrrr.YYYYMM*" "hrrr.t*f06.grib2" "/write/to/here/file_prefix"
 #
 
 # For wgrib
