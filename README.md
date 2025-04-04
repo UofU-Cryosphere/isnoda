@@ -14,12 +14,6 @@ env variables. Also has an install script to download the above components
 
 Backup of configuration files.
 
-## Docs
-
-Install instructions for:
-* [IPW](https://github.com/USDA-ARS-NWRC/ipw) on Mac OS and Linux environments.  
-* [basin setup](https://github.com/USDA-ARS-NWRC/basin_setup) from source on Linux.
-
 ## Notebooks
 
 Collection of Jupyter notebooks for mostly output analysis.
