@@ -1,8 +1,9 @@
 # iSnoda
 iSnobal installation in a local conda environment that allows for editing of:
-* [AWSM](https://github.com/USDA-ARS-NWRC/awsm)
-* [SMRF](https://github.com/USDA-ARS-NWRC/smrf)
+* [AWSM](https://github.com/UofU-Cryosphere/awsm)
+* [SMRF](https://github.com/UofU-Cryosphere/smrf)
 * [PySnobal](https://github.com/USDA-ARS-NWRC/pysnobal)
+* [TopoCalc](https://github.com/USDA-ARS-NWRC/topocalc)
 
 ## Conda
 Contains `environment.yml` file and de/activation scripts to setup required
