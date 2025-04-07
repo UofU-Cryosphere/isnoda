@@ -1,9 +1,9 @@
 # iSnoda
 iSnobal installation in a local conda environment that allows for editing of:
-* [AWSM](https://github.com/USDA-ARS-NWRC/awsm)
-* [SMRF](https://github.com/USDA-ARS-NWRC/smrf)
+* [AWSM](https://github.com/UofU-Cryosphere/awsm)
+* [SMRF](https://github.com/UofU-Cryosphere/smrf)
 * [PySnobal](https://github.com/USDA-ARS-NWRC/pysnobal)
-* [Weather forecast retrieval](https://github.com/USDA-ARS-NWRC/weather_forecast_retrieval) 
+* [TopoCalc](https://github.com/USDA-ARS-NWRC/topocalc)
 
 ## Conda
 Contains `environment.yml` file and de/activation scripts to setup required
@@ -13,12 +13,6 @@ env variables. Also has an install script to download the above components
 ## Config
 
 Backup of configuration files.
-
-## Docs
-
-Install instructions for:
-* [IPW](https://github.com/USDA-ARS-NWRC/ipw) on Mac OS and Linux environments.  
-* [basin setup](https://github.com/USDA-ARS-NWRC/basin_setup) from source on Linux.
 
 ## Notebooks
 
