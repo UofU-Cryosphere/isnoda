@@ -2,7 +2,7 @@
 # Does the following sequence:
 # * Extract TCDC from given HRRR files for given topo extent
 # * Calculates the cloud factor in format expected by iSnobal
-# * Creates daily output files organized in MST time zone
+# * Creates daily output files organized in UTC time zone
 #
 # NOTES:
 # - First argument needs to be in quotes to prevent shell expansion
@@ -51,7 +51,7 @@ get_day() {
 export -f get_day
 parallel --tag --line-buffer --jobs ${OMP_NUM_THREADS} get_day ::: ${HRRR_GLOB}
 
-## Part 2 - Organize by MST
+## Part 2 - Organize by UTC
 
 ## Reduce overload on disk with too many parallel processes
 export OMP_NUM_THREADS=4
@@ -67,7 +67,7 @@ export WATER_START_MONTH=10
 export TCDC_IN=${4}
 export TCDC_OUT=${7}
 
-# Merge by month to get one file per day starting at midnight MST.
+# Merge by month to get one file per day starting at midnight UTC.
 # The 6-hour forecast requires to add the last day of the previous month
 function tcdc_for_month() {
   CDO_COMMAND='cdo -z zip4 -O'
@@ -77,7 +77,7 @@ function tcdc_for_month() {
   # Need to add the 'hrrr' back in as it stems from the HRRR folder pattern
   TCDC_IN="${TCDC_IN}hrrr"
   BASIN_MONTH="${TCDC_OUT}/BASIN_TCDC"
-  BASIN_DAY_MST="${TCDC_OUT}/tcdc.MST"
+  BASIN_DAY_MST="${TCDC_OUT}/tcdc.UTC"
 
   pushd "${TCDC_OUT}" || exit
 
@@ -100,7 +100,7 @@ function tcdc_for_month() {
     exit 1
   fi
 
-  echo "  Split by day MST and convert to fraction"
+  echo "  Split by day UTC and convert to fraction"
   ${CDO_COMMAND} splitday -selmonth,${MONTH} -expr,"${CDO_MATH}" ${MONTH_FILE} ${BASIN_DAY_MST}.${MONTH_SELECTOR}
 
   if [[ $? != 0 ]]; then

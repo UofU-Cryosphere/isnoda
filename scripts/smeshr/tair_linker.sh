@@ -16,7 +16,7 @@ for dir in "${BASIN_DIR}"/run[0-9]*; do
     if [ -d "$dir" ]; then
         RUN_DATE=$(basename "$dir")
 	SRC_FILE="$dir/air_temp.nc"
-	OUT_FILE="${OUTPUT_DIR}/air_temp.${RUN_DATE}.MST.nc"
+	OUT_FILE="${OUTPUT_DIR}/air_temp.${RUN_DATE}.UTC.nc"
 
 	if [ -f "${SRC_FILE}" ]; then
 	   ln -s "${SRC_FILE}" "${OUT_FILE}"

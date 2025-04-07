@@ -13,6 +13,6 @@ for DAY in $1; do
   pushd $DAY || exit 1
   # get date in YYYYMMDD format
   DAY=$(echo $(basename $DAY) | sed 's/\//./g' | sed 's/run//g' );
-  ln -fsv ${2}/*.MST.$DAY.nc $3
+  ln -fsv ${2}/*.UTC.$DAY.nc $3
   popd
 done
