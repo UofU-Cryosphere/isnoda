@@ -96,6 +96,8 @@ if $process_cloudcover ; then
     if $realrun ; then
         if [ ! -d ${TCDC} ] ; then
             mkdir -pv ${TCDC}
+        fi
+        if [ ! -d ${TCDC_out} ] ; then
             mkdir -pv ${TCDC_out}
         fi
     fi
