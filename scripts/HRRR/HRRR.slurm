@@ -33,13 +33,14 @@ module use $HOME/MyModules
 module load miniconda3/latest
 conda activate work
 
-cd /uufs/chpc.utah.edu/common/home/skiles-group3/HRRR_CBR
+# cd /uufs/chpc.utah.edu/common/home/uvu-group1/olson/snow-data/HRRR
+cd /uufs/chpc.utah.edu/common/home/skiles-group3/HRRR_CBR || exit
 download_script=${HOME}/git_dirs/isnoda/scripts/HRRR/download_hrrr.sh
 # cd /uufs/chpc.utah.edu/common/home/skiles-group3/HRRR_feather
 # download_script=${HOME}/git_dirs/isnoda/scripts/HRRR/download_hrrr_feather.sh
 
-YEAR=2024
-MONTH=09
+YEAR=2025
+MONTH=03
 
 for NEXT in {0..1}; do
   CURRENT_MONTH=($(date -d "${YEAR}/${MONTH}/01 + ${NEXT} month" "+%m %Y"))
@@ -58,4 +59,3 @@ done
 
 # Move log files to log dir
 mv slurm-${SLURM_JOB_ID}* $LOGDIR
-

@@ -18,19 +18,22 @@
 #
 
 export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|DLWRF:surface|HGT:surface'
- 
+
 if [ -z "${LMOD_VERSION}" ]; then
   source /uufs/chpc.utah.edu/sys/etc/profile.d/module.sh
 fi
 
 cd /uufs/chpc.utah.edu/common/home/skiles-group3/HRRR_CBR || exit
+#cd /uufs/chpc.utah.edu/common/home/uvu-group1/olson/snow-data/HRRR || exit
 ml wgrib2
 
 export HRRR_FC_HOURS=(1 6)
 export HRRR_DAY_HOURS=$(seq 0 23)
 
 # Western United States from Denver West
-export GRIB_AREA="-122.00:-105.00 32.00:49.00"
+#export GRIB_AREA="-122.00:-105.00 32.00:49.00"
+# previous grib area to keep in line with HRRR_CBR for operational WY 2025 runs, otherwise throws error
+export GRIB_AREA="-112.322:-105.628 35.556:43.452"
 # Job control - the defaults require to have 32 CPUs for the job
 ## Number of jobs to download in parallel
 PARALLEL_JOBS=16
