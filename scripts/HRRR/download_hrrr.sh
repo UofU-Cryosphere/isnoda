@@ -139,8 +139,8 @@ download_hrrr() {
   if [[ $? -eq 3 ]]; then
     >&2 printf "  ** Forecast hour ${FC_HOUR} not available **\n"
 
-    # Try a previous hour of the day when getting the F06 forecast
-    if [[ ${FC_HOUR} -eq 6 ]]; then
+    # Try a previous hour of the day when getting either the F01 or F06 forecast
+    if [[ ${FC_HOUR} -eq 1 ]] || [[ ${FC_HOUR} -eq 6 ]]; then
       NEW_DATE=$(date -u -d "${DATE} $(printf "%02d" $DAY_HOUR):00:00 1 hour ago" "+%Y%m%d%H")
       ALT_DATE=${NEW_DATE:0:-2}
       FILE_NAME="hrrr.t${NEW_DATE:(-2)}z.wrfsfcf0$(($FC_HOUR + 1)).grib2"
