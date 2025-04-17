@@ -15,3 +15,9 @@ wgrib2 -set_date +1hr -set_ftime "${CREATED_HOUR} hour fcst" ${SOURCE_FILE} -gri
 # Print to verify output
 echo " ** Result **"
 wgrib2 -s ${CREATED_FILE}
+
+# Clean up missing file
+find . -type f -name "${CREATED_FILE}.missing" -size 0 -delete
+
+# Remove SOURCE_FILE
+rm ${SOURCE_FILE}

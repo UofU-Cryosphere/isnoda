@@ -23,3 +23,9 @@ rm ${CREATED_FILE}_{1,2}
 # Print to verify output
 echo " ** Result **"
 wgrib2 -s ${CREATED_FILE}
+
+# Clean up missing file
+find . -type f -name "${CREATED_FILE}.missing" -size 0 -delete
+
+# Remove SOURCE_FILE
+rm ${SOURCE_FILE}
