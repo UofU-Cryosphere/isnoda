@@ -63,7 +63,9 @@ elif [ ! -e ${NET_SOLAR_DIR}/net_dswrf.MST.${LAST_DAY}.nc ]; then
     echo "*************************************************************"
     echo "Last day of WY missing for net solar merged outputs <net_HRRR_MODIS> for ${BASIN} ${WY}"
     # check for the last processed day of this water year, if it exists
-    LAST_PROCESSED_DAY=$(ls -1 ${NET_SOLAR_DIR}/net_dswrf.MST.${WY}*.nc | tail -n 1)
+    # Must be between the first and last day of the water year
+    # (i.e. 20221001 and 20230930)
+    LAST_PROCESSED_DAY=$(ls -1 ${NET_SOLAR_DIR}/net_dswrf.MST.${WY}0*.nc | tail -n 1)
     echo "Last processed day of this WY ${WY} is ${LAST_PROCESSED_DAY}"
     echo "Setting ENTRY_POINT=3"
     echo "*************************************************************"
