@@ -26,6 +26,7 @@ process_radiation=true
 process_albedo=true
 process_netsolar=true
 
+ENTRY_POINT=4
 if [ "$ENTRY_POINT" = 1 ] ; then
     process_cloudcover=false
 elif [ "$ENTRY_POINT" = 2 ] ; then
@@ -35,6 +36,11 @@ elif [ "$ENTRY_POINT" = 3 ] ; then
     process_cloudcover=false
     process_radiation=false
     process_albedo=false
+elif [ "$ENTRY_POINT" = 4 ] ; then
+    process_cloudcover=false
+    process_radiation=false
+    process_albedo=false
+    process_netsolar=false
 fi
 
 echo ; echo verbose is $verbose, realrun is $realrun ; echo
