@@ -22,4 +22,4 @@ dependencies:
 - siphon
 - utm==0.5
 - xarray<2023
-
+- setuptools>=61.0
