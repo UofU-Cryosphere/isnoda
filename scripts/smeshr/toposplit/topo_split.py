@@ -35,19 +35,19 @@ def hrrr_solar_geom(hrrr_dswrf, topo_shade):
     Calculate solar geometry for HRRR grib file and topo shade information
     """
 
-    # DID NOT WORK
+    
     # time range for solar angles
-    # time_range = [
-    #     hrrr_dswrf.timestep_for_band(10) + timedelta(hours=hour)
-    #     for hour in range(0, 24)
-    # ]
+    time_range = [
+        hrrr_dswrf.timestep_for_band(10) + timedelta(hours=hour)
+        for hour in range(0, 24)
+    ]
     # temporary
-    hour = hrrr_dswrf.timestep_for_band(10)
-    start_day = hour.strftime('%Y-%m-%d') 
-    end_day = (hour + timedelta(days=1)).strftime('%Y-%m-%d')
-    time_range = np.arange(str(start_day), str(end_day), np.timedelta64(1, 'h'), dtype='datetime64[s]')
-    time_range = [datetime.fromisoformat(str(r)) for r in time_range]
-    topo_shade.calculate(time_range)
+    # hour = hrrr_dswrf.timestep_for_band(10)
+    # start_day = hour.strftime('%Y-%m-%d') 
+    # end_day = (hour + timedelta(days=1)).strftime('%Y-%m-%d')
+    # time_range = np.arange(str(start_day), str(end_day), np.timedelta64(1, 'h'), dtype='datetime64[s]')
+    # time_range = [datetime.fromisoformat(str(r)) for r in time_range]
+    # topo_shade.calculate(time_range)
     # # # #
     # calculate
     topo_shade.calculate(time_range)
