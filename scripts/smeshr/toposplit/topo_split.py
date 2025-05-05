@@ -4,6 +4,7 @@ import os
 from datetime import datetime, timedelta
 
 import numpy as np
+import math as m
 from netCDF4 import Dataset
 from topocalc.horizon import horizon
 
@@ -33,11 +34,22 @@ def hrrr_solar_geom(hrrr_dswrf, topo_shade):
     """
     Calculate solar geometry for HRRR grib file and topo shade information
     """
+
+    # DID NOT WORK
     # time range for solar angles
-    time_range = [
-        hrrr_dswrf.timestep_for_band(10) + timedelta(hours=hour)
-        for hour in range(0, 24)
-    ]
+    # time_range = [
+    #     hrrr_dswrf.timestep_for_band(10) + timedelta(hours=hour)
+    #     for hour in range(0, 24)
+    # ]
+    # temporary
+    hour = hrrr_dswrf.timestep_for_band(10)
+    start_day = hour.strftime('%Y-%m-%d') 
+    end_day = (hour + timedelta(days=1)).strftime('%Y-%m-%d')
+    time_range = np.arange(str(start_day), str(end_day), np.timedelta64(1, 'h'), dtype='datetime64[s]')
+    time_range = [datetime.fromisoformat(str(r)) for r in time_range]
+    topo_shade.calculate(time_range)
+    # # # #
+    # calculate
     topo_shade.calculate(time_range)
 
     azimuth = {
@@ -55,9 +67,32 @@ def hrrr_solar_geom(hrrr_dswrf, topo_shade):
     # shading corrected incidence for a full day
     illumination = horizon_shader(topo_shade, zenith, incidence)
 
+    # ADD flat DSW3 model for station comparison 
+    cosZ = copy.deepcopy(illumination)
+    for key in illumination:
+        illum_val = illumination[key]
+        zen_val = zenith[key]
+    
+        if isinstance(illum_val, (int, float)):
+            # leave scalars of 0 to preserve shading, otherwise apply zenith angle
+            if illum_val != 0:
+                cosZ[key] = m.cos(m.radians(zen_val))
+            continue
+        if isinstance(illum_val, np.ndarray):
+            if illum_val.shape == (1, 1):
+                # check this section
+                if illum_val[0, 0] != 0:
+                    cosZ[key] = np.array([[zen_val]])
+            else:
+                # replace only non-zero values
+                mask = illum_val != 0
+                cosZ[key][mask] = np.cos(np.radians(zen_val))
+        else:
+            raise TypeError(f"Unexpected type for illumination[{key}]: {type(illum_val)}")
+
     del topo_shade
 
-    return azimuth, zenith, incidence, illumination
+    return azimuth, zenith, incidence, illumination, cosZ
 
 
 # for shade
@@ -87,7 +122,7 @@ def mask_sun(date, zenith, inc_angles, horizon_angles):
 
 # topographic splitting models (4 total)
 def toposplit(
-    hrrr_dswrf, zenith, incidence_angles, illumination, sky_view_factor
+    hrrr_dswrf, zenith, incidence_angles, illumination, cosZ, sky_view_factor
 ):
     """
     Topo models for HRRR
@@ -98,6 +133,7 @@ def toposplit(
         dsw1 - + illumination angle (inc)
         dsw2 - + inc + skyview (vf)
         dsw3 - + inc + vf + shading (COMPLETE)
+        dsw3h - same as above but for pyranometer comparison
 
     """
     # define hour
@@ -108,7 +144,7 @@ def toposplit(
     if zenith[hour] == 0:
         # print("** Sun is down **")
         empty = np.zeros_like(sky_view_factor)
-        return empty, empty, empty, empty, empty
+        return empty, empty, empty, empty, empty, empty
 
     # Warp once, then grab the bands
     hrrr_data = hrrr_dswrf.grib_file
@@ -166,9 +202,12 @@ def toposplit(
     dsw3 = direct_g * illumination[hour] + diffuse_g * sky_view_factor
     # print("DSW3: ", end='')
     # print(dsw3.mean().round(2))
+    
+    # New final model on flat plane for pyranometer
+    dsw3h = direct_g * cosZ[hour] + diffuse_g * sky_view_factor
 
     del hrrr_data
-    return ghi, dsw1, dsw2, dsw3, k
+    return ghi, dsw1, dsw2, dsw3, dsw3h, k
 
 
 
@@ -196,7 +235,7 @@ def toposplit_for_day(topo_file, hrrr_dir, resample_method='cubic'):
 
     # solar geometry once for day
     sample_dswrf = HrrrParameter(topo_file, hrrr_files[0])
-    _azimuth, zenith, incidence_angles, illumination = hrrr_solar_geom(
+    _azimuth, zenith, incidence_angles, illumination, cosZ = hrrr_solar_geom(
         sample_dswrf, topo_shade
     )
 
@@ -209,6 +248,7 @@ def toposplit_for_day(topo_file, hrrr_dir, resample_method='cubic'):
     dsw1_stack = np.zeros_like(ghi_stack)
     dsw2_stack = np.zeros_like(ghi_stack)
     dsw3_stack = np.zeros_like(ghi_stack)
+    dsw3h_stack = np.zeros_like(ghi_stack)
     k_stack = np.zeros_like(ghi_stack)
     time_list = []
 
@@ -220,11 +260,12 @@ def toposplit_for_day(topo_file, hrrr_dir, resample_method='cubic'):
 
             # print(f" Processing {hour.strftime('%Y-%m-%d %H:%M')}")
 
-            ghi, dsw1, dsw2, dsw3, k = toposplit(
+            ghi, dsw1, dsw2, dsw3, dsw3h, k = toposplit(
                 hrrr_dswrf,
                 zenith,
                 incidence_angles,
                 illumination,
+                cosZ,
                 sky_view_factor
             )
 
@@ -232,6 +273,7 @@ def toposplit_for_day(topo_file, hrrr_dir, resample_method='cubic'):
             dsw1_stack[i] = dsw1
             dsw2_stack[i] = dsw2
             dsw3_stack[i] = dsw3
+            dsw3h_stack[i] = dsw3h
             k_stack[i] = k
 
             # print(f"[✓]")
@@ -240,13 +282,14 @@ def toposplit_for_day(topo_file, hrrr_dir, resample_method='cubic'):
             print(f"[!] Error on {file_path}")
             raise e
 
-    return ghi_stack, dsw1_stack, dsw2_stack, dsw3_stack, k_stack, time_list
+    return ghi_stack, dsw1_stack, dsw2_stack, dsw3_stack, dsw3h_stack, k_stack, time_list
 
 def write_nc(
     ghi_stack, 
     dsw1_stack, 
     dsw2_stack, 
     dsw3_stack, 
+    dsw3h_stack,
     k_stack, 
     time_list, 
     out_path,
@@ -258,7 +301,7 @@ def write_nc(
                 timestep, outfile, counter == 0
             )
 
-        for var in ['ghi', 'dsw1', 'dsw2', 'dsw3']:
+        for var in ['ghi', 'dsw1', 'dsw2', 'dsw3', 'dsw3h']:
             var = outfile.createVariable(
                 var,
                 'f4', ('time', 'y', 'x'), 
@@ -281,6 +324,9 @@ def write_nc(
         )
         outfile['dsw3'][::] = dsw3_stack
         outfile['dsw3'].setncatts({'description': 'HRRR DSWRF - Final model'})
+
+        outfile['dsw3h'][::] = dsw3h_stack
+        outfile['dsw3h'].setncatts({'description': 'HRRR DSWRF - Final model horiz'})
 
         var = outfile.createVariable(
             'k',
