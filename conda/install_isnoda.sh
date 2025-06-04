@@ -5,8 +5,8 @@
 # The below components are installed with the latest from the master branch:
 #  - AWSM (University of Utah)
 #  - SMRF (University of Utah)
-#  - PySnobal (ARS)
-#  - TopoCalc (ARS)
+#  - PySnobal (iSnobal Community)
+#  - TopoCalc (iSnobal Community)
 #
 # Other packages are installed via the latest available version as pip package.
 # 
@@ -27,8 +27,8 @@ cd $ISNODA_HOME
 declare -a repositories=(
   "https://github.com/UofU-Cryosphere/awsm.git"
   "https://github.com/UofU-Cryosphere/smrf.git"
-  "https://github.com/USDA-ARS-NWRC/pysnobal.git"
-  "https://github.com/USDA-ARS-NWRC/topocalc.git"
+  "https://github.com/iSnobal/pysnobal.git"
+  "https://github.com/iSnobal/topocalc.git"
 )
 
 for repository in "${repositories[@]}"
