@@ -47,17 +47,3 @@ do
   pip install -v --no-deps -e .
   popd
 done
-
-#######
-# iSnobal components not available via conda package
-#######
-
-declare -a packages=(
-  "inicheck"
-  "spatialnc"
-)
-
-for package in "${packages[@]}"
-do
-  pip install ${package}
-done

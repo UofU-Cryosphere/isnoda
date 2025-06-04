@@ -22,4 +22,7 @@ dependencies:
 - siphon
 - utm==0.5
 - xarray<2023
-
+- pip
+- pip:
+    - inicheck
+    - spatialnc
