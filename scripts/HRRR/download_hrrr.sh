@@ -176,8 +176,21 @@ download_hrrr() {
   curl -s --range ${MIN_RANGE}-${MAX_RANGE} ${ARCHIVE_URL} -o $TMP_FILE | \
   wgrib2 $TMP_FILE -v0 ${GRIB_THREADS} -set_grib_type same -small_grib ${GRIB_AREA} - | \
   wgrib2 - -v0 ${GRIB_THREADS} -match "${HRRR_VARS}" -grib $FILE_NAME >&1
-
   rm $TMP_FILE
+
+  # Check if the file was downloaded successfully and is not zero size
+  check_file_existence
+
+  # Check alternate archive if file is zero size
+  if [[ $? -eq 3 ]]; then
+    printf "  File is zero size, checking alternate archive: \n"
+    check_alternate_archive
+    mkfifo $TMP_FILE
+    curl -s --range ${MIN_RANGE}-${MAX_RANGE} ${ARCHIVE_URL} -o $TMP_FILE | \
+    wgrib2 $TMP_FILE -v0 ${GRIB_THREADS} -set_grib_type same -small_grib ${GRIB_AREA} - | \
+    wgrib2 - -v0 ${GRIB_THREADS} -match "${HRRR_VARS}" -grib $FILE_NAME >&1
+    rm $TMP_FILE
+  fi
 
   if [ $? -eq 0 ]; then
     >&1 printf " created \n"
