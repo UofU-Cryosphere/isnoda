@@ -72,7 +72,13 @@ check_file_in_archive() {
 export -f check_file_in_archive
 
 check_alternate_archive() {
-    ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE $Azure_ARCHIVE)
+    # If user inputs archive, update ARCHIVES to user input
+    if [[ $1 == @($UofU_ARCHIVE|$AWS_ARCHIVE|$Google_ARCHIVE|$Azure_ARCHIVE) ]]; then
+      ARCHIVES=($1)
+     >&2 printf "  Input detected: $1"
+    else
+      ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE $Azure_ARCHIVE)
+    fi
 
     >&2 printf "  Checking alternate archive: \n"
     for ALT_ARCHIVE in "${ARCHIVES[@]}"; do
@@ -176,9 +182,35 @@ download_hrrr() {
   curl -s --range ${MIN_RANGE}-${MAX_RANGE} ${ARCHIVE_URL} -o $TMP_FILE | \
   wgrib2 $TMP_FILE -v0 ${GRIB_THREADS} -set_grib_type same -small_grib ${GRIB_AREA} - | \
   wgrib2 - -v0 ${GRIB_THREADS} -match "${HRRR_VARS}" -grib $FILE_NAME >&1
-
   rm $TMP_FILE
 
+  # Check if the file was downloaded successfully and is not zero size
+  check_file_existence
+
+  # Handle zero size file
+  if [[ $? -eq 3 ]]; then
+    >&2 printf "File is zero size, checking alternate archives...\n"
+
+    # Check alternate archives until downloaded file is no longer zero size
+    # or all archives have been checked.
+    ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE $Azure_ARCHIVE)
+    for ALT_ARCHIVE in "${ARCHIVES[@]}"; do
+      check_alternate_archive $ALT_ARCHIVE
+      mkfifo $TMP_FILE
+      if [[ $? -eq 0 ]]; then
+        curl -s --range ${MIN_RANGE}-${MAX_RANGE} ${ARCHIVE_URL} -o $TMP_FILE | \
+        wgrib2 $TMP_FILE -v0 ${GRIB_THREADS} -set_grib_type same -small_grib ${GRIB_AREA} - | \
+        wgrib2 - -v0 ${GRIB_THREADS} -match "${HRRR_VARS}" -grib $FILE_NAME >&1
+        find . -type f -name "${FILE_NAME}.missing" -size 0 -delete
+        rm $TMP_FILE
+        check_file_existence
+
+        if [[ $? -eq 3 ]] ; then
+            printf "  File is still zero size\n"
+        fi
+      fi
+    done
+  fi
   if [ $? -eq 0 ]; then
     >&1 printf " created \n"
   fi
