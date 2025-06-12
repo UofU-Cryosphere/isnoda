@@ -72,7 +72,13 @@ check_file_in_archive() {
 export -f check_file_in_archive
 
 check_alternate_archive() {
-    ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE $Azure_ARCHIVE)
+    # If user inputs archive, update ARCHIVES to user input
+    if [[ $1 == @($UofU_ARCHIVE|$AWS_ARCHIVE|$Google_ARCHIVE|$Azure_ARCHIVE) ]]; then
+      ARCHIVES=($1)
+     >&2 printf "  Input detected: $1"
+    else
+      ARCHIVES=($UofU_ARCHIVE $AWS_ARCHIVE $Google_ARCHIVE $Azure_ARCHIVE)
+    fi
 
     >&2 printf "  Checking alternate archive: \n"
     for ALT_ARCHIVE in "${ARCHIVES[@]}"; do
