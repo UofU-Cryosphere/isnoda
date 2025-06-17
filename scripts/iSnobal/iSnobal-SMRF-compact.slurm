@@ -1,27 +1,34 @@
 #!/bin/bash
 
 #SBATCH --job-name=SMRF-compact
-#SBATCH --account=notchpeak-gpu
-#SBATCH --partition=notchpeak-gpu
+#SBATCH --account=owner-gpu-guest
+#SBATCH --partition=notchpeak-gpu-guest
 
 #SBATCH --time=4:00:00
 #SBATCH --ntasks=12
 #SBATCH --mem=4G
 
 #SBATCH --mail-type=FAIL,END
-#SBATCH --mail-user=user@utah.edu
+#SBATCH --mail-user=j.michelle.hu@utah.edu
 
-#SBATCH --chdir=/path/to/scratch/
 #SBATCH --output=slurm-%j.out-%N
 #SBATCH --error=slurm-%j.err-%N
 
 export OMP_NUM_THREADS=${SLURM_NTASKS}
+# Log some items
+echo "Running $0 from $SLURM_SUBMIT_DIR"
+echo "        with SLURM_JOB_ID:  $SLURM_JOB_ID"
+echo "        with SLURM_JOB_PARTITION:  $SLURM_JOB_PARTITION"
+echo "        with SLURM_JOB_NODELIST:  $SLURM_JOB_NODELIST"
+
+module use $HOME/MyModules
+module load miniconda3/latest
+conda activate snobedo
 
 ml cdo/2.0.0
-source load_conda_env snobedo
 
 # Path to iSnobal output up to the daily outputs (e.g. runYYYYMMDD)
-SOURCE_FOLDER="/path/to/iSnobal/output/run*"
+SOURCE_FOLDER=$1
 
 compact_smrf() {
   smrf_compactor -sd ${1} --delete-originals
