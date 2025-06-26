@@ -4,12 +4,13 @@ channels:
 dependencies:
   - colorama
   - coloredlogs
+  - gdal<3.9
   - geopandas
   - netcdf4
   - numpy<1.25
   - pandas
   - pip
-  - python
+  - python=3.11
   - rioxarray
   - xarray
   - pip:
