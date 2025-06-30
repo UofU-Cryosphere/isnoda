@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
-# Script to install all required components from GitHub repositories.
-# Requires to have a fully setup and activated conda environment.
+# Script to install all required components from GitHub repositories for
+# development. Requires to have a fully setup and activated conda environment.
 #
 # The below components are installed with the latest from the master branch:
 #  - AWSM (University of Utah)
 #  - SMRF (University of Utah)
-#  - PySnobal (iSnobal Community)
-#  - TopoCalc (iSnobal Community)
 #
-# Other packages are installed via the latest available version as pip package.
-# 
 # Install location is given via the first parameter or defaults to $HOME/iSnobal
 
 set -e
@@ -27,8 +23,6 @@ cd $ISNODA_HOME
 declare -a repositories=(
   "https://github.com/UofU-Cryosphere/awsm.git"
   "https://github.com/UofU-Cryosphere/smrf.git"
-  "https://github.com/iSnobal/pysnobal.git"
-  "https://github.com/iSnobal/topocalc.git"
 )
 
 for repository in "${repositories[@]}"
