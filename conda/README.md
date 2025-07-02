@@ -1,7 +1,6 @@
 # iSnoda - Conda Install
 
-This folder contains conda environment files and a install script to create 
-an execution environment from scratch.
+This folder contains conda environment files and install scripts.
 
 ## Model execution environment
 The following steps create a new environment to execute the iSnobal model.
@@ -17,9 +16,14 @@ The following steps create a new environment to execute the iSnobal model.
   conda activate isnoda
 ```
 
+All done!
+
+## Development environment
+Set up a conda environment with the steps shown above.
+
 ### Run the install script
 ```
-  ./install_isnoda.sh
+  ./install_isnoda_development.sh
 ```
 The script takes a user-defined install location as the first argument. The
 default location is: `$HOME/iSnobal` if none is provided.
@@ -30,5 +34,5 @@ Separate setup to run [basin_setup](https://github.com/USDA-ARS-NWRC/basin_setup
 to prepare a model domain.
 
 ### IPW
-Experimental setup for the old 1-D version of Snobal
-
+Experimental setup for the old 1-D version of Snobal. No support can be provided
+for this.
