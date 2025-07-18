@@ -224,7 +224,7 @@ export -f download_hrrr
 # Parse the given user inputs
 if [[ ! -z $2 ]] && [[ $2 != @($UofU_ARCHIVE|$AWS_ARCHIVE|$Google_ARCHIVE) ]]; then
   export YEAR=$1
-  export MONTH=$2
+  export MONTH=$(printf "%02d" "$2")
   export LAST_DAY=$(date -d "${MONTH}/01/${YEAR} + 1 month - 1 day" +%d)
 
   export DATES=($(seq -f "${YEAR}${MONTH}%02g" 1 $LAST_DAY))
