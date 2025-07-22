@@ -9,7 +9,6 @@ The following steps create a new environment to execute the iSnobal model.
 ```
   conda env create -f environment.yml
 ```
-**NOTE**: Use the `environment_Mac_OSX.yml` if you are running on Mac OS X.
 
 ### Activate the environment
 ```
