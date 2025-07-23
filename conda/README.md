@@ -9,7 +9,6 @@ The following steps create a new environment to execute the iSnobal model.
 ```
   conda env create -f environment.yml
 ```
-**NOTE**: Use the `environment_Mac_OSX.yml` if you are running on Mac OS X.
 
 ### Activate the environment
 ```
@@ -27,6 +26,25 @@ Set up a conda environment with the steps shown above.
 ```
 The script takes a user-defined install location as the first argument. The
 default location is: `$HOME/iSnobal` if none is provided.
+
+### Releasing a new model version
+Updating the [conda environment.yaml](environment.yaml) to use a newer version
+of AWSM requires [creating a new release](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository#creating-a-release) 
+on the [AWSM GitHub repository](https://github.com/UofU-Cryosphere/awsm). AWSM
+only depends on SMRF and any updates to the latter should be completed first
+before creating a new referenced release from AWSM to SMRF.
+
+All other model dependencies (i.e., pySnobal, TopoCalc) are managed within
+[SMRF](https://github.com/UofU-Cryosphere/smrf). New releases of these dependencies
+should be handled there.
+
+Once the release is published, update the `- pip:` section in the environment YAML
+that points to the GitHub URL. The URL has the form of:  
+```
+    - git+https://github.com/UofU-Cryosphere/awsm.git@_RELEASE_TAG_
+```
+The `_RELEASE_TAG_` is a placeholder in this case and should be replaced with
+the actual release name.
 
 ## Other environments
 ### Basin Setup
