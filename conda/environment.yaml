@@ -26,4 +26,4 @@ dependencies:
 - pip:
     - inicheck
     - spatialnc
-    - git+https://github.com/UofU-Cryosphere/awsm.git@20250630
+    - git+https://github.com/UofU-Cryosphere/awsm.git@20250722
