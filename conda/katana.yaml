@@ -1,0 +1,14 @@
+name: katana
+channels:
+  - conda-forge
+dependencies:
+  - dateparser==0.7.2
+  - numpy<2
+  - python=3.9
+  - pytz
+  - regex=2021
+  - wgrib2
+  - pip:
+    - coloredlogs==15.0.1
+    - inicheck==0.9.1
+    - utm==0.4.0
