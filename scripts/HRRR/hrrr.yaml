@@ -1,0 +1,7 @@
+name: hrrr
+channels:
+  - conda-forge
+dependencies:
+  - parallel
+  - wget
+  - wgrib2
