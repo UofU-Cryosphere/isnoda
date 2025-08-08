@@ -1,9 +1,19 @@
-# HRRR scripts
+# HRRR
 
-## `check_bad_gribs.sh`
+## Conda envrionment
+Use the supplied [hrrr.yaml](hrrr.yaml) to create a conda environment that
+has the required software packages installed.
+
+Command to create the environment:
+```bash
+conda env create -f hrrr.yaml
+```
+
+## Scripts
+### `check_bad_gribs.sh`
 Quick check of GRIB files if they are readable with GDAL.
 
-## `download_hrrr.sh`
+### `download_hrrr.sh`
 Utility to download HRRR files from different available source.
 
 ## `grib2` command cheat sheet
