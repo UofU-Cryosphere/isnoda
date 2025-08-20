@@ -18,7 +18,7 @@
 #
 set -e
 
-export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|DLWRF:surface|HGT:surface'
+export HRRR_VARS='TMP:2 m|RH:2 m|DPT: 2 m|UGRD:10 m|VGRD:10 m|TCDC:|APCP:surface|DSWRF:surface|DLWRF:surface|VBDSF:surface|VDDSF:surface|HGT:surface'
 export HRRR_FC_HOURS=(1 6)
 export HRRR_DAY_HOURS=$(seq 0 23)
 
