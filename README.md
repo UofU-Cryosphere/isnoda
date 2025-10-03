@@ -1,18 +1,4 @@
 # iSnoda
-iSnobal installation in a local conda environment that allows for editing of:
-* [AWSM](https://github.com/UofU-Cryosphere/awsm)
-* [SMRF](https://github.com/UofU-Cryosphere/smrf)
-* [PySnobal](https://github.com/USDA-ARS-NWRC/pysnobal)
-* [TopoCalc](https://github.com/USDA-ARS-NWRC/topocalc)
-
-## Conda
-Contains `environment.yml` file and de/activation scripts to setup required
-env variables. Also has an install script to download the above components
-(plus their dependencies) and adds them to the environment in editable mode.
-
-## Config
-
-Backup of configuration files.
 
 ## Notebooks
 
@@ -29,12 +15,6 @@ Helper scripts to download or prepare data and execute the model components.
 ## Snobal 1D
 
 Example on how to run the one dimensional implementation of Snobal.
-
-## Development
-
-Any updates to the conda installation needs to be done on a branch with
-a `conda-` prefix. This will trigger a build on Travis and verifies integrity
-of changes.
 
 # Publications
 This work was developed as part of two publications:
